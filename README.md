@@ -1,12 +1,32 @@
 # 抗炎厨房 · Anti-Inflammatory Kitchen
 
-一个给 Claude 用的 skill：把抗炎饮食（地中海底盘）变成每天能执行的厨房助手——管冰箱、出菜谱、算缺口、做周复盘。
+以**地中海饮食**为底盘、以**抗炎**为目标的 Claude skill。它把「每天吃到哪些抗炎食物、每周吃够几次」拆成一套可计算的目标——每日必有 8 类、每周达标 6 项——再从你的冰箱出发，帮你一顿一顿把这些目标吃到位。
 
-> **English summary** — A Claude Agent Skill (Chinese-language) that turns an anti-inflammatory, Mediterranean-style diet into a daily kitchen routine: fridge inventory from chat / grocery screenshots / food photos, recipe suggestions driven by what's in the fridge and what's missing this week, and a deterministic weekly review. No calorie counting, no weighing, no streaks. Install the `kitchen/` folder as a skill in Claude (claude.ai, Claude Desktop / Cowork, or Claude Code).
+> **English summary** — A Claude Agent Skill (Chinese-language) built on the Mediterranean diet as an anti-inflammatory eating pattern. It turns the diet into concrete, countable targets — 8 food groups every day, 6 food groups a set number of times per week — and helps you hit them from what's actually in your fridge: inventory from chat / grocery screenshots / food photos, recipes ranked by today's and this week's gaps, and a deterministic weekly review. No calorie counting, no weighing, no streaks. Install the `kitchen/` folder as a skill in Claude (claude.ai, Claude Desktop / Cowork, or Claude Code).
+
+## 背后的方法：把地中海抗炎饮食变成每日目标
+
+地中海饮食是抗炎方面证据最充分的膳食模式之一。这个 skill 没有把它停留在「多吃鱼、多吃菜、用橄榄油」的原则上，而是落成一张有频次的清单，并区分两种节奏：
+
+- **每日必有（8 类）**：作用来得快、去得也快的东西必须天天吃。多酚（橄榄油、茶、浆果）半衰期只有几小时，断一天就断了；每天约 50ml 橄榄油、30g 坚果直接取自 PREDIMED 试验的协议；发酵食品、全谷主食也是按剂量天天吃才见效。
+- **每周达标（6 项）**：效应以周累积的东西按次数算。深海鱼的 omega-3、红橙色蔬果的类胡萝卜素、十字花科、豆类、菌菇、黑巧可可——一天补不完，也不需要天天有。
+
+| 分组 | 类别 | 目标 |
+|---|---|---|
+| 每日必有（8） | 优质脂肪、坚果种子、发酵食品、深色绿叶菜、全谷主食、浆果柑橘、茶饮、香辛料 | 每天各 ≥1 份 |
+| 每周达标（6） | 高脂深海鱼 3、豆类与豆制品 5（≥3 次整豆）、十字花科 4、红橙色蔬果 5、菌菇 3、黑巧可可 2 | 次/周 |
+| 其他优质蛋白（4） | 蛋 ≤5、白肉鱼海鲜、禽肉、红肉 ≤2 | 只计次 |
+| 中性食物（1） | 海藻、普通蔬果、奶、奶酪、干果、其他淀粉、猪肉、蜂蜜 | 不计分 |
+
+同时记录致炎的限制项（加工肉、含糖饮料、超加工食品、油炸、精制碳水为主的一餐、酒精等），只报次数，不评判。
+
+计数规则：一道菜可以同时命中多个类别（小白菜 = 深色绿叶菜 + 十字花科，中式蔬菜天然占优），但同一餐里同一类别只计一次。每周 6 项合计约 20 个菜位，一周正餐约 28 个菜位，目标是吃得下的，还留得出蛋、禽肉、红肉和外食的位置。
+
+证据强度如实说：有人体炎症指标 RCT 直接支持的是橄榄油、坚果、发酵食品、深海鱼四样，加上地中海模式整体；其余频次是从流行病学、机制和膳食模式推出来的操作性约定，不是临床阈值。完整口径与依据见 [`kitchen/references/food-table.md`](kitchen/references/food-table.md)。
 
 ## 它做什么
 
-八件事，一次只做你要的那一件：
+八件事，围绕上面的目标，一次只做你要的那一件：
 
 1. **更新冰箱** —— 对话、超市订单截图、食物照片都行，归到固定的 19 个类别
 2. **记住常用菜谱** —— 「这个存下来，以后叫它周三鱼汤」
@@ -16,19 +36,6 @@
 6. **补货建议** —— 只列缺口对应、冰箱里又没有的
 7. **清库菜谱** —— 围绕最快坏的两三样出菜
 8. **一周复盘** —— 先用脚本算数，再给三个能直接执行的下周动作
-
-## 抗炎清单（v5 · 19 类）
-
-| 分组 | 类别 | 目标 |
-|---|---|---|
-| 每日必有（8） | 优质脂肪、坚果种子、发酵食品、深色绿叶菜、全谷主食、浆果柑橘、茶饮、香辛料 | 每天各 ≥1 份 |
-| 每周达标（6） | 高脂深海鱼 3、豆类与豆制品 5（≥3 次整豆）、十字花科 4、红橙色蔬果 5、菌菇 3、黑巧可可 2 | 次/周 |
-| 其他优质蛋白（4） | 蛋 ≤5、白肉鱼海鲜、禽肉、红肉 ≤2 | 只计次 |
-| 中性食物（1） | 海藻、普通蔬果、奶、奶酪、干果、其他淀粉、猪肉、蜂蜜 | 不计分 |
-
-计数规则：一道菜可以同时命中多个类别（小白菜 = 深色绿叶菜 + 十字花科），但同一餐里同一类别只计一次。
-
-完整口径见 [`kitchen/references/food-table.md`](kitchen/references/food-table.md)。
 
 ## 设计原则
 
