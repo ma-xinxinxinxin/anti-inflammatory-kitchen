@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.DS_Store
+# 个人状态文件不要提交
+/kitchen-fridge.md
+/kitchen-log.md
+/kitchen-recipes.md
