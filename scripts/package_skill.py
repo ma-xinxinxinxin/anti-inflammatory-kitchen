@@ -2,16 +2,18 @@
 """Build reproducible native-skill and single-file chat distributions."""
 import argparse
 import io
+import json
 from pathlib import Path
 import re
 from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
 
 ROOT = Path(__file__).resolve().parents[1]
+PLUGIN = ROOT / 'plugins/anti-inflammatory-kitchen'
 # Explicit allowlist: caches, personal state and accidental files never ship.
 SKILL_FILES = (
     'SKILL.md', 'agents/openai.yaml', 'scripts/kitchen.py',
     'references/food-table.md', 'references/recipe-rules.md',
-    'references/state-files.md', 'references/visuals.md',
+    'references/state-files.md', 'references/visuals.md', 'references/nutrition-plan.md',
 )
 
 
@@ -26,14 +28,18 @@ def skill_files():
 
 
 def archive_bytes():
+    return zip_bytes({'kitchen/' + name: source.read_bytes() for name, source in skill_files()})
+
+
+def zip_bytes(files):
     data = io.BytesIO()
     with ZipFile(data, 'w', ZIP_DEFLATED) as archive:
-        for name, source in sorted(skill_files()):
-            entry = ZipInfo('kitchen/' + name, (2026, 1, 1, 0, 0, 0))
+        for name, content in sorted(files.items()):
+            entry = ZipInfo(name, (2026, 1, 1, 0, 0, 0))
             entry.compress_type = ZIP_DEFLATED
             entry.create_system = 3
             entry.external_attr = 0o644 << 16
-            archive.writestr(entry, source.read_bytes())
+            archive.writestr(entry, content)
     return data.getvalue()
 
 
@@ -46,7 +52,7 @@ def package(destination=None):
 
 def chat_guide():
     sections = [('SKILL.md', 'workflow'), ('references/food-table.md', 'food-table'),
-                ('references/state-files.md', 'state-files'),
+                ('references/state-files.md', 'state-files'), ('references/nutrition-plan.md', 'nutrition-plan'),
                 ('references/recipe-rules.md', 'recipe-rules'),
                 ('references/visuals.md', 'visuals')]
     preface = '''# 抗炎厨房 / Anti-Inflammatory Kitchen · Chat guide
@@ -81,12 +87,36 @@ When using this single file: use the embedded references, calculate manually and
             content = re.sub(r'\A---\n.*?\n---\n', '', content, count=1, flags=re.S)
         for target, link in targets.items():
             content = content.replace('](' + target + ')', '](#' + link + ')')
+            if name.startswith('references/') and target.startswith('references/'):
+                content = content.replace('](' + target.removeprefix('references/') + ')', '](#' + link + ')')
         out.extend([f'\n---\n\n<a id="{anchor}"></a>\n\n', content, '\n'])
     return ''.join(out).encode('utf-8')
 
 
+def plugin_files():
+    """One skill source, with small manifests for each supported plugin host."""
+    manifest = json.loads((PLUGIN / '.codex-plugin/plugin.json').read_text(encoding='utf-8'))
+    common = {key: manifest[key] for key in
+              ('name', 'version', 'description', 'author', 'homepage', 'repository', 'license', 'keywords')}
+    portable = {'$schema': 'https://agent-plugins.org/schemas/1.0.0/plugin.schema.json', **common,
+                'extensions': {'com.openai': {'interface': manifest['interface']}}}
+    as_json = lambda value: (json.dumps(value, ensure_ascii=False, indent=2) + '\n').encode('utf-8')
+    files = {
+        'plugin.json': as_json(portable),
+        '.codex-plugin/plugin.json': as_json(manifest),
+        '.claude-plugin/plugin.json': as_json(common),
+        '.cursor-plugin/plugin.json': as_json(common),
+        'README.md': (ROOT / 'docs/plugin-readme.md').read_bytes(),
+        'gemini-extension.json': as_json({key: common[key] for key in ('name', 'version', 'description')}),
+        'LICENSE': (ROOT / 'LICENSE').read_bytes(),
+    }
+    files.update({'skills/kitchen/' + name: source.read_bytes() for name, source in skill_files()})
+    return files
+
+
 def distributions():
-    return {'kitchen.zip': archive_bytes(), 'kitchen-chat-guide.md': chat_guide()}
+    return {'kitchen.zip': archive_bytes(), 'kitchen-chat-guide.md': chat_guide(),
+            'anti-inflammatory-kitchen-plugin.zip': zip_bytes(plugin_files())}
 
 
 def main():
@@ -102,8 +132,19 @@ def main():
                  or (ROOT / 'downloads' / name).read_bytes() != content]
         if stale:
             parser.error('Stale downloads: ' + ', '.join(stale) + '; run python3 scripts/package_skill.py --publish')
+        files = plugin_files()
+        expected = set(files)
+        actual = {path.relative_to(PLUGIN).as_posix() for path in PLUGIN.rglob('*') if path.is_file()
+                  and '__pycache__' not in path.parts and path.name != '.DS_Store'}
+        if actual != expected or any((PLUGIN / name).read_bytes() != content for name, content in files.items()):
+            parser.error('Plugin tree differs from sources; rebuild with --publish and remove unexpected files')
         print('Download artifacts match skill sources.')
     else:
+        if args.publish:
+            for name, content in plugin_files().items():
+                output = PLUGIN / name
+                output.parent.mkdir(parents=True, exist_ok=True)
+                output.write_bytes(content)
         directory = ROOT / ('downloads' if args.publish else 'dist')
         directory.mkdir(parents=True, exist_ok=True)
         for name, content in distributions().items():

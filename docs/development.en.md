@@ -30,7 +30,9 @@ Incomplete logs show the actual number of recorded days. Unknown ingredients app
 | `kitchen/scripts/kitchen.py` | Inventory tables, counts, daily and weekly cards |
 | `scripts/install_skill.py` | Tool-specific destinations and upgrade backups |
 | `scripts/package_skill.py` | Generate distributions from the same sources |
-| `downloads/` | Ready-to-download ZIP and single-file chat guide |
+| `downloads/` | Ready-to-download skill ZIP, plugin ZIP, and chat guide |
+| `plugins/anti-inflammatory-kitchen/` | Shared plugin; `.codex-plugin/plugin.json` is metadata source, other formats and skill copies are generated |
+| `.agents/plugins/`, `.claude-plugin/`, `.cursor-plugin/` | Host-specific repository marketplaces |
 | `examples/`, `tests/` | Fictional examples and regression checks |
 | `.kitchen-state/` | Private user state, ignored by Git and excluded from packages |
 
@@ -47,3 +49,5 @@ Default packaging writes to `dist/`. `--publish` only rebuilds the repository's 
 CI checks Linux (Python 3.10 and 3.13) and Windows (Python 3.13). These checks validate files and scripts, not installation inside every AI product, phone, or account. See [manual acceptance scenarios](installation.en.md#verify).
 
 See the [contribution guide](../CONTRIBUTING.md) for change conventions and behavioral checks. Never use personal inventory, chat exports, or health records as public test fixtures.
+
+`kitchen/` remains the single skill source. Rebuild with `--publish` after changing rules. Renaming a plugin also requires updating all marketplaces. `--check` validates both downloads and the plugin tree. See [verification records](verification.md) for installation and mobile testing scope.

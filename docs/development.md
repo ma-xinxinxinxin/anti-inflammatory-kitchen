@@ -30,7 +30,9 @@ python3 kitchen/scripts/kitchen.py schema
 | `kitchen/scripts/kitchen.py` | 库存表、计数、日卡与周卡 |
 | `scripts/install_skill.py` | 按工具选择路径；升级前备份 |
 | `scripts/package_skill.py` | 从同一套源文件生成发行文件 |
-| `downloads/` | 用户直接下载的 ZIP 与单文件聊天指南 |
+| `downloads/` | 用户直接下载的 skill ZIP、插件 ZIP 与单文件聊天指南 |
+| `plugins/anti-inflammatory-kitchen/` | 共用插件包；`.codex-plugin/plugin.json` 为元数据源，其他格式及 skill 副本由构建生成 |
+| `.agents/plugins/`、`.claude-plugin/`、`.cursor-plugin/` | 各平台仓库插件目录 |
 | `examples/`、`tests/` | 虚构演示与回归检查 |
 | `.kitchen-state/` | 用户私人状态，忽略提交，不参与打包 |
 
@@ -47,3 +49,5 @@ python3 scripts/package_skill.py --check
 CI 检查 Linux（Python 3.10、3.13）和 Windows（Python 3.13）。这些检查验证文件与脚本，不替代真实 AI 产品、手机和账号的安装验收；手动场景见[安装验收](installation.md#verify)。
 
 改动约定和手动行为检查见[贡献指南](../CONTRIBUTING.md)。不要把个人库存、聊天导出或健康资料用于公开测试。
+
+插件 skill 源文件仍只有 `kitchen/` 一份。改规则后运行 `--publish` 同步插件副本；修改插件名称需同时更新各平台 marketplace。`--check` 同时检查下载包与插件目录。实际安装与手机验收范围见[验证记录](verification.md)。
