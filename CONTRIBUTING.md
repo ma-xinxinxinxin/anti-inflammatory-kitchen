@@ -6,12 +6,16 @@
 
 ```bash
 python3 -m unittest discover -s tests -v
-python3 scripts/package_skill.py
+python3 scripts/package_skill.py --publish
+python3 scripts/package_skill.py --check
 ```
 
-脚本仅使用 Python 标准库。测试覆盖计数规则、库存状态读取、缺失记录、输入错误、HTML 转义和安装包内容。打包结果在被忽略的 `dist/`，只包含 skill。
+脚本仅使用 Python 标准库。测试覆盖计数规则、库存状态读取、缺失记录、输入错误、HTML 转义和安装包内容。默认打包结果在被忽略的 `dist/`；`--publish` 生成需一起提交的 `downloads/`，包括原生 ZIP 与单文件对话指南。安装器还验证路径、升级备份与私人状态隔离。
 
 ## 修改约定
+
+- 首页与安装文档保持中英文内容对应；能力声明附平台官方说明，明确区分文件级测试与产品实测。
+- 修改 skill 后重建 `downloads/`，不手工编辑生成的聊天指南。
 
 - 19 类名称和每日 8 / 每周 6 的结构保持一致；修改时同步 `kitchen/SKILL.md`、食材表、脚本、示例和测试。
 - 加食材别名时同时检查容易误归类的词，例如燕麦与燕麦奶、杏仁与杏仁奶。未知词不能默认为已正确识别。
