@@ -4,13 +4,71 @@
 
 Choose one path for your actual tool. Do not install duplicate copies of `kitchen` in the same agent. Rules and scripts are portable; private records are not migrated with them. Platform documentation was checked on 2026-10-04; account permissions and versions can change the available controls.
 
+<a id="plugins"></a>
+## Plugin installation: one workflow, multiple host formats
+
+[Download anti-inflammatory-kitchen-plugin.zip](../downloads/anti-inflammatory-kitchen-plugin.zip). It includes Agent Plugins, Codex/Claude Code/Cursor compatibility manifests, a Gemini CLI extension manifest, and the complete `skills/kitchen/` workflow. Choose either the plugin or standalone skill; back up old installations before switching to avoid duplicates.
+
+### Claude Code
+
+Run in your terminal after this repository version is merged into main:
+
+```bash
+claude plugin marketplace add ma-xinxinxinxin/anti-inflammatory-kitchen
+claude plugin install anti-inflammatory-kitchen@kitchen-plugins
+```
+
+For a downloaded repository, run `claude plugin marketplace add .` from its root, then the same install command. In a new session, use `/anti-inflammatory-kitchen:kitchen` or ask to use Kitchen. This installs a Claude Code plugin. Claude web/mobile personal Skills use the separate `kitchen.zip` described below.
+
+### Codex / local desktop environment
+
+Download and extract the repository, then run from its root:
+
+```bash
+codex plugin marketplace add .
+codex plugin add anti-inflammatory-kitchen@kitchen-plugins
+```
+
+You can replace `.` with `ma-xinxinxinxin/anti-inflammatory-kitchen` to add the remote repository. Start a new session with the plugin enabled and ask for its version. Local installation does not publish it to ChatGPT cloud/mobile.
+
+### Gemini CLI extension
+
+From the downloaded repository root:
+
+```bash
+gemini extensions install ./plugins/anti-inflammatory-kitchen
+```
+
+Alternatively, extract the plugin ZIP into a folder named `anti-inflammatory-kitchen` and pass that folder to `gemini extensions install`. Restart Gemini CLI and check `gemini extensions list` and `/skills list`. The repository root is not the extension root: keep the subdirectory in the command. This command does not apply to the Gemini mobile app.
+
+### Cursor and other Agent Plugins hosts
+
+The package's root `plugin.json` and `skills/` follow Agent Plugins. A Cursor manifest and repository marketplace are also provided. Cursor officially supports the format, but this project is not yet listed in Cursor Marketplace. A directory install link will be available only after publication. For now, use `--tool cursor` below to install the complete standalone skill. Other hosts can import the plugin only if they explicitly support this standard; follow their documented controls.
+
+Sources: [OpenAI packaging](https://developers.openai.com/plugins/build/plugins), [Claude Code marketplaces](https://code.claude.com/docs/en/plugin-marketplaces), [Cursor formats](https://cursor.com/docs/reference/plugins), [Gemini extensions](https://geminicli.com/docs/extensions/reference/).
+
+<a id="chatgpt-plugin"></a>
+## Native ChatGPT plugin and mobile publishing
+
+**Status: package built; not submitted or listed in the public ChatGPT directory; mobile not yet tested.** The ZIP includes the complete skill. This version does not require an MCP deployment.
+
+For the publisher:
+
+1. Download the plugin ZIP above. Do not upload the standalone `kitchen.zip` or entire repository ZIP as a plugin.
+2. In [OpenAI Plugins](https://platform.openai.com/plugins), select the owning organization/project and verified developer identity. Choose **Upload new or existing plugin → Upload plugin**.
+3. Review automated findings under Metadata & Skills; fix and re-upload as required. Enable the plugin in an available test environment and run the [acceptance scenarios](#verify).
+4. Submit for review and publish after approval. Add the actual installation link here once published; there is no public one-click installation link yet.
+5. On mobile, sign into an account with access and invoke the plugin in a new chat. Check input, direct meal suggestions, recipes, stock updates, and state after reopening. Do not claim mobile installation is complete before distribution and device checks succeed.
+
+Package compatibility, account installation, public listing, and private state synchronization are separate steps. The plugin uses storage supplied by its host; it does not include a cross-platform cloud database. Identity and publishing requirements follow [OpenAI's submission process](https://developers.openai.com/plugins/deploy/submission).
+
 <a id="claude-upload"></a>
 ## Claude: upload the skill ZIP
 
 1. [Download kitchen.zip](../downloads/kitchen.zip) using GitHub's download button. No local Python setup is needed.
 2. Enable Code execution and file creation in Settings → Capabilities as permitted by your account.
 3. Open **Customize → Skills → + → Create skill → Upload a skill**, upload the ZIP, and enable it.
-4. Start a new chat and ask for the Kitchen version and category count: v5.2 and 19.
+4. Start a new chat and ask for the Kitchen version and category count: v5.3 and 19.
 
 Use the controls actually available to your account. The ZIP contains `kitchen/SKILL.md`, references, and the helper. Attaching it to an ordinary conversation is not a Skills installation. Mobile discovery and invocation still require testing on that account; this project does not claim identical behavior across all clients.
 
@@ -88,12 +146,12 @@ This is a generic route to try in ChatGPT, Gemini, Kimi, DeepSeek, or another ch
    Wait for my ingredients; do not suggest recipes yet.
    ```
 
-4. Confirm the assistant identifies **v5.2, 8 daily categories, 6 weekly categories, and 19 total categories** before you begin.
+4. Confirm the assistant identifies **v5.3, 8 daily categories, 6 weekly categories, and 19 total categories** before you begin.
 5. Before switching chats, export inventory, saved recipes, and meal records. Bring those snapshots and the guide into the next chat. Visible chat history is not proof that structured state is synchronized.
 
-The single file embeds the workflow, food table, state rules, recipe rules, and visual guidance. **It does not include the Python helper.** Manual calculation and Markdown tables are the default fallback. If the host cannot read the complete file, the import is not complete; do not treat it as an installed skill.
+The single file embeds the workflow, nutrition plan, food table, state rules, recipe rules, and visual guidance. **It does not include the Python helper.** Manual calculation and Markdown tables are the default fallback. If the host cannot read the complete file, the import is not complete; do not treat it as an installed skill.
 
-**Native ChatGPT plugin: not published.** A Plugins menu does not mean Kitchen is listed. The skill ZIP is not a published plugin package, and local Codex installation does not synchronize to a cloud account. Native mobile distribution needs a separate supported plugin/workspace publishing and verification process. See [OpenAI skills](https://learn.chatgpt.com/docs/build-skills) and [plugin submission](https://developers.openai.com/plugins/deploy/submission).
+**Native ChatGPT plugin: not published.** A Plugins menu does not mean Kitchen is listed. The standalone skill ZIP is not a plugin package; use the plugin ZIP above, and local Codex installation does not synchronize to a cloud account. Native mobile distribution needs a separate supported plugin/workspace publishing and verification process. See [OpenAI skills](https://learn.chatgpt.com/docs/build-skills) and [plugin submission](https://developers.openai.com/plugins/deploy/submission).
 
 <a id="verify"></a>
 ## Verify your installation
@@ -102,10 +160,10 @@ Start with fictional data:
 
 | Prompt | Expected observation |
 |---|---|
-| “Which version and how many categories?” | v5.2; 8 daily, 6 weekly, 4 other proteins, 1 neutral |
+| “Which version and how many categories?” | v5.3; 8 daily, 6 weekly, 4 other proteins, 1 neutral |
 | “I have spinach.” | Acknowledge this batch without unsolicited recipes |
 | “Also tofu and salmon. That's everything; show inventory.” | All 19 rows, including empty categories |
-| “Plan dinner with these, but I haven't eaten it.” | Recipe candidates; no actual-consumption log or assumption that pantry items are finished |
+| “Plan dinner with these, but I haven't eaten it.” | One meal recommendation; no actual-consumption log or assumption that pantry items are finished |
 | “I ate bok choy and tofu. What could I add today and this week?” | Both daily and weekly coverage; bok choy can cover leafy greens and cruciferous vegetables |
 | Read inventory in a new chat | Restore only if persistent storage was confirmed; otherwise ask for the snapshot |
 

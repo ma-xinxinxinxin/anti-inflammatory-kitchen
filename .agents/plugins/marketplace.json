@@ -1,0 +1,20 @@
+{
+  "name": "kitchen-plugins",
+  "interface": {
+    "displayName": "Kitchen Plugins"
+  },
+  "plugins": [
+    {
+      "name": "anti-inflammatory-kitchen",
+      "source": {
+        "source": "local",
+        "path": "./plugins/anti-inflammatory-kitchen"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

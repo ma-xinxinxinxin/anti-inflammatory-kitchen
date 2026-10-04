@@ -1,0 +1,19 @@
+{
+  "name": "anti-inflammatory-kitchen",
+  "version": "5.3.0",
+  "description": "Anti-inflammatory meal planning from your latest kitchen inventory: what to eat, how to cook, and what to buy.",
+  "author": {
+    "name": "ma-xinxinxinxin",
+    "url": "https://github.com/ma-xinxinxinxin"
+  },
+  "homepage": "https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen",
+  "repository": "https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen",
+  "license": "MIT",
+  "keywords": [
+    "kitchen",
+    "meal-planning",
+    "anti-inflammatory",
+    "nutrition",
+    "inventory"
+  ]
+}

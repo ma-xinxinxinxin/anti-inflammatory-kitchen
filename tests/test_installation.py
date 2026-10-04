@@ -1,5 +1,6 @@
 """New-user installation and distribution acceptance tests, using isolated homes."""
 import io
+import json
 import os
 from pathlib import Path
 import re
@@ -64,7 +65,7 @@ class InstallationTests(unittest.TestCase):
         result = installer.install(target, update=True)
         self.assertEqual((Path(result['backup']) / 'SKILL.md').read_text(), 'old rules')
         self.assertFalse((self.home / '.agents').exists())
-        self.assertIn('v5.2', (legacy / 'SKILL.md').read_text(encoding='utf-8'))
+        self.assertIn('v5.3', (legacy / 'SKILL.md').read_text(encoding='utf-8'))
 
     def test_duplicate_codex_locations_require_resolution(self):
         for folder in ['.codex', '.agents']:
@@ -116,9 +117,49 @@ class InstallationTests(unittest.TestCase):
 
 
 class DistributionTests(unittest.TestCase):
+    def test_plugin_hosts_share_identity_and_complete_skill(self):
+        files = builder.plugin_files()
+        for name in ['plugin.json', '.codex-plugin/plugin.json', '.claude-plugin/plugin.json',
+                     '.cursor-plugin/plugin.json', 'gemini-extension.json']:
+            manifest = json.loads(files[name])
+            self.assertEqual(manifest['name'], 'anti-inflammatory-kitchen')
+            self.assertEqual(manifest['version'], '5.3.0')
+        portable = json.loads(files['plugin.json'])
+        self.assertEqual(portable['$schema'], 'https://agent-plugins.org/schemas/1.0.0/plugin.schema.json')
+        for name, source in builder.skill_files():
+            self.assertEqual(files['skills/kitchen/' + name], source.read_bytes())
+        self.assertFalse(any('kitchen-fridge' in name or '.local/' in name for name in files))
+
+    def test_each_marketplace_resolves_to_the_real_plugin(self):
+        for name in ['.agents/plugins/marketplace.json', '.claude-plugin/marketplace.json',
+                     '.cursor-plugin/marketplace.json']:
+            catalog = json.loads((ROOT / name).read_text(encoding='utf-8'))
+            entry = catalog['plugins'][0]
+            source = entry['source']
+            path = source['path'] if isinstance(source, dict) else source
+            manifest = json.loads((ROOT / path / 'plugin.json').read_text(encoding='utf-8'))
+            self.assertEqual(entry['name'], manifest['name'])
+            self.assertTrue((ROOT / path / 'skills/kitchen/SKILL.md').is_file())
+
+    def test_plugin_zip_runs_without_repository(self):
+        data = builder.distributions()['anti-inflammatory-kitchen-plugin.zip']
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder) / 'anti-inflammatory-kitchen'
+            with ZipFile(io.BytesIO(data)) as archive:
+                self.assertIn('plugin.json', archive.namelist())
+                self.assertIn('gemini-extension.json', archive.namelist())
+                self.assertEqual(set(archive.namelist()), set(builder.plugin_files()))
+                archive.extractall(target)
+            result = subprocess.run([sys.executable, str(target / 'skills/kitchen/scripts/kitchen.py'),
+                                     'fridge', '--items', '菠菜, 豆腐'], cwd=folder,
+                                    capture_output=True, encoding='utf-8', env={**os.environ, 'PYTHONUTF8': '1'})
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn('菠菜', result.stdout)
+            self.assertTrue((target / 'skills/kitchen/references/nutrition-plan.md').is_file())
+
     def test_zip_extracts_to_complete_installable_skill(self):
         with ZipFile(io.BytesIO(builder.archive_bytes())) as archive:
-            self.assertEqual(len(archive.namelist()), 7)
+            self.assertEqual(len(archive.namelist()), 8)
             self.assertEqual(archive.read('kitchen/SKILL.md'), (ROOT / 'kitchen/SKILL.md').read_bytes())
             with tempfile.TemporaryDirectory() as folder:
                 archive.extractall(folder)
@@ -139,7 +180,7 @@ class DistributionTests(unittest.TestCase):
 
     def test_chat_guide_is_self_contained_for_references(self):
         guide = builder.chat_guide().decode('utf-8')
-        self.assertIn('v5.2', guide)
+        self.assertIn('v5.3', guide)
         self.assertNotRegex(guide, r'\]\(references/')
         for anchor in ['workflow', 'food-table', 'state-files', 'recipe-rules', 'visuals']:
             self.assertIn(f'<a id="{anchor}"></a>', guide)
