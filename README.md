@@ -1,82 +1,109 @@
 # 抗炎厨房 · Anti-Inflammatory Kitchen
 
-以**地中海饮食**为底盘、以**抗炎**为目标的 Claude skill。它把「每天吃到哪些抗炎食物、每周吃够几次」拆成一套可计算的目标——每日必有 8 类、每周达标 6 项——再从你的冰箱出发，帮你一顿一顿把这些目标吃到位。
+**从冰箱里有什么，到今天吃什么。**
 
-> **English summary** — A Claude Agent Skill (Chinese-language) built on the Mediterranean diet as an anti-inflammatory eating pattern. It turns the diet into concrete, countable targets — 8 food groups every day, 6 food groups a set number of times per week — and helps you hit them from what's actually in your fridge: inventory from chat / grocery screenshots / food photos, recipes ranked by today's and this week's gaps, and a deterministic weekly review. No calorie counting, no weighing, no streaks. Install the `kitchen/` folder as a skill in Claude (claude.ai, Claude Desktop / Cowork, or Claude Code).
+一个以地中海饮食为基础的中文 Agent Skill：整理食材、一起定菜谱、记录吃过什么，再看每天与每周的搭配。无需称重、计算卡路里或连续打卡。
 
-## 背后的方法：把地中海抗炎饮食变成每日目标
+支持 Claude 和具备本地 skill 能力的 ChatGPT 桌面 / Codex 环境。脚本仅依赖 **Python 3.10+ 标准库**，没有 API key、数据库或付费服务要求。
 
-地中海饮食是抗炎方面证据最充分的膳食模式之一。这个 skill 没有把它停留在「多吃鱼、多吃菜、用橄榄油」的原则上，而是落成一张有频次的清单，并区分两种节奏：
+[快速开始](#快速开始) · [19 类食物](#一张清单两种节奏) · [运行示例](#运行示例) · [English](docs/README.en.md) · [更新记录](CHANGELOG.md)
 
-- **每日必有（8 类）**：作用来得快、去得也快的东西必须天天吃。多酚（橄榄油、茶、浆果）半衰期只有几小时，断一天就断了；每天约 50ml 橄榄油、30g 坚果直接取自 PREDIMED 试验的协议；发酵食品、全谷主食也是按剂量天天吃才见效。
-- **每周达标（6 项）**：效应以周累积的东西按次数算。深海鱼的 omega-3、红橙色蔬果的类胡萝卜素、十字花科、豆类、菌菇、黑巧可可——一天补不完，也不需要天天有。
+## 你可以直接这样说
 
-| 分组 | 类别 | 目标 |
-|---|---|---|
-| 每日必有（8） | 优质脂肪、坚果种子、发酵食品、深色绿叶菜、全谷主食、浆果柑橘、茶饮、香辛料 | 每天各 ≥1 份 |
-| 每周达标（6） | 高脂深海鱼 3、豆类与豆制品 5（≥3 次整豆）、十字花科 4、红橙色蔬果 5、菌菇 3、黑巧可可 2 | 次/周 |
-| 其他优质蛋白（4） | 蛋 ≤5、白肉鱼海鲜、禽肉、红肉 ≤2 | 只计次 |
-| 中性食物（1） | 海藻、普通蔬果、奶、奶酪、干果、其他淀粉、猪肉、蜂蜜 | 不计分 |
+| 想做什么 | 发给助手 |
+|---|---|
+| 更新冰箱 | 「买了菠菜、豆腐和三文鱼，豆浆用完了。就这些，更新库存。」 |
+| 决定晚餐 | 「想吃鱼，结合冰箱给两个 25 分钟内能做的方案。」 |
+| 展开做法 | 「选第二个，展开做法，告诉我怎么判断火候。」 |
+| 保存菜谱 | 「存下来，以后叫它周三鱼汤。」 |
+| 看缺口 | 「今天和本周还可以补哪些类别？只看已经吃过的。」 |
+| 安排今天 | 「用现有食材规划今天剩下两餐，做成一张卡片。」 |
+| 补货或清库 | 「只买缺的」或「菠菜快坏了，先围绕它做一道菜。」 |
+| 周复盘 | 「复盘截至 9 月 7 日的七天，给三个下周能做的动作。」 |
 
-同时记录致炎的限制项（加工肉、含糖饮料、超加工食品、油炸、精制碳水为主的一餐、酒精等），只报次数，不评判。
+先给候选，再展开做法；你在报库存时不会抢着给菜谱。库存始终显示 19 行，空的类别也看得见。
 
-计数规则：一道菜可以同时命中多个类别（小白菜 = 深色绿叶菜 + 十字花科，中式蔬菜天然占优），但同一餐里同一类别只计一次。每周 6 项合计约 20 个菜位，一周正餐约 28 个菜位，目标是吃得下的，还留得出蛋、禽肉、红肉和外食的位置。
+## 快速开始
 
-证据强度如实说：有人体炎症指标 RCT 直接支持的是橄榄油、坚果、发酵食品、深海鱼四样，加上地中海模式整体；其余频次是从流行病学、机制和膳食模式推出来的操作性约定，不是临床阈值。完整口径与依据见 [`kitchen/references/food-table.md`](kitchen/references/food-table.md)。
+### ChatGPT 桌面 / Codex 本地 skill
 
-## 它做什么
+在支持 Skill Installer 的本地环境中发送：
 
-八件事，围绕上面的目标，一次只做你要的那一件：
+```text
+用 Skill Installer 安装 https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen 的 kitchen 目录。
+```
 
-1. **更新冰箱** —— 对话、超市订单截图、食物照片都行，归到固定的 19 个类别
-2. **记住常用菜谱** —— 「这个存下来，以后叫它周三鱼汤」
-3. **生成每顿菜谱** —— 先给 2–3 个候选，按「你想吃什么 > 冰箱里有什么 > 今天/本周缺什么」排
-4. **展开完整做法** —— 带火候和判断节点，不写「炒熟即可」
-5. **今天的三餐与营养** —— 渲染成一张手机卡片
-6. **补货建议** —— 只列缺口对应、冰箱里又没有的
-7. **清库菜谱** —— 围绕最快坏的两三样出菜
-8. **一周复盘** —— 先用脚本算数，再给三个能直接执行的下周动作
+安装后可用 `$kitchen` 或在 skill 选择器中选择「抗炎厨房」。新安装的 skill 会在下一轮可用；未出现时重新打开会话。适用范围与分发方式见 [OpenAI 官方 skill 文档](https://learn.chatgpt.com/docs/build-skills)。**本地安装不等于向 ChatGPT 网页或移动端账号同步安装**；跨这些平台的分发需要相应插件或工作区能力。
 
-## 设计原则
+### Claude
 
-- 不称重、不算卡路里、不设体重目标、不打卡、不发徽章
-- 达标判定是确定性计算（`scripts/kitchen.py`），不靠模型印象
-- 看一周，不看一顿；记录不全是常态，按记了的算
-- 语气直接，不说教
-
-## 安装
-
-**Claude.ai / Claude 桌面版（含 Cowork）**：把 `kitchen/` 文件夹打成 zip，在设置里的 Skills 页面上传。
-
-**Claude Code**：
+- **Claude Code**：克隆仓库，确保 `~/.claude/skills/` 存在，将整个 `kitchen/` 文件夹放入其中。已有同名 skill 时先备份再替换。
+- **支持上传 skill 的 Claude 环境**：运行下方打包命令，上传 `dist/kitchen.zip`。具体入口以当前产品为准。
 
 ```bash
 git clone https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen.git
-cp -r anti-inflammatory-kitchen/kitchen ~/.claude/skills/
+cd anti-inflammatory-kitchen
+python3 scripts/package_skill.py
 ```
 
-建议放在一个固定的 Claude Project 里用——冰箱、菜谱、饮食记录三份状态存在 Claude 的 memory 里，跨对话保留。
+### 第一次使用
 
-## 换成你的城市
+在固定项目里打开对话，先说：「用抗炎厨房，先记一下冰箱……」。本地环境把三份状态放在该项目的 `.kitchen-state/`。换聊天时继续使用同一个项目。
 
-默认本地化是上海（盒马 / Ole / 本地菜场）。改两处即可：
+有持久 memory 工具的平台可使用其实际项目存储；没有持久存储时，助手会提供状态文件供下次上传。**安装 skill 不会导入任何人的冰箱、菜谱或饮食记录，也不会自动同步 Claude 与 ChatGPT 的私人数据。**
 
-- `kitchen/SKILL.md` 的「本地化」一节：换成你常用的采买渠道
-- `kitchen/references/food-table.md` 末尾的「本地采买备注」：换成本地版本
+## 一张清单，两种节奏
 
-## 脚本
+| 分组 | 类别 | 默认记录目标 |
+|---|---|---|
+| 每日必有 · 8 | 优质脂肪、坚果种子、发酵食品、深色绿叶菜、全谷主食、浆果柑橘、茶饮、香辛料 | 每类 ≥1 计数单位/日 |
+| 每周达标 · 6 | 高脂深海鱼、豆类与豆制品、十字花科、红橙色蔬果、菌菇、黑巧可可 | 分别 3 / 5 / 4 / 5 / 3 / 2 次 |
+| 其他优质蛋白 · 4 | 蛋、白肉鱼海鲜、禽肉、红肉 | 只记餐次 |
+| 中性食物 · 1 | 其他蔬果、奶、海藻、薯类等 | 展示，不增加覆盖数 |
 
-`kitchen/scripts/kitchen.py` 只依赖 Python 3 标准库：
+「每日必有」是清单名称，**不是每个人每天都必须吃齐的医学要求**。19 类与频次是本项目的规划约定，不是经临床验证的抗炎评分。中性食物也有营养价值。
+
+同餐同类最多计一次；同一种食材可覆盖多类。小白菜同时覆盖深色绿叶菜和十字花科。半份权重、食材别名、未知食材处理与研究依据见 [食材表](kitchen/references/food-table.md)。
+
+## 运行示例
+
+在仓库根目录运行：
 
 ```bash
-python3 kitchen/scripts/kitchen.py fridge --items "有机菠菜 250g, 云南蓝莓 125g, 手抓饼"
-python3 kitchen/scripts/kitchen.py score  --log kitchen-log.md
+# 19 行库存表：自动去掉常见规格；无法归类的单列待确认
+python3 kitchen/scripts/kitchen.py fridge --items "有机菠菜 250g, 西兰花, 松茸, 手抓饼"
+
+# 演示日志 → 七天统计 → 手机宽度的连续长页
+python3 kitchen/scripts/kitchen.py score --log examples/meal-log.md --end 2026-09-07 -o /tmp/kitchen-week.json
+python3 kitchen/scripts/kitchen.py week --json /tmp/kitchen-week.json -o /tmp/kitchen-week.html
+
+# 计划餐单与预计覆盖；不会写入实际摄入日志
+python3 kitchen/scripts/kitchen.py day --json examples/day.json -o /tmp/kitchen-today.html
+
+# 参数与输入结构
+python3 kitchen/scripts/kitchen.py schema
 ```
 
-## 边界
+示例完全为演示编写。生成的 HTML 可离线打开，不加载远程字体。脚本只读取传入文件、输出结果；不会自己改库存或调用模型。自然语言理解、照片识别和菜谱建议由宿主助手完成。
 
-这是饮食搭配层面的工具，不诊断疾病、不解读化验、不给用药或补剂剂量。表里的「每周 3 次」「每天 1 份」都是操作性约定，不是临床阈值。有健康问题请咨询医生或注册营养师。
+记录不全时显示实际记录天数。未知食材会出现在统计结果的 `unrecognizedItems` 中，不能把未识别当作没吃。
 
-## License
+## 自定义与贡献
 
-[MIT](LICENSE)
+默认中文，上海采买渠道只是示例，直接告诉助手你的城市和常用商店即可。偏好、忌口和状态属于个人工作区；分享 skill 时不用携带它们。
+
+运行回归测试：
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+欢迎改进食材别名、示例与兼容性。修改类别、频次或健康表述前，请阅读 [贡献指南](CONTRIBUTING.md)，同步文档、脚本和测试。
+
+## 边界与隐私
+
+这是饮食搭配助手，不诊断疾病、不解读化验、不给药物或补剂剂量。饮食研究的结果不等于本工具能降低某个人的炎症指标。
+
+仓库忽略私有状态目录和三份状态文件。公开 issue、截图或 PR 前仍请检查是否含私人信息；宿主 AI 对上传内容的处理由所用平台决定。
+
+[MIT License](LICENSE)

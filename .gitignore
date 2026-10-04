@@ -1,7 +1,11 @@
 __pycache__/
 *.pyc
 .DS_Store
-# 个人状态文件不要提交
-/kitchen-fridge.md
-/kitchen-log.md
-/kitchen-recipes.md
+# Private user state, never part of the public skill
+.kitchen-state/
+.local/
+kitchen-fridge.md
+kitchen-log.md
+kitchen-recipes.md
+# Generated artifacts
+dist/
