@@ -1,109 +1,94 @@
 # 抗炎厨房 · Anti-Inflammatory Kitchen
 
-**从冰箱里有什么，到今天吃什么。**
+<table><tr><td><strong>简体中文</strong></td><td><a href="README.en.md">English</a></td></tr></table>
 
-一个以地中海饮食为基础的中文 Agent Skill：整理食材、一起定菜谱、记录吃过什么，再看每天与每周的搭配。无需称重、计算卡路里或连续打卡。
+**给经常自己做饭、想吃得更多样，却每天都在纠结吃什么的人。**
 
-支持 Claude 和具备本地 skill 能力的 ChatGPT 桌面 / Codex 环境。脚本仅依赖 **Python 3.10+ 标准库**，没有 API key、数据库或付费服务要求。
+抗炎厨房是一个可带到不同 AI 助手里的饮食搭配 skill。它以地中海饮食为基础，结合你想吃的东西、冰箱库存和已经记录的饮食，帮你决定下一顿、列补货清单、回顾一周。**不用称重、算卡路里或每天打卡。**
 
-[快速开始](#快速开始) · [19 类食物](#一张清单两种节奏) · [运行示例](#运行示例) · [English](docs/README.en.md) · [更新记录](CHANGELOG.md)
+你负责告诉它有什么、想吃什么、实际吃了什么；它负责把这些信息变成好做的菜和清楚的搭配建议。
 
-## 你可以直接这样说
+[选择安装方式](#选择你的-ai-工具) · [下载 skill ZIP](downloads/kitchen.zip) · [下载对话指南](downloads/kitchen-chat-guide.md) · [完整安装说明](docs/installation.md)
 
-| 想做什么 | 发给助手 |
-|---|---|
-| 更新冰箱 | 「买了菠菜、豆腐和三文鱼，豆浆用完了。就这些，更新库存。」 |
-| 决定晚餐 | 「想吃鱼，结合冰箱给两个 25 分钟内能做的方案。」 |
-| 展开做法 | 「选第二个，展开做法，告诉我怎么判断火候。」 |
-| 保存菜谱 | 「存下来，以后叫它周三鱼汤。」 |
-| 看缺口 | 「今天和本周还可以补哪些类别？只看已经吃过的。」 |
-| 安排今天 | 「用现有食材规划今天剩下两餐，做成一张卡片。」 |
-| 补货或清库 | 「只买缺的」或「菠菜快坏了，先围绕它做一道菜。」 |
-| 周复盘 | 「复盘截至 9 月 7 日的七天，给三个下周能做的动作。」 |
+## 它能帮你做什么
 
-先给候选，再展开做法；你在报库存时不会抢着给菜谱。库存始终显示 19 行，空的类别也看得见。
+| 操作 | 你可以这样说 | 你会得到什么 |
+|---|---|---|
+| 整理冰箱 | 「买了菠菜、豆腐和三文鱼，豆浆用完了。」 | 按固定食物类别整理的库存，空缺也显示 |
+| 保存常用菜谱 | 「存下来，以后叫它周三鱼汤。」 | 下次能按名字找回的菜谱；能否跨聊天保存取决于工具 |
+| 决定下一顿 | 「今天想吃鱼，结合冰箱给两个方案。」 | 先给 2–3 个候选，由你选择 |
+| 展开具体做法 | 「选第二个，告诉我怎么做、怎么判断火候。」 | 食材、步骤、时间与烹饪判断节点 |
+| 规划今日搭配 | 「今天还缺什么？顺便安排晚餐。」 | 每日与每周的搭配缺口；支持时生成连续长页餐单 |
+| 生成补货清单 | 「只买现在缺的，够接下来三顿。」 | 结合饮食记录和库存的补货建议 |
+| 优先清库 | 「菠菜快坏了，围绕它做一道菜。」 | 优先用掉指定食材的方案 |
+| 复盘一周 | 「回顾这七天，给三个下周能做的动作。」 | 基于已记录餐次的统计和具体行动 |
 
-## 快速开始
+你还在报库存时，它先接收，不抢着出菜谱。计划的饭不会算成已经吃过；没记的饭也不会被当作没吃。
 
-### ChatGPT 桌面 / Codex 本地 skill
+## 选择你的 AI 工具
 
-在支持 Skill Installer 的本地环境中发送：
+同一份厨房规则，按工具能力选择使用方式。**原生安装和对话导入不是一回事。**
+
+| 你使用的工具 | 安装或导入方式 | 从这里开始 |
+|---|---|---|
+| Claude（有自定义 Skills 入口的账号） | 下载 ZIP，在 Customize → Skills 上传并启用 | [Claude 上传步骤](docs/installation.md#claude-upload) |
+| Claude Code | 安装到 `.claude/skills/kitchen` | [本地安装](docs/installation.md#local-install) |
+| Codex / ChatGPT 桌面的本地 Codex 环境 | Skill Installer，或安装到 `.agents/skills/kitchen` | [本地安装](docs/installation.md#local-install) |
+| Cursor | 安装到 `.cursor/skills/kitchen` | [本地安装](docs/installation.md#local-install) |
+| Gemini CLI | 官方安装命令，或安装到 `.gemini/skills/kitchen` | [Gemini CLI](docs/installation.md#gemini-cli) |
+| 其他支持 Agent Skills 的工具 | 导入整个 `kitchen/` 目录到该工具的 skill 目录 | [通用 Agent Skills](docs/installation.md#agent-skills) |
+| ChatGPT 网页/手机、Gemini、Kimi、DeepSeek 等聊天界面 | 在能读取文本附件的会话上传单文件指南，或复制全文 | [对话导入与手机使用](docs/installation.md#chat-import) |
+
+**手机用户先看这里：** 本仓库尚未发布可在 ChatGPT 插件目录安装的抗炎厨房插件。手机可尝试“对话导入”，不依赖电脑在线，但它只为当前对话提供规则，不等于原生安装，不保证跨聊天记忆或自动执行脚本。界面有「插件」入口也不代表本项目已经上架。
+
+### 不想碰命令行？
+
+- **Claude Skills 用户：** [下载 kitchen.zip](downloads/kitchen.zip)，按上传步骤安装。
+- **普通聊天用户：** [打开单文件指南](downloads/kitchen-chat-guide.md)，在 GitHub 点击下载原始文件的按钮，上传到对话；也可打开 Raw 后复制全文。
+- **本地 AI 工具用户：** 将下面的话交给有文件访问权限的助手：
 
 ```text
-用 Skill Installer 安装 https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen 的 kitchen 目录。
+请从 https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen 安装 kitchen skill。
+先读取 docs/installation.md，按当前工具选择原生安装路径。
+保留已有安装和私人记录；如果当前环境不支持原生 skill，请说明并使用单文件对话指南。
 ```
 
-安装后可用 `$kitchen` 或在 skill 选择器中选择「抗炎厨房」。新安装的 skill 会在下一轮可用；未出现时重新打开会话。适用范围与分发方式见 [OpenAI 官方 skill 文档](https://learn.chatgpt.com/docs/build-skills)。**本地安装不等于向 ChatGPT 网页或移动端账号同步安装**；跨这些平台的分发需要相应插件或工作区能力。
+### 安装后，先完成一件小事
 
-### Claude
-
-- **Claude Code**：克隆仓库，确保 `~/.claude/skills/` 存在，将整个 `kitchen/` 文件夹放入其中。已有同名 skill 时先备份再替换。
-- **支持上传 skill 的 Claude 环境**：运行下方打包命令，上传 `dist/kitchen.zip`。具体入口以当前产品为准。
-
-```bash
-git clone https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen.git
-cd anti-inflammatory-kitchen
-python3 scripts/package_skill.py
+```text
+用抗炎厨房。先告诉我这里能否跨聊天保存库存。
+冰箱有菠菜、豆腐和三文鱼，就这些。请只更新库存，先不要给菜谱。
 ```
 
-### 第一次使用
+应看到 **v5.2 的 19 类库存**，包括空类别。如果是对话导入，先上传指南，并明确要求按附件工作。所有使用方式的验证步骤见[安装验收](docs/installation.md#verify)。
 
-在固定项目里打开对话，先说：「用抗炎厨房，先记一下冰箱……」。本地环境把三份状态放在该项目的 `.kitchen-state/`。换聊天时继续使用同一个项目。
+## 它如何判断搭配
 
-有持久 memory 工具的平台可使用其实际项目存储；没有持久存储时，助手会提供状态文件供下次上传。**安装 skill 不会导入任何人的冰箱、菜谱或饮食记录，也不会自动同步 Claude 与 ChatGPT 的私人数据。**
+先尊重你想吃什么，再看现有食材，最后考虑饮食记录中的缺口。默认工作日晚餐尽量在 25 分钟、两个锅以内完成。中式做法也适用，不要求做成西餐。
 
-## 一张清单，两种节奏
-
-| 分组 | 类别 | 默认记录目标 |
+| 分组 | 内容 | 默认规划频率 |
 |---|---|---|
-| 每日必有 · 8 | 优质脂肪、坚果种子、发酵食品、深色绿叶菜、全谷主食、浆果柑橘、茶饮、香辛料 | 每类 ≥1 计数单位/日 |
-| 每周达标 · 6 | 高脂深海鱼、豆类与豆制品、十字花科、红橙色蔬果、菌菇、黑巧可可 | 分别 3 / 5 / 4 / 5 / 3 / 2 次 |
-| 其他优质蛋白 · 4 | 蛋、白肉鱼海鲜、禽肉、红肉 | 只记餐次 |
-| 中性食物 · 1 | 其他蔬果、奶、海藻、薯类等 | 展示，不增加覆盖数 |
+| 每日 8 类 | 优质脂肪、坚果种子、发酵食品、深色绿叶菜、全谷主食、浆果柑橘、茶饮、香辛料 | 每类每天覆盖一次 |
+| 每周 6 类 | 高脂深海鱼、豆类与豆制品、十字花科、红橙色蔬果、菌菇、黑巧可可 | 分别 3 / 5 / 4 / 5 / 3 / 2 次 |
+| 其他蛋白 4 类 | 蛋、白肉鱼海鲜、禽肉、红肉 | 记录餐次 |
+| 中性食物 1 类 | 其他蔬果、奶、海藻、薯类等 | 展示，不增加覆盖数 |
 
-「每日必有」是清单名称，**不是每个人每天都必须吃齐的医学要求**。19 类与频次是本项目的规划约定，不是经临床验证的抗炎评分。中性食物也有营养价值。
+同餐同类最多计一次，同一种食材可以覆盖多类。脚本无法识别的食材会列出待核对。没有代码工具时按相同规则手算，并说明限制。
 
-同餐同类最多计一次；同一种食材可覆盖多类。小白菜同时覆盖深色绿叶菜和十字花科。半份权重、食材别名、未知食材处理与研究依据见 [食材表](kitchen/references/food-table.md)。
+**这些频率是本项目的规划约定，不是医学阈值，也不是炎症评分。** 中性食物仍有营养价值，没吃齐不意味着饮食失败。完整食材与依据见[食材表](kitchen/references/food-table.md)。
 
-## 运行示例
+## 库存和记录保存在哪
 
-在仓库根目录运行：
+- **本地工具：** 保存在你选定项目的 `.kitchen-state/`，新聊天继续使用同一项目。
+- **有持久存储的云端工具：** 由助手确认实际可用的保存位置，写入成功后才确认保存。
+- **只有对话：** 在当前聊天维护记录；结束时导出库存、菜谱和日志快照，下次带入。
 
-```bash
-# 19 行库存表：自动去掉常见规格；无法归类的单列待确认
-python3 kitchen/scripts/kitchen.py fridge --items "有机菠菜 250g, 西兰花, 松茸, 手抓饼"
+不同 AI 工具不会自动同步私人记录。下载包没有任何人的库存或饮食历史；你的私人状态不应提交到公开 GitHub。[存储规则](kitchen/references/state-files.md)
 
-# 演示日志 → 七天统计 → 手机宽度的连续长页
-python3 kitchen/scripts/kitchen.py score --log examples/meal-log.md --end 2026-09-07 -o /tmp/kitchen-week.json
-python3 kitchen/scripts/kitchen.py week --json /tmp/kitchen-week.json -o /tmp/kitchen-week.html
+## 开发、示例与贡献
 
-# 计划餐单与预计覆盖；不会写入实际摄入日志
-python3 kitchen/scripts/kitchen.py day --json examples/day.json -o /tmp/kitchen-today.html
+核心助手不需要 API key；本地辅助脚本需要 Python 3.10+，只使用标准库。AI 工具自身的订阅、权限和能力由各平台决定。
 
-# 参数与输入结构
-python3 kitchen/scripts/kitchen.py schema
-```
+[运行示例与项目结构](docs/development.md) · [贡献指南](CONTRIBUTING.md) · [更新记录](CHANGELOG.md) · [MIT License](LICENSE)
 
-示例完全为演示编写。生成的 HTML 可离线打开，不加载远程字体。脚本只读取传入文件、输出结果；不会自己改库存或调用模型。自然语言理解、照片识别和菜谱建议由宿主助手完成。
-
-记录不全时显示实际记录天数。未知食材会出现在统计结果的 `unrecognizedItems` 中，不能把未识别当作没吃。
-
-## 自定义与贡献
-
-默认中文，上海采买渠道只是示例，直接告诉助手你的城市和常用商店即可。偏好、忌口和状态属于个人工作区；分享 skill 时不用携带它们。
-
-运行回归测试：
-
-```bash
-python3 -m unittest discover -s tests -v
-```
-
-欢迎改进食材别名、示例与兼容性。修改类别、频次或健康表述前，请阅读 [贡献指南](CONTRIBUTING.md)，同步文档、脚本和测试。
-
-## 边界与隐私
-
-这是饮食搭配助手，不诊断疾病、不解读化验、不给药物或补剂剂量。饮食研究的结果不等于本工具能降低某个人的炎症指标。
-
-仓库忽略私有状态目录和三份状态文件。公开 issue、截图或 PR 前仍请检查是否含私人信息；宿主 AI 对上传内容的处理由所用平台决定。
-
-[MIT License](LICENSE)
+抗炎厨房用于日常饮食搭配，不诊断疾病、不解读化验，也不给药物或补剂剂量。
