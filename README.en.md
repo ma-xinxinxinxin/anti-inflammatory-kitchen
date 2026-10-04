@@ -2,13 +2,15 @@
 
 <table><tr><td><a href="README.md">简体中文</a></td><td><strong>English</strong></td></tr></table>
 
-**For people who want to follow an anti-inflammatory diet and eat healthier, with clear ingredients and simpler, less processed choices.**
+**For people who want to follow an anti-inflammatory diet and eat healthy, clean meals.**
 
-Anti-Inflammatory Kitchen is an AI meal-planning assistant built around **an anti-inflammatory eating plan and what is actually in your kitchen right now**. Based on a Mediterranean-style eating pattern, it combines your latest inventory, preferences, and recorded meals to give simple next steps: what to eat, how to cook, what to buy, and what to use first.
+Anti-Inflammatory Kitchen is your AI meal-planning assistant, built around **a healthy anti-inflammatory eating plan and what is in your kitchen right now**. Based on a Mediterranean-style eating pattern, it draws on nutrition research to organize its ingredient list and meal-combination rules. It brings these together with your kitchen inventory, preferences, and recorded meals to tell you **what to eat, how to cook, and what to buy**.
 
-After shopping, type, speak, or send a photo of your groceries or receipt. After cooking, tell it what you ate and what ran out. It updates your kitchen state from the information you confirm, then uses that state for the next recommendation. “Live inventory” means updates from your reports, not automatic monitoring. No weighing, calorie counting, or daily streaks.
+To get started, tell it what is in your kitchen. After that, whenever you shop, type, speak, or send a photo of your groceries or receipt. After cooking, tell it what you ate and what ran out. It updates your kitchen state from that information, so the next recommendation starts with your latest inventory.
 
-“Clean eating” here means knowing your ingredients and relying less on high-salt, high-sugar, and highly processed foods. Frozen vegetables, plain yogurt, and suitable canned foods can all fit. Expensive ingredients and zero processing are not required.
+Ask “What should I eat today?”, “Give me three breakfast options”, or “What should I stock up on this weekend?” It prioritizes ingredients already in your kitchen and fridge to suggest recipes you can start cooking right away, balancing meal composition with fresh ideas and options. Anything you need to buy is listed separately, so you know what you can make now and what to plan for your next shop.
+
+I now use it every day and wouldn't want to do without it.
 
 [Choose your AI tool](#choose-your-ai-tool) · [Download plugin](downloads/anti-inflammatory-kitchen-plugin.zip) · [Claude Skill ZIP](downloads/kitchen.zip) · [Full installation guide](docs/installation.en.md)
 
