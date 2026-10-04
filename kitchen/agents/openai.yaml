@@ -1,0 +1,4 @@
+interface:
+  display_name: "抗炎厨房 · Anti-Inflammatory Kitchen"
+  short_description: "从冰箱出发，规划好做的日常菜谱、整理补货清单并复盘每周饮食搭配"
+  default_prompt: "用 $kitchen 看看我今天和本周的饮食记录还缺什么，再结合冰箱里的食材给一个搭配。"
