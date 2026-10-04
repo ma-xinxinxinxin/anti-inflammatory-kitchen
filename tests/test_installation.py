@@ -123,7 +123,7 @@ class DistributionTests(unittest.TestCase):
                      '.cursor-plugin/plugin.json', 'gemini-extension.json']:
             manifest = json.loads(files[name])
             self.assertEqual(manifest['name'], 'anti-inflammatory-kitchen')
-            self.assertEqual(manifest['version'], '5.4.0')
+            self.assertEqual(manifest['version'], '5.4.1')
         portable = json.loads(files['plugin.json'])
         self.assertEqual(portable['$schema'], 'https://agent-plugins.org/schemas/1.0.0/plugin.schema.json')
         for name, source in builder.skill_files():

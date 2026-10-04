@@ -10,3 +10,10 @@ kitchen-recipes.md
 kitchen-profile.json
 # Generated artifacts
 dist/
+
+# Local workspace handoff notes
+CONTEXT-INDEX.txt
+# Local credentials
+.env
+.env.*
+!.env.example

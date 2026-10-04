@@ -11,7 +11,7 @@
 
 ### Claude Code
 
-在终端执行（仓库版本合并到主分支后）：
+在终端执行：
 
 ```bash
 claude plugin marketplace add ma-xinxinxinxin/anti-inflammatory-kitchen
@@ -43,7 +43,7 @@ gemini extensions install ./plugins/anti-inflammatory-kitchen
 
 ### Cursor 与其他 Agent Plugins 宿主
 
-包内的根 `plugin.json` 与 `skills/` 遵循 Agent Plugins；同时提供 Cursor manifest 和仓库 marketplace。Cursor 官方支持该格式，但本项目尚未上架 Cursor Marketplace；不要搜索一个尚不存在的安装链接。发布后可从目录安装；当前可使用下方 `--tool cursor` 安装完整 skill。其他宿主只有明确支持该标准时才能导入插件包，实际入口以其说明为准。
+包内的根 `plugin.json` 与 `skills/` 遵循 Agent Plugins；同时提供 Cursor manifest 和仓库 marketplace。Cursor 官方支持该格式，但本项目尚未上架 Cursor Marketplace；当前可使用下方 `--tool cursor` 安装完整 skill。其他宿主只有明确支持该标准时才能导入插件包，实际入口以其说明为准。
 
 依据：[OpenAI 插件格式](https://developers.openai.com/plugins/build/plugins) · [Claude Code 插件市场](https://code.claude.com/docs/en/plugin-marketplaces) · [Cursor 插件格式](https://cursor.com/docs/reference/plugins) · [Gemini 扩展](https://geminicli.com/docs/extensions/reference/)。
 
@@ -52,7 +52,8 @@ gemini extensions install ./plugins/anti-inflammatory-kitchen
 
 **当前状态：插件包已制作，尚未提交或上架 ChatGPT 公共目录，手机端尚未实测。** ZIP 已包含完整 skill，不需要为本版本部署 MCP 服务。
 
-供发布者操作：
+<details>
+<summary>维护者：发布插件到公共目录</summary>
 
 1. 下载上述插件 ZIP；不要把单独的 `kitchen.zip` 或整个 GitHub 仓库 ZIP 当成插件上传。
 2. 在 [OpenAI Plugins](https://platform.openai.com/plugins) 选择组织/项目和已验证的发布者身份，使用 **Upload new or existing plugin → Upload plugin** 上传。
@@ -62,13 +63,15 @@ gemini extensions install ./plugins/anti-inflammatory-kitchen
 
 插件格式兼容、账号安装、公开上架和私人库存同步是四件不同的事。本插件使用宿主可用的存储，并不自带跨平台云数据库。发布步骤与身份要求依据 [OpenAI 官方流程](https://developers.openai.com/plugins/deploy/submission)。
 
+</details>
+
 <a id="claude-upload"></a>
 ## Claude：上传安装包
 
 1. [下载 kitchen.zip](../downloads/kitchen.zip)。在 GitHub 文件页面点击下载按钮；不需要自己安装 Python 或重新打包。
 2. 根据账号权限，在 Settings → Capabilities 开启 Code execution and file creation。
 3. 进入 **Customize → Skills → + → Create skill → Upload a skill**，上传 ZIP 并启用。
-4. 新开聊天，说「用抗炎厨房，告诉我版本和分类数量」。应为 v5.4、19 类。
+4. 新开聊天，说「用抗炎厨房，告诉我版本和分类数量」。应为 v5.4.1、19 类。
 
 以账号实际界面为准。ZIP 内为 `kitchen/SKILL.md` 和必要参考、脚本文件。上传到普通聊天只是附件，不等于完成 Skills 安装。手机上的安装入口与调用能力仍需在该账号实测，不承诺所有客户端一致。
 
@@ -158,7 +161,7 @@ gemini skills install https://github.com/ma-xinxinxinxin/anti-inflammatory-kitch
 
 | 发送内容 | 应观察到 |
 |---|---|
-| 「你是哪一版？有多少类？」 | v5.4；每日 8、每周 6、其他蛋白 4、中性 1 |
+| 「你是哪一版？有多少类？」 | v5.4.1；每日 8、每周 6、其他蛋白 4、中性 1 |
 | 「我有菠菜。」 | 接收本批信息，不抢着出菜谱 |
 | 「还有豆腐、三文鱼。就这些，列库存。」 | 19 行完整库存，包含空类别 |
 | 「用这些规划晚餐，但还没吃。」 | 直接给一套搭配；不写成已吃、不默认库存用完 |

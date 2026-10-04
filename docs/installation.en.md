@@ -11,7 +11,7 @@ Choose one path for your actual tool. Do not install duplicate copies of `kitche
 
 ### Claude Code
 
-Run in your terminal after this repository version is merged into main:
+Run in your terminal:
 
 ```bash
 claude plugin marketplace add ma-xinxinxinxin/anti-inflammatory-kitchen
@@ -52,7 +52,8 @@ Sources: [OpenAI packaging](https://developers.openai.com/plugins/build/plugins)
 
 **Status: package built; not submitted or listed in the public ChatGPT directory; mobile not yet tested.** The ZIP includes the complete skill. This version does not require an MCP deployment.
 
-For the publisher:
+<details>
+<summary>Maintainers: publish to the public directory</summary>
 
 1. Download the plugin ZIP above. Do not upload the standalone `kitchen.zip` or entire repository ZIP as a plugin.
 2. In [OpenAI Plugins](https://platform.openai.com/plugins), select the owning organization/project and verified developer identity. Choose **Upload new or existing plugin → Upload plugin**.
@@ -62,13 +63,15 @@ For the publisher:
 
 Package compatibility, account installation, public listing, and private state synchronization are separate steps. The plugin uses storage supplied by its host; it does not include a cross-platform cloud database. Identity and publishing requirements follow [OpenAI's submission process](https://developers.openai.com/plugins/deploy/submission).
 
+</details>
+
 <a id="claude-upload"></a>
 ## Claude: upload the skill ZIP
 
 1. [Download kitchen.zip](../downloads/kitchen.zip) using GitHub's download button. No local Python setup is needed.
 2. Enable Code execution and file creation in Settings → Capabilities as permitted by your account.
 3. Open **Customize → Skills → + → Create skill → Upload a skill**, upload the ZIP, and enable it.
-4. Start a new chat and ask for the Kitchen version and category count: v5.4 and 19.
+4. Start a new chat and ask for the Kitchen version and category count: v5.4.1 and 19.
 
 Use the controls actually available to your account. The ZIP contains `kitchen/SKILL.md`, references, and the helper. Attaching it to an ordinary conversation is not a Skills installation. Mobile discovery and invocation still require testing on that account; this project does not claim identical behavior across all clients.
 
@@ -158,7 +161,7 @@ These optional acceptance checks are not required for onboarding. Use fictional 
 
 | Prompt | Expected observation |
 |---|---|
-| “Which version and how many categories?” | v5.4; 8 daily, 6 weekly, 4 other proteins, 1 neutral |
+| “Which version and how many categories?” | v5.4.1; 8 daily, 6 weekly, 4 other proteins, 1 neutral |
 | “I have spinach.” | Acknowledge this batch without unsolicited recipes |
 | “Also tofu and salmon. That's everything; show inventory.” | All 19 rows, including empty categories |
 | “Plan dinner with these, but I haven't eaten it.” | One meal recommendation; no actual-consumption log or assumption that pantry items are finished |

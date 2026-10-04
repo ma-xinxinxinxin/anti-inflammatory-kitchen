@@ -2,6 +2,8 @@
 
 <table><tr><td><strong>简体中文</strong></td><td><a href="README.en.md">English</a></td></tr></table>
 
+[![Checks](https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen/actions/workflows/checks.yml/badge.svg)](https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen/actions/workflows/checks.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-3D5A3F.svg)](LICENSE)
+
 **给想要遵循抗炎饮食、追求吃得健康和干净的人。**
 
 抗炎厨房是你的 AI 饮食规划助手：**一切围绕健康的抗炎饮食计划，以及厨房里当前有什么食材。** 它以地中海式抗炎饮食为基础，参考营养研究整理食材清单和搭配规则，结合你的厨房库存、饮食偏好和已记录的餐食，告诉你应该「吃什么、怎么做、买什么」。
@@ -10,9 +12,9 @@
 
 当你问它「今天吃什么」「给我三个早饭选项」「周末应该补充点什么」，它会优先用厨房和冰箱里已有的食材，给你可以马上动手做的食谱：既照顾营养搭配，又带来新的灵感和选项。需要补买的食材会单独列出，让你清楚哪些现在能做、哪些留给下一次采购。
 
-我的生活现在每一天都离不开它。
+**[开始使用](#安装好建立你的厨房)** · [选择 AI 工具](#选择你的-ai-工具) · [食材与频率](#它如何判断搭配) · [库存与记录](#库存和记录保存在哪)
 
-[选择安装方式](#选择你的-ai-工具) · [下载插件包](downloads/anti-inflammatory-kitchen-plugin.zip) · [Claude Skill ZIP](downloads/kitchen.zip) · [完整安装说明](docs/installation.md)
+[下载插件包](downloads/anti-inflammatory-kitchen-plugin.zip) · [Claude Skill ZIP](downloads/kitchen.zip) · [对话导入指南](downloads/kitchen-chat-guide.md)
 
 ## 它能帮你做什么
 
@@ -41,20 +43,18 @@
 
 ## 选择你的 AI 工具
 
-同一份厨房规则，按工具能力选择使用方式。**原生安装和对话导入不是一回事。**
+按你使用的工具选择一个入口，安装同一份厨房规则。
 
-| 你使用的工具 | 安装或导入方式 | 从这里开始 |
+| AI 工具 | 使用方式 | 安装说明 |
 |---|---|---|
-| Claude（有自定义 Skills 入口的账号） | 下载 ZIP，在 Customize → Skills 上传并启用 | [Claude 上传步骤](docs/installation.md#claude-upload) |
-| Claude Code | 添加仓库插件市场，安装抗炎厨房插件 | [插件安装](docs/installation.md#plugins) |
-| Codex / 本地桌面环境 | 添加仓库插件市场并安装；也保留独立 skill 方式 | [插件安装](docs/installation.md#plugins) |
-| ChatGPT 网页与手机的原生插件 | 插件包已提供；需发布者上传、测试并通过平台发布，当前尚未上架 | [ChatGPT 发布与手机验收](docs/installation.md#chatgpt-plugin) |
-| Cursor | 提供兼容 Agent Plugins 的包；上架前可先安装独立 skill | [插件与兼容方式](docs/installation.md#plugins) |
-| Gemini CLI | 安装包内扩展，或用独立 skill 安装命令 | [插件/扩展安装](docs/installation.md#plugins) |
-| 其他支持 Agent Skills 的工具 | 导入整个 `kitchen/` 目录到该工具的 skill 目录 | [通用 Agent Skills](docs/installation.md#agent-skills) |
-| ChatGPT 网页/手机、Gemini、Kimi、DeepSeek 等聊天界面 | 在能读取文本附件的会话上传单文件指南，或复制全文 | [对话导入与手机使用](docs/installation.md#chat-import) |
+| Claude（支持自定义 Skills 的账号） | 上传 Skill ZIP 并启用 | [上传步骤](docs/installation.md#claude-upload) |
+| Claude Code / Codex | 从仓库插件市场安装 | [插件安装](docs/installation.md#plugins) |
+| Cursor | 本地安装完整 skill | [本地安装](docs/installation.md#local-install) |
+| Gemini CLI | 安装 skill 或扩展 | [Skill 安装](docs/installation.md#gemini-cli) |
+| ChatGPT、Gemini、Kimi、DeepSeek 等聊天工具 | 在项目或聊天中上传单文件指南，或粘贴全文 | [对话导入](docs/installation.md#chat-import) |
+| 其他支持 Agent Skills 的工具 | 导入完整 `kitchen/` 文件夹 | [通用安装](docs/installation.md#agent-skills) |
 
-**手机用户先看这里：** 已制作原生插件包，但本仓库尚未发布可在 ChatGPT 插件目录安装的抗炎厨房插件。手机可尝试“对话导入”，不依赖电脑在线，但它只为当前对话提供规则，不等于原生安装，不保证跨聊天记忆或自动执行脚本。界面有「插件」入口也不代表本项目已经上架。
+> **手机使用：** ChatGPT 手机可尝试对话导入；原生插件尚未上架公共目录。跨聊天保存取决于工具的项目、记忆和文件能力。各平台支持范围见[兼容与验证](docs/verification.md)。
 
 ### 不想碰命令行？
 
@@ -81,25 +81,25 @@
 
 ### 抗炎食物清单与默认频率
 
-每日 8 类与每周 6 类放在同一张清单里。下表是起点：你可以按忌口、营养目标和实际习惯调整为每天或每周的次数，也可以对某类不设频次；后续建议按你确认的设置执行。
+**「每日必有」表示当天有安排，不限制出现在哪一餐或一天吃几次；每周频次表示规划中的最低覆盖次数。** 下表是起点：你可以按忌口、营养目标和实际习惯调整为每天或每周的次数，也可以对某类不设频次；后续建议按你确认的设置执行。
 
 <table width="100%">
 <thead><tr><th width="25%">类别</th><th width="16%">默认频率</th><th width="59%">具体食材</th></tr></thead>
 <tbody>
-<tr><td>优质脂肪</td><td>每天 1 次</td><td>特级初榨橄榄油、橄榄油、牛油果、橄榄</td></tr>
-<tr><td>坚果种子</td><td>每天 1 次</td><td>核桃、杏仁、开心果、南瓜籽、亚麻籽粉、奇亚籽、巴西坚果、芝麻、芝麻酱、杏仁酱；花生酱按 0.5</td></tr>
-<tr><td>发酵食品</td><td>每天 1 次</td><td>希腊酸奶、无糖酸奶、开菲尔、纳豆、味噌、泡菜、康普茶</td></tr>
-<tr><td>深色绿叶菜</td><td>每天 1 次</td><td>菠菜、羽衣甘蓝、西洋菜、茼蒿、豌豆尖、苋菜、油麦菜、鸡毛菜、空心菜、生菜、小白菜、芥蓝、油菜</td></tr>
-<tr><td>全谷主食</td><td>每天 1 次</td><td>燕麦、糙米、藜麦、小米、以全谷物为主的荞麦面、全麦面包、全麦皮塔</td></tr>
-<tr><td>浆果柑橘</td><td>每天 1 次</td><td>蓝莓、树莓、草莓、黑莓、蔓越莓、橙、柚子、猕猴桃、石榴、樱桃；巴西莓粉按 0.5</td></tr>
-<tr><td>茶饮</td><td>每天 1 次</td><td>绿茶、乌龙茶、白茶、红茶、抹茶、洛神花茶</td></tr>
-<tr><td>香辛料</td><td>每天 1 次</td><td>葱、蒜、生姜、洋葱、姜黄粉、黑胡椒、迷迭香、牛至、百里香、丁香、肉桂、孜然</td></tr>
-<tr><td>高脂深海鱼</td><td>每周 3 次</td><td>三文鱼、鲭鱼/青花鱼、沙丁鱼、凤尾鱼、秋刀鱼</td></tr>
-<tr><td>豆类与豆制品</td><td>每周 5 次</td><td>鹰嘴豆、扁豆、毛豆、黑豆、红腰豆、豆腐、豆干、腐竹、无糖豆浆、天贝</td></tr>
-<tr><td>十字花科</td><td>每周 4 次</td><td>西蓝花/西兰花、花椰菜、卷心菜、紫甘蓝、芝麻菜、小白菜、鸡毛菜、白萝卜、抱子甘蓝、芥蓝、油菜</td></tr>
-<tr><td>红橙色蔬果</td><td>每周 5 次</td><td>番茄/小番茄、胡萝卜、南瓜、红椒、黄椒、红薯、紫薯；枸杞按 0.5</td></tr>
-<tr><td>菌菇</td><td>每周 3 次</td><td>香菇、舞茸、灰树花、平菇、木耳、杏鲍菇、松茸、蘑菇、金针菇</td></tr>
-<tr><td>黑巧可可</td><td>每周 2 次</td><td>黑巧克力、天然可可粉；优先低添加糖，按耐受选择</td></tr>
+<tr><td>优质脂肪</td><td>每日必有</td><td>特级初榨橄榄油、橄榄油、牛油果、橄榄</td></tr>
+<tr><td>坚果种子</td><td>每日必有</td><td>核桃、杏仁、开心果、南瓜籽、亚麻籽粉、奇亚籽、巴西坚果、芝麻、芝麻酱、杏仁酱、花生酱</td></tr>
+<tr><td>发酵食品</td><td>每日必有</td><td>希腊酸奶、无糖酸奶、开菲尔、纳豆、味噌、泡菜、康普茶</td></tr>
+<tr><td>深色绿叶菜</td><td>每日必有</td><td>菠菜、羽衣甘蓝、西洋菜、茼蒿、豌豆尖、苋菜、油麦菜、鸡毛菜、空心菜、生菜、小白菜、芥蓝、油菜</td></tr>
+<tr><td>全谷主食</td><td>每日必有</td><td>燕麦、糙米、藜麦、小米、以全谷物为主的荞麦面、全麦面包、全麦皮塔</td></tr>
+<tr><td>浆果柑橘</td><td>每日必有</td><td>蓝莓、树莓、草莓、黑莓、蔓越莓、橙、柚子、猕猴桃、石榴、樱桃、巴西莓粉</td></tr>
+<tr><td>茶饮</td><td>每日必有</td><td>绿茶、乌龙茶、白茶、红茶、抹茶、洛神花茶</td></tr>
+<tr><td>香辛料</td><td>每日必有</td><td>葱、蒜、生姜、洋葱、姜黄粉、黑胡椒、迷迭香、牛至、百里香、丁香、肉桂、孜然</td></tr>
+<tr><td>高脂深海鱼</td><td>每周至少 3 次</td><td>三文鱼、鲭鱼/青花鱼、沙丁鱼、凤尾鱼、秋刀鱼</td></tr>
+<tr><td>豆类与豆制品</td><td>每周至少 5 次</td><td>鹰嘴豆、扁豆、毛豆、黑豆、红腰豆、豆腐、豆干、腐竹、无糖豆浆、天贝</td></tr>
+<tr><td>十字花科</td><td>每周至少 4 次</td><td>西蓝花/西兰花、花椰菜、卷心菜、紫甘蓝、芝麻菜、小白菜、鸡毛菜、白萝卜、抱子甘蓝、芥蓝、油菜</td></tr>
+<tr><td>红橙色蔬果</td><td>每周至少 5 次</td><td>番茄/小番茄、胡萝卜、南瓜、红椒、黄椒、红薯、紫薯、枸杞</td></tr>
+<tr><td>菌菇</td><td>每周至少 3 次</td><td>香菇、舞茸、灰树花、平菇、木耳、杏鲍菇、松茸、蘑菇、金针菇</td></tr>
+<tr><td>黑巧可可</td><td>每周至少 2 次</td><td>黑巧克力、天然可可粉；优先低添加糖，按耐受选择</td></tr>
 </tbody>
 </table>
 
@@ -122,7 +122,7 @@
 
 它先看最新厨房库存、你的口味与忌口，优先用已有和需要尽快吃掉的食材，按「蔬菜或水果 + 蛋白质 + 主食 + 合适用油」组成完整的一餐。再对照每日、每周饮食记录，在配菜、下一餐或下次采购中补充较少出现的类别，让食物轮换更丰富，不要求一餐凑齐。确认买回、用完或吃过后，它分别更新库存和饮食记录，再据此告诉你下一步吃什么、怎么做、还缺什么。
 
-**这些频率是本项目的规划约定，不是医学阈值，也不是炎症评分。** 同餐同类最多计 1，同一食材可覆盖多类；表中的 0.5 是记录权重，不是建议份量。中性食物仍有营养价值，猪肉虽沿用原来的存放分类，营养上仍属红肉。详细规则见[抗炎营养规划](kitchen/references/nutrition-plan.md)与[食材表](kitchen/references/food-table.md)；整体饮食模式参考 [AHA 膳食指导](https://professional.heart.org/en/science-news/2021-dietary-guidance-to-improve-cardiovascular-health/top-things-to-know)，该指导并未验证本项目的频次或个人抗炎效果。
+**这些频率是本项目的规划约定，不是医学阈值，也不是炎症评分。** 同餐同类计一次，同一食材可覆盖多类；具体计数口径见食材表。中性食物仍有营养价值，猪肉虽沿用原来的存放分类，营养上仍属红肉。详细规则见[抗炎营养规划](kitchen/references/nutrition-plan.md)与[食材表](kitchen/references/food-table.md)；整体饮食模式参考 [AHA 膳食指导](https://professional.heart.org/en/science-news/2021-dietary-guidance-to-improve-cardiovascular-health/top-things-to-know)，该指导并未验证本项目的频次或个人抗炎效果。
 
 ## 库存和记录保存在哪
 
@@ -136,10 +136,21 @@
 
 不同 AI 工具不会自动同步私人记录。下载包没有任何人的库存或饮食历史；你的私人状态不应提交到公开 GitHub。[存储规则](kitchen/references/state-files.md)
 
-## 开发、示例与贡献
+## 参与改进
 
 核心助手不需要 API key；本地辅助脚本需要 Python 3.10+，只使用标准库。AI 工具自身的订阅、权限和能力由各平台决定。
 
 [运行示例与项目结构](docs/development.md) · [贡献指南](CONTRIBUTING.md) · [更新记录](CHANGELOG.md) · [MIT License](LICENSE)
 
-抗炎厨房用于日常饮食搭配，不诊断疾病、不解读化验，也不给药物或补剂剂量。
+欢迎分享使用反馈、食材别名和跨工具兼容问题。[提交反馈](https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen/issues/new) 时请使用虚构示例，避免上传私人库存、聊天记录或健康资料。
+
+<details>
+<summary>作者的话</summary>
+
+我的生活现在每一天都离不开它。
+
+</details>
+
+---
+
+抗炎厨房用于日常饮食搭配，不提供疾病诊断、化验解读或药物、补剂剂量建议。
