@@ -16,16 +16,25 @@ I now use it every day and wouldn't want to do without it.
 
 ## What you can do
 
-| Task | Say or do this | What you get |
-|---|---|---|
-| **1. Organize fridge and pantry inventory** | Type or speak your ingredients, photograph groceries or a receipt, or upload a screenshot: “I bought these; organize them.” | AI-recognized ingredients, confirmed before updating fridge, freezer, and pantry stock; all 19 categories, including empty ones |
-| **2. Decide what to eat** | “What should I have for breakfast/lunch/dinner?” or “I feel like fish tonight.” | One meal combination using available ingredients, or a meal built around your preference with sides and a staple suited to the eating plan |
-| **3. Learn how to cook it** | “Let's make that. Tell me how.” | Ingredients, order, timing, heat, and doneness cues; weeknight defaults aim for 25 minutes and at most two pans |
-| **4. Know what to buy** | “What am I missing for the next three meals?” | Only ingredients needed by the plan and missing from inventory, with their purpose and planned meals |
-| **5. Plan the rest of the day** | “I ate these foods today. How should I plan the next two meals?” | Daily and weekly coverage used to vary upcoming meals; a meal-plan page when supported |
-| **6. Record meals and save recipes** | “I ate this, used up the spinach, and want to save it as Wednesday fish soup.” | Separate updates to actual meal records, confirmed depleted stock, and recipes you explicitly save |
-| **7. Use up perishables** | “The spinach needs using. Build a dish around it.” | A meal prioritizing ingredients that need attention, reducing waste |
-| **8. Review the week** | “Review seven days and help plan next week's meals and shopping.” | Observations from recorded meals and practical suggestions for variety, preparation, and purchasing |
+<table width="100%">
+<thead>
+<tr>
+<th width="30%">Task</th>
+<th width="32%">Say or do this</th>
+<th width="38%">What you get</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>1. Organize fridge and pantry inventory</strong></td><td>Type or speak your ingredients, photograph groceries or a receipt, or upload a screenshot: “I bought these; organize them.”</td><td>AI-recognized ingredients, confirmed before updating fridge, freezer, and pantry stock; all 19 categories, including empty ones</td></tr>
+<tr><td><strong>2. Decide what to eat</strong></td><td>“What should I have for breakfast/lunch/dinner?” or “I feel like fish tonight.”</td><td>One meal combination using available ingredients, or a meal built around your preference with sides and a staple suited to the eating plan</td></tr>
+<tr><td><strong>3. Learn how to cook it</strong></td><td>“Let's make that. Tell me how.”</td><td>Ingredients, order, timing, heat, and doneness cues; weeknight defaults aim for 25 minutes and at most two pans</td></tr>
+<tr><td><strong>4. Know what to buy</strong></td><td>“What am I missing for the next three meals?”</td><td>Only ingredients needed by the plan and missing from inventory, with their purpose and planned meals</td></tr>
+<tr><td><strong>5. Plan the rest of the day</strong></td><td>“I ate these foods today. How should I plan the next two meals?”</td><td>Daily and weekly coverage used to vary upcoming meals; a meal-plan page when supported</td></tr>
+<tr><td><strong>6. Record meals and save recipes</strong></td><td>“I ate this, used up the spinach, and want to save it as Wednesday fish soup.”</td><td>Separate updates to actual meal records, confirmed depleted stock, and recipes you explicitly save</td></tr>
+<tr><td><strong>7. Use up perishables</strong></td><td>“The spinach needs using. Build a dish around it.”</td><td>A meal prioritizing ingredients that need attention, reducing waste</td></tr>
+<tr><td><strong>8. Review the week</strong></td><td>“Review seven days and help plan next week's meals and shopping.”</td><td>Observations from recorded meals and practical suggestions for variety, preparation, and purchasing</td></tr>
+</tbody>
+</table>
 
 Voice, photo, and receipt recognition depend on the host AI. Unclear items are checked first. While you list stock, it listens; when you ask what to eat, it recommends a meal directly, offering alternatives when you want them. Planned meals are not logged as eaten, and shopping lists are not stock already owned.
 
@@ -72,32 +81,49 @@ Expect the **v5.3 inventory with 19 categories**, including empty ones. The skil
 
 ## How meal guidance works
 
-### Start with the eating pattern, then use what you have
+### 8 daily categories
 
-Kitchen focuses on an overall pattern: varied produce and whole grains for fiber and micronutrients; fish, legumes, eggs, and poultry for protein variety; and liquid plant oils, nuts, and fish for unsaturated fats. Garlic, herbs, lemon, and vinegar add flavor while reducing reliance on large amounts of salt and sugar, frequent deep-frying, and processed meat. Chinese cooking fits this approach.
+The default plan covers each category daily, adjusted for preferences, allergies, and tolerance.
 
-| Planning layer | What the assistant does |
+| Category | Ingredients |
 |---|---|
-| **Build a complete meal** | Breakfast usually combines a staple, protein, and produce. Lunch/dinner combine vegetables, protein, a staple, and suitable cooking fat. Adjust to appetite, servings, and activity; do not remove staples or serve only vegetables to improve category counts |
-| **Check actual stock and preferences** | Read current inventory; prioritize what you want, already own, and need to use soon. Respect allergies and restrictions. Mark missing ingredients or offer substitutions, including for seasonings |
-| **Vary food across days and weeks** | Use 8 daily and 6 weekly categories to notice less represented foods. Add variety through sides, another meal, or the next shop; do not squeeze every category into one meal |
-| **Give a simple next action** | Recommend one meal when asked what to eat, steps when asked how, and only missing ingredients when asked what to buy. Weeknight defaults aim for 25 minutes and at most two pans |
-| **Update from feedback** | Confirmed purchases, depletion, and disposal update stock; confirmed eaten meals update the log. Recompute the next recommendation without treating plans as intake or a meal as proof that all its seasonings ran out |
+| Healthy fats | Extra-virgin olive oil, olive oil, avocado, olives |
+| Nuts and seeds | Walnuts, almonds, pistachios, pumpkin seeds, ground flaxseed, chia seeds, Brazil nuts, sesame seeds, sesame paste, almond butter; peanut butter counts as 0.5 |
+| Fermented foods | Greek yogurt, unsweetened yogurt, kefir, natto, miso, kimchi, kombucha |
+| Dark leafy greens | Spinach, kale, watercress, garland chrysanthemum, pea shoots, amaranth greens, Chinese lettuce, young bok choy greens, water spinach, lettuce, bok choy, Chinese broccoli, rapeseed greens |
+| Whole-grain staples | Oats, brown rice, quinoa, millet, predominantly whole-grain buckwheat noodles, whole-wheat bread, whole-wheat pita |
+| Berries and citrus | Blueberries, raspberries, strawberries, blackberries, cranberries, oranges, pomelo, kiwifruit, pomegranate, cherries; açaí powder counts as 0.5 |
+| Tea | Green tea, oolong, white tea, black tea, matcha, hibiscus tea |
+| Herbs and spices | Scallions, garlic, ginger, onions, turmeric powder, black pepper, rosemary, oregano, thyme, cloves, cinnamon, cumin |
 
-For example, with salmon, bok choy, and brown rice in stock, it can directly recommend a dinner using all three, checking available oil and seasonings before detailing the method. Bok choy covers both leafy and cruciferous categories. Missing ingredients are identified rather than invented; a recorded coverage gap alone does not justify a long shopping list.
+### 6 weekly categories
 
-### How the 19-category checklist supports planning
-
-| Group | Includes | Default planning frequency |
+| Category | Default times/week | Ingredients |
 |---|---|---|
-| 8 daily categories | Healthy fats, nuts/seeds, fermented foods, dark leafy greens, whole grains, berries/citrus, tea, herbs/spices | Cover each daily |
-| 6 weekly categories | Oily fish, legumes/soy, cruciferous vegetables, red/orange produce, mushrooms, dark chocolate/cocoa | 3 / 5 / 4 / 5 / 3 / 2 times respectively |
-| 4 other protein categories | Eggs, white fish/seafood, poultry, red meat | Record meal occurrences |
-| 1 neutral category | Other produce, milk, seaweed, tubers, and more | Display without adding coverage |
+| Oily fish | 3 | Salmon, mackerel, sardines, anchovies, Pacific saury |
+| Legumes and soy foods | 5 | Chickpeas, lentils, edamame, black beans, red kidney beans, tofu, pressed tofu, dried tofu skin, unsweetened soy milk, tempeh |
+| Cruciferous vegetables | 4 | Broccoli, cauliflower, cabbage, red cabbage, arugula, bok choy, young bok choy greens, daikon, Brussels sprouts, Chinese broccoli, rapeseed greens |
+| Red and orange produce | 5 | Tomatoes/cherry tomatoes, carrots, pumpkin, red peppers, yellow peppers, sweet potatoes, purple sweet potatoes; goji berries count as 0.5 |
+| Mushrooms | 3 | Shiitake, maitake/hen-of-the-woods, oyster mushrooms, wood ear mushrooms, king oyster mushrooms, matsutake, button mushrooms, enoki |
+| Dark chocolate and cocoa | 2 | Dark chocolate, natural cocoa powder; prefer low added sugar and choose according to tolerance |
 
-A category counts at most once per meal; an ingredient can cover multiple categories. The helper flags unknown ingredients for review. Without code tools, the assistant follows the same rules manually and says so.
+### 4 other protein categories and 1 neutral category
 
-**These frequencies are project planning conventions, not medical thresholds or inflammation scores.** Neutral foods still have nutritional value. Missing a category is not a dietary failure. See the [nutrition-planning rules](kitchen/references/nutrition-plan.md) and [food table](kitchen/references/food-table.md). The overall pattern draws on [AHA dietary guidance](https://professional.heart.org/en/science-news/2021-dietary-guidance-to-improve-cardiovascular-health/top-things-to-know); that guidance does not validate the project's frequencies or individual anti-inflammatory effects.
+Other proteins are recorded by meal occurrence. Neutral foods appear in inventory without adding to target coverage.
+
+| Category | Ingredients |
+|---|---|
+| Eggs | Eggs, boiled eggs, fried eggs |
+| White fish and seafood | Cod, sea bass, mandarin fish, shrimp, scallops, clams, cuttlefish, squid, tuna of unspecified species |
+| Poultry | Chicken legs, chicken breast, chicken, duck breast, duck |
+| Red meat | Beef shank, beef tenderloin, beef brisket, beef, steak, lamb leg, lamb |
+| Neutral foods | Seaweed, other fruit and vegetables, dairy and plant milks, cheese, dried fruit, potatoes, Chinese yam, taro, lotus root, pork, honey, and more |
+
+### How it combines them
+
+It starts with your latest kitchen inventory, preferences, and dietary restrictions, prioritizing ingredients you already have or need to use soon to build a complete meal with produce, protein, a staple, and suitable cooking fat. It then checks daily and weekly meal records and adds less represented categories through sides, the next meal, or the next shop, encouraging variety without fitting every category into one meal. Confirmed purchases, depletion, and eaten meals update inventory and meal records separately, informing the next suggestion for what to eat, how to cook, and what is still missing.
+
+**These frequencies are project planning conventions, not medical thresholds or inflammation scores.** A category counts at most once per meal, and one ingredient can cover multiple categories; 0.5 is a logging weight, not a recommended serving size. Neutral foods still have nutritional value; pork retains its original storage category but is nutritionally red meat. See the [nutrition-planning rules](kitchen/references/nutrition-plan.md) and [food table](kitchen/references/food-table.md); the overall eating pattern draws on [AHA dietary guidance](https://professional.heart.org/en/science-news/2021-dietary-guidance-to-improve-cardiovascular-health/top-things-to-know), which does not validate the project's frequencies or individual anti-inflammatory effects.
 
 ## Where your information goes
 
