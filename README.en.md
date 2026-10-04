@@ -25,14 +25,15 @@ I now use it every day and wouldn't want to do without it.
 </tr>
 </thead>
 <tbody>
-<tr><td><strong>1. Organize fridge and pantry inventory</strong></td><td>Type or speak your ingredients, photograph groceries or a receipt, or upload a screenshot: “I bought these; organize them.”</td><td>AI-recognized ingredients, confirmed before updating fridge, freezer, and pantry stock; all 19 categories, including empty ones</td></tr>
-<tr><td><strong>2. Decide what to eat</strong></td><td>“What should I have for breakfast/lunch/dinner?” or “I feel like fish tonight.”</td><td>One meal combination using available ingredients, or a meal built around your preference with sides and a staple suited to the eating plan</td></tr>
+<tr><td><strong>1. Organize fridge and pantry inventory</strong></td><td><strong>Check stock:</strong> “What is in my fridge?”<br><br><strong>Add groceries:</strong> say “I bought tomatoes and eggs,” or photograph your groceries or receipt.<br><br><strong>Remove finished items:</strong> “I finished the spinach” or “The olive oil has run out.”</td><td>View fridge, freezer, and pantry stock; update it after purchases or confirmed depletion; check photo recognition before saving, with all 19 categories shown, including empty ones</td></tr>
+<tr><td><strong>2. Decide what to eat</strong></td><td>“What should I have for breakfast/lunch/dinner?”<br><br>“I feel like fish tonight.”<br><br>“Give me 3 breakfast options.”</td><td>One meal combination using available ingredients, or a meal built around your preference with sides and a staple suited to the eating plan; multiple options when requested</td></tr>
 <tr><td><strong>3. Learn how to cook it</strong></td><td>“Let's make that. Tell me how.”</td><td>Ingredients, order, timing, heat, and doneness cues; weeknight defaults aim for 25 minutes and at most two pans</td></tr>
-<tr><td><strong>4. Know what to buy</strong></td><td>“What am I missing for the next three meals?”</td><td>Only ingredients needed by the plan and missing from inventory, with their purpose and planned meals</td></tr>
-<tr><td><strong>5. Plan the rest of the day</strong></td><td>“I ate these foods today. How should I plan the next two meals?”</td><td>Daily and weekly coverage used to vary upcoming meals; a meal-plan page when supported</td></tr>
-<tr><td><strong>6. Record meals and save recipes</strong></td><td>“I ate this, used up the spinach, and want to save it as Wednesday fish soup.”</td><td>Separate updates to actual meal records, confirmed depleted stock, and recipes you explicitly save</td></tr>
+<tr><td><strong>4. Know what to buy</strong></td><td>“What am I missing for the next three meals?”</td><td>Suggestions based on the anti-inflammatory eating plan, personal goals, and current stock: only missing ingredients needed for planned meals, with their purpose and planned use</td></tr>
+<tr><td><strong>5. Plan the rest of the day</strong></td><td>“I ate these foods today. How should I plan the next two meals?”</td><td>Upcoming meals based on the anti-inflammatory eating plan, your frequency settings, recorded meals, and current stock; a meal-plan page when supported</td></tr>
+<tr><td><strong>6. Record meals and save favorite recipes</strong></td><td><strong>Log a meal:</strong> “I had this fish soup for dinner.”<br><br><strong>Save a favorite:</strong> “Save this as a favorite recipe called ‘Wednesday fish soup.’”</td><td>Record meals you confirm eating and save recipes you choose, so you can retrieve their instructions by name later</td></tr>
 <tr><td><strong>7. Use up perishables</strong></td><td>“The spinach needs using. Build a dish around it.”</td><td>A meal prioritizing ingredients that need attention, reducing waste</td></tr>
 <tr><td><strong>8. Review the week</strong></td><td>“Review seven days and help plan next week's meals and shopping.”</td><td>Observations from recorded meals and practical suggestions for variety, preparation, and purchasing</td></tr>
+<tr><td><strong>9. Set preferences and goals</strong></td><td>“I avoid cilantro and want more plant protein.”<br><br>“Set legumes and soy to 6 times a week, with no frequency target for tea.”<br><br>“Set other proteins to 4 meals a week combined,” or “No target for other proteins.”</td><td>Save dietary restrictions, allergies, nutrition goals, and personal frequencies; set them at the start, skip them, or change them later, with future meals, shopping, and reviews following your settings</td></tr>
 </tbody>
 </table>
 
@@ -68,56 +69,55 @@ Preserve existing installations and private records. If native skills are unavai
 explain that and use the single-file conversation guide instead.
 ```
 
-### Start with one small task
+### Install it, then set up your kitchen
 
-```text
-Use Anti-Inflammatory Kitchen and respond in English.
-First tell me whether this environment can save inventory across chats.
-I have spinach, tofu, and salmon. That is everything.
-Only update inventory for now; do not suggest recipes yet.
-```
+1. **Install the skill.** Choose a method above; for chat import, upload the guide and ask the assistant to follow it.
+2. **Create a dedicated “Anti-Inflammatory Kitchen” Project.** Keep inventory, meals, recipes, and shopping conversations there; enable project memory where supported. If your tool has no Projects feature, start with one ongoing chat.
+3. **Set preferences and goals (optional).** Share allergies, dietary restrictions, nutrition goals, and any food frequencies you want to change. Skip this to start with the defaults; you can adjust them later.
+4. **Add your real kitchen inventory.** Type, speak, or send grocery and receipt photos, then say “That is everything; organize my inventory.” It organizes fridge, freezer, and pantry ingredients; after that, just tell it what you bought or used up.
 
-Expect the **v5.3 inventory with 19 categories**, including empty ones. The skill defaults to Chinese; ask for English and it can add translations beside the canonical Chinese category labels. With chat import, attach the guide first and explicitly request that it be followed. See the [verification steps](docs/installation.en.md#verify).
+Then ask “What should I eat today?” or “Give me 3 breakfast options.” See [where your information goes](#where-your-information-goes) for continuity and [installation checks](docs/installation.en.md#verify) if you need to verify the setup. The skill defaults to Chinese; ask for English to use translated labels alongside the canonical categories.
 
 ## How meal guidance works
 
-### 8 daily categories
+### Anti-inflammatory food checklist and default frequencies
 
-The default plan covers each category daily, adjusted for preferences, allergies, and tolerance.
+The 8 daily and 6 weekly categories share one checklist. These are starting points: adjust daily or weekly frequencies to your restrictions, nutrition goals, and habits, or leave a category without a target. Future suggestions follow your confirmed settings.
 
-| Category | Ingredients |
-|---|---|
-| Healthy fats | Extra-virgin olive oil, olive oil, avocado, olives |
-| Nuts and seeds | Walnuts, almonds, pistachios, pumpkin seeds, ground flaxseed, chia seeds, Brazil nuts, sesame seeds, sesame paste, almond butter; peanut butter counts as 0.5 |
-| Fermented foods | Greek yogurt, unsweetened yogurt, kefir, natto, miso, kimchi, kombucha |
-| Dark leafy greens | Spinach, kale, watercress, garland chrysanthemum, pea shoots, amaranth greens, Chinese lettuce, young bok choy greens, water spinach, lettuce, bok choy, Chinese broccoli, rapeseed greens |
-| Whole-grain staples | Oats, brown rice, quinoa, millet, predominantly whole-grain buckwheat noodles, whole-wheat bread, whole-wheat pita |
-| Berries and citrus | Blueberries, raspberries, strawberries, blackberries, cranberries, oranges, pomelo, kiwifruit, pomegranate, cherries; açaí powder counts as 0.5 |
-| Tea | Green tea, oolong, white tea, black tea, matcha, hibiscus tea |
-| Herbs and spices | Scallions, garlic, ginger, onions, turmeric powder, black pepper, rosemary, oregano, thyme, cloves, cinnamon, cumin |
+<table width="100%">
+<thead><tr><th width="25%">Category</th><th width="18%">Default frequency</th><th width="57%">Ingredients</th></tr></thead>
+<tbody>
+<tr><td>Healthy fats</td><td>Once daily</td><td>Extra-virgin olive oil, olive oil, avocado, olives</td></tr>
+<tr><td>Nuts and seeds</td><td>Once daily</td><td>Walnuts, almonds, pistachios, pumpkin seeds, ground flaxseed, chia seeds, Brazil nuts, sesame seeds, sesame paste, almond butter; peanut butter counts as 0.5</td></tr>
+<tr><td>Fermented foods</td><td>Once daily</td><td>Greek yogurt, unsweetened yogurt, kefir, natto, miso, kimchi, kombucha</td></tr>
+<tr><td>Dark leafy greens</td><td>Once daily</td><td>Spinach, kale, watercress, garland chrysanthemum, pea shoots, amaranth greens, Chinese lettuce, young bok choy greens, water spinach, lettuce, bok choy, Chinese broccoli, rapeseed greens</td></tr>
+<tr><td>Whole-grain staples</td><td>Once daily</td><td>Oats, brown rice, quinoa, millet, predominantly whole-grain buckwheat noodles, whole-wheat bread, whole-wheat pita</td></tr>
+<tr><td>Berries and citrus</td><td>Once daily</td><td>Blueberries, raspberries, strawberries, blackberries, cranberries, oranges, pomelo, kiwifruit, pomegranate, cherries; açaí powder counts as 0.5</td></tr>
+<tr><td>Tea</td><td>Once daily</td><td>Green tea, oolong, white tea, black tea, matcha, hibiscus tea</td></tr>
+<tr><td>Herbs and spices</td><td>Once daily</td><td>Scallions, garlic, ginger, onions, turmeric powder, black pepper, rosemary, oregano, thyme, cloves, cinnamon, cumin</td></tr>
+<tr><td>Oily fish</td><td>3 times/week</td><td>Salmon, mackerel, sardines, anchovies, Pacific saury</td></tr>
+<tr><td>Legumes and soy foods</td><td>5 times/week</td><td>Chickpeas, lentils, edamame, black beans, red kidney beans, tofu, pressed tofu, dried tofu skin, unsweetened soy milk, tempeh</td></tr>
+<tr><td>Cruciferous vegetables</td><td>4 times/week</td><td>Broccoli, cauliflower, cabbage, red cabbage, arugula, bok choy, young bok choy greens, daikon, Brussels sprouts, Chinese broccoli, rapeseed greens</td></tr>
+<tr><td>Red and orange produce</td><td>5 times/week</td><td>Tomatoes/cherry tomatoes, carrots, pumpkin, red peppers, yellow peppers, sweet potatoes, purple sweet potatoes; goji berries count as 0.5</td></tr>
+<tr><td>Mushrooms</td><td>3 times/week</td><td>Shiitake, maitake/hen-of-the-woods, oyster mushrooms, wood ear mushrooms, king oyster mushrooms, matsutake, button mushrooms, enoki</td></tr>
+<tr><td>Dark chocolate and cocoa</td><td>2 times/week</td><td>Dark chocolate, natural cocoa powder; prefer low added sugar and choose according to tolerance</td></tr>
+</tbody>
+</table>
 
-### 6 weekly categories
+### Other proteins and neutral foods
 
-| Category | Default times/week | Ingredients |
-|---|---|---|
-| Oily fish | 3 | Salmon, mackerel, sardines, anchovies, Pacific saury |
-| Legumes and soy foods | 5 | Chickpeas, lentils, edamame, black beans, red kidney beans, tofu, pressed tofu, dried tofu skin, unsweetened soy milk, tempeh |
-| Cruciferous vegetables | 4 | Broccoli, cauliflower, cabbage, red cabbage, arugula, bok choy, young bok choy greens, daikon, Brussels sprouts, Chinese broccoli, rapeseed greens |
-| Red and orange produce | 5 | Tomatoes/cherry tomatoes, carrots, pumpkin, red peppers, yellow peppers, sweet potatoes, purple sweet potatoes; goji berries count as 0.5 |
-| Mushrooms | 3 | Shiitake, maitake/hen-of-the-woods, oyster mushrooms, wood ear mushrooms, king oyster mushrooms, matsutake, button mushrooms, enoki |
-| Dark chocolate and cocoa | 2 | Dark chocolate, natural cocoa powder; prefer low added sugar and choose according to tolerance |
+**The default plan includes protein every day while preserving the planned frequencies for oily fish and legumes/soy.** You may set a combined frequency for eggs, white fish/seafood, poultry, and red meat, or leave it unset. These four categories add variety; they do not require an extra daily serving of “other protein,” and their targets should not crowd out fish or soy foods. Allergies and dietary restrictions take priority, with affected categories adjusted and alternatives planned. Neutral foods have no frequency target.
 
-### 4 other protein categories and 1 neutral category
-
-Other proteins are recorded by meal occurrence. Neutral foods appear in inventory without adding to target coverage.
-
-| Category | Ingredients |
-|---|---|
-| Eggs | Eggs, boiled eggs, fried eggs |
-| White fish and seafood | Cod, sea bass, mandarin fish, shrimp, scallops, clams, cuttlefish, squid, tuna of unspecified species |
-| Poultry | Chicken legs, chicken breast, chicken, duck breast, duck |
-| Red meat | Beef shank, beef tenderloin, beef brisket, beef, steak, lamb leg, lamb |
-| Neutral foods | Seaweed, other fruit and vegetables, dairy and plant milks, cheese, dried fruit, potatoes, Chinese yam, taro, lotus root, pork, honey, and more |
+<table width="100%">
+<thead><tr><th width="25%">Category</th><th width="23%">Frequency</th><th width="52%">Ingredients</th></tr></thead>
+<tbody>
+<tr><td>Eggs</td><td>Optional combined target; none by default</td><td>Eggs, boiled eggs, fried eggs</td></tr>
+<tr><td>White fish and seafood</td><td>Optional combined target; none by default</td><td>Cod, sea bass, mandarin fish, shrimp, scallops, clams, cuttlefish, squid, tuna of unspecified species</td></tr>
+<tr><td>Poultry</td><td>Optional combined target; none by default</td><td>Chicken legs, chicken breast, chicken, duck breast, duck</td></tr>
+<tr><td>Red meat</td><td>Optional combined target; none by default</td><td>Beef shank, beef tenderloin, beef brisket, beef, steak, lamb leg, lamb</td></tr>
+<tr><td>Neutral foods</td><td>No target</td><td>Seaweed, other fruit and vegetables, dairy and plant milks, cheese, dried fruit, potatoes, Chinese yam, taro, lotus root, pork, honey, and more</td></tr>
+</tbody>
+</table>
 
 ### How it combines them
 
@@ -129,11 +129,11 @@ It starts with your latest kitchen inventory, preferences, and dietary restricti
 
 **Create a dedicated “Anti-Inflammatory Kitchen” Project and use it for your everyday kitchen conversations.** Use the skill there, or add the conversation-import guide; keep inventory updates, meal records, recipes, and shopping discussions in that same project. If your tool supports project memory, enable it according to the platform's settings so later conversations can refer to earlier records and food preferences, reducing repeated setup.
 
-Project memory helps carry context forward; the latest confirmed records remain the source of truth for inventory and meal logs. Periodically ask the AI to prepare a snapshot of your current inventory, meal log, and saved recipes, and save it in the project's files or sources. If the assistant cannot save it directly, download and upload it yourself. When starting a new chat, ask it to read the latest records before planning. [ChatGPT project guidance](https://learn.chatgpt.com/docs/projects)
+Project memory helps carry context forward; the latest confirmed records remain the source of truth for inventory and meal logs. Periodically ask the AI to prepare a snapshot of your personal settings, current inventory, meal log, and saved recipes, and save it in the project's files or sources. If the assistant cannot save it directly, download and upload it yourself. When starting a new chat, ask it to read the latest records before planning. [ChatGPT project guidance](https://learn.chatgpt.com/docs/projects)
 
 - **Local agents:** the selected project's `.kitchen-state/`. Reopen the same project in a new chat.
 - **Cloud tools with persistent storage:** the assistant confirms the actual available location and reports saving only after a successful write.
-- **Conversation-only tools:** keep records in that conversation, then export inventory, recipes, and meal-log snapshots to bring into the next chat.
+- **Conversation-only tools:** keep records in that conversation, then export personal settings, inventory, recipes, and meal-log snapshots to bring into the next chat.
 
 Different AI tools do not automatically synchronize private records. Downloads contain no personal inventory or dietary history. Keep private state out of public GitHub repositories. [Storage rules](kitchen/references/state-files.md)
 

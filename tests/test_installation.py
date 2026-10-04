@@ -65,7 +65,7 @@ class InstallationTests(unittest.TestCase):
         result = installer.install(target, update=True)
         self.assertEqual((Path(result['backup']) / 'SKILL.md').read_text(), 'old rules')
         self.assertFalse((self.home / '.agents').exists())
-        self.assertIn('v5.3', (legacy / 'SKILL.md').read_text(encoding='utf-8'))
+        self.assertIn('v5.4', (legacy / 'SKILL.md').read_text(encoding='utf-8'))
 
     def test_duplicate_codex_locations_require_resolution(self):
         for folder in ['.codex', '.agents']:
@@ -123,7 +123,7 @@ class DistributionTests(unittest.TestCase):
                      '.cursor-plugin/plugin.json', 'gemini-extension.json']:
             manifest = json.loads(files[name])
             self.assertEqual(manifest['name'], 'anti-inflammatory-kitchen')
-            self.assertEqual(manifest['version'], '5.3.0')
+            self.assertEqual(manifest['version'], '5.4.0')
         portable = json.loads(files['plugin.json'])
         self.assertEqual(portable['$schema'], 'https://agent-plugins.org/schemas/1.0.0/plugin.schema.json')
         for name, source in builder.skill_files():
@@ -180,7 +180,7 @@ class DistributionTests(unittest.TestCase):
 
     def test_chat_guide_is_self_contained_for_references(self):
         guide = builder.chat_guide().decode('utf-8')
-        self.assertIn('v5.3', guide)
+        self.assertIn('v5.4', guide)
         self.assertNotRegex(guide, r'\]\(references/')
         for anchor in ['workflow', 'food-table', 'state-files', 'recipe-rules', 'visuals']:
             self.assertIn(f'<a id="{anchor}"></a>', guide)

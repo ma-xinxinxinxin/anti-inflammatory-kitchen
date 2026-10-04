@@ -75,8 +75,11 @@ This is a conversation guide, not an account-wide skill installation. Attachment
 When using this single file: use the embedded references, calculate manually and say so (the Python helper is not included), use text tables when rendering is unavailable, and export a state snapshot when persistent storage is unavailable. Respond in the user's language; translated labels can accompany canonical Chinese categories.
 
 开始使用 / Start:
-> 请按附件中的抗炎厨房指南工作。先说明本次能否保存库存、执行脚本，然后等我报食材；现在不要生成菜谱。
-> Follow the attached Kitchen guide. Tell me whether this session can save inventory or run scripts, then wait for my ingredients. Do not suggest recipes yet.
+建议把指南放在单独的「抗炎厨房」Project；可设置忌口、营养目标和频次，再录入真实库存。无项目功能时用固定聊天，结束时导出个人设置与餐厨记录。
+Keep this guide in a dedicated Kitchen Project; optionally set restrictions, nutrition goals, and frequencies, then add real inventory. Without Projects, use one ongoing chat and export personal settings and kitchen records.
+
+> 请按附件中的抗炎厨房指南工作。我会先告诉你个人偏好和厨房里有什么，报完后再帮我整理。
+> Follow the attached Kitchen guide. I will share my preferences and kitchen inventory first; organize them when I finish.
 
 '''
     out = [preface]

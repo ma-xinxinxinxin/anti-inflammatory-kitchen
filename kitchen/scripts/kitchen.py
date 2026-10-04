@@ -11,6 +11,7 @@ day.json / week.json 的字段见文件末尾 SCHEMA 说明。
 score 的输出可直接当 week.json 用（再补上 review 三段文字）。
 """
 import sys, json, re, argparse, datetime as dt
+import math
 from html import escape
 from pathlib import Path
 
@@ -197,7 +198,51 @@ def week_dates(end):
     e = dt.date.fromisoformat(end)
     return [(e - dt.timedelta(days=i)).isoformat() for i in range(6, -1, -1)]
 
-def score(text, end=None):
+def profile_frequencies(profile):
+    """Resolve explicit personal targets without mutating defaults or user settings."""
+    frequencies = {k: {"period": "day", "target": 1} for k in DAILY_KEYS}
+    frequencies.update({k: {"period": "week", "target": t} for k, _, t, _ in WEEKLY})
+    frequencies.update({k: None for k, _, _ in OTHERP})
+    frequencies["otherProtein"] = None
+    if not isinstance(profile, dict):
+        raise ValueError("profile must be a JSON object")
+    for field in ("restrictions", "preferences", "goals"):
+        value = profile.get(field, [])
+        if not isinstance(value, list) or any(not isinstance(x, str) for x in value):
+            raise ValueError(f"profile {field} must be a list of text values")
+    overrides = profile.get("frequencies", {})
+    if not isinstance(overrides, dict):
+        raise ValueError("profile frequencies must be an object")
+    for key, rule in overrides.items():
+        if key not in frequencies:
+            raise ValueError(f"Unknown frequency category: {key}; neutral foods have no target")
+        if rule is not None:
+            if not isinstance(rule, dict) or set(rule) != {"period", "target"}:
+                raise ValueError(f"{key}: use period and target, or null for no target")
+            target = rule["target"]
+            if (rule["period"] not in ("day", "week") or isinstance(target, bool)
+                    or not isinstance(target, (int, float)) or not math.isfinite(target) or target <= 0):
+                raise ValueError(f"{key}: period must be day/week and target positive; use null for no target")
+        frequencies[key] = rule
+    return frequencies
+
+
+def personal_plan(frequencies, counts, dates, recorded):
+    """Keep daily thresholds per day; never let extra meals erase an unrecorded day."""
+    result = []
+    for key, rule in frequencies.items():
+        values = [round(counts[d].get(key, 0), 1) if d in recorded else None for d in dates]
+        row = {"key": key, "name": "其他蛋白合计" if key == "otherProtein" else NAME[key],
+               "frequency": rule, "dailyCounts": values,
+               "recordedCount": round(sum(v for v in values if v is not None), 1)}
+        if rule and rule["period"] == "day":
+            row["metDays"] = sum(v is not None and v >= rule["target"] for v in values)
+        result.append(row)
+    return result
+
+
+def score(text, end=None, profile=None):
+    frequencies = profile_frequencies(profile) if profile is not None else None
     days, lims = parse_log(text)
     end = end or (max(days) if days else dt.date.today().isoformat())
     dates = week_dates(end)
@@ -208,6 +253,7 @@ def score(text, end=None):
     limits = {}
     logged = 0
     unknown, neutral = set(), set()
+    counts = {d: {} for d in dates}
     for d in dates:
         meals = days.get(d)
         if meals is None:
@@ -225,22 +271,28 @@ def score(text, end=None):
                     meal_weights[k] = max(meal_weights.get(k, 0), wt)
                     if k == "neutral": neutral.add(it)
             for k, wt in meal_weights.items():
+                counts[d][k] = counts[d].get(k, 0) + wt
                 if k in acc: acc[k] += wt
                 elif k in weekly: weekly[k] += wt
                 elif k in other: other[k] += 1
+            if any(k in meal_weights for k in other):
+                counts[d]["otherProtein"] = counts[d].get("otherProtein", 0) + 1
         for k in DAILY_KEYS:
             ok = acc[k] >= 1.0
             matrix[k].append("met" if ok else "recorded")
             if ok: met_days[k] += 1
         for lk, n in lims.get(d, {}).items():
             limits[lk] = limits.get(lk, 0) + n
-    return {
+    result = {
         "weekStart": dates[0], "weekEnd": dates[-1], "daysWithRecord": logged,
         "dailyMatrix": matrix, "dailyMetDays": met_days,
         "weeklyCounts": {k: round(v, 1) for k, v in weekly.items()}, "weeklyTargets": {k: t for k, _, t, _ in WEEKLY},
         "otherProtein": other, "limitsHit": limits,
         "neutralList": sorted(neutral), "unrecognizedItems": sorted(unknown),
     }
+    if frequencies is not None:
+        result["personalPlan"] = personal_plan(frequencies, counts, dates, days)
+    return result
 
 # ---------- 视觉 ----------
 HEAD = """<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -418,34 +470,48 @@ def render_week(w):
              f'color:#F6F2E8">{w.get("rangeLabel", "")}</div>')
     h.append(f'<div style="font:400 12px \'Noto Sans SC\';color:{MUT};margin-top:-6px">'
              f'7 天里有 {logged} 天记录，按记了的算</div>')
-    # 矩阵
-    rows = []
-    for k in DAILY_KEYS:
-        cells = w["dailyMatrix"][k]; met = w["dailyMetDays"][k]
-        col = MUT if logged == 0 else (G if met == logged else INK)
-        sq = "".join(
-            f'<span style="flex:1;height:24px;border-radius:7px;'
-            + ('background:%s"></span>' % G if c == "met" else
-               'background:#E4E1D2"></span>' if c == "recorded" else
-               'border:1px dashed rgba(42,42,36,.3)"></span>')
-            for c in cells)
-        rows.append(f'<div style="display:flex;align-items:center;gap:9px">'
-                    f'<span style="width:82px;flex:none;font:400 12.5px \'Noto Sans SC\'">{NAME[k]}</span>'
-                    f'<span style="flex:1;display:flex;gap:6px">{sq}</span>'
-                    f'<span class="num" style="width:32px;text-align:right;font-size:12.5px;font-weight:500;color:{col}">{met}/{logged}</span></div>')
-    h.append(f'<div><div style="font:700 15px \'Noto Sans SC\';margin-bottom:10px">每日必有 8 类 · 达标天数</div>'
-             f'<div style="display:flex;flex-direction:column;gap:7px">{"".join(rows)}</div>'
-             f'<div style="display:flex;gap:14px;margin-top:10px;font:400 11px \'Noto Sans SC\';color:{MUT}">'
-             f'<span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:{G};'
-             f'margin-right:5px;vertical-align:0"></span>达标</span>'
-             f'<span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#E4E1D2;'
-             f'margin-right:5px"></span>有记录未达标</span>'
-             f'<span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;'
-             f'border:1px dashed rgba(42,42,36,.35);margin-right:5px"></span>没记录</span></div></div>')
-    wk = [{"name": n, "n": w["weeklyCounts"].get(k, 0), "t": w.get("weeklyTargets", {}).get(k, t),
-           "behind": w["weeklyCounts"].get(k, 0) < t * 2 / 3} for k, n, t, _ in WEEKLY]
-    h.append(f'<div><div style="font:700 15px \'Noto Sans SC\';margin-bottom:9px">每周达标 6 项</div>'
-             + _weekly_grid(wk) + '</div>')
+    if "personalPlan" in w:
+        h.append('<div class="card"><div class="sect">个人频次与记录</div>')
+        for row in w["personalPlan"]:
+            rule = row["frequency"]
+            if rule is None:
+                detail = f'不设频次 · 已记录 {row["recordedCount"]:g} 次'
+            elif rule["period"] == "day":
+                detail = (f'每天 {rule["target"]:g} 次 · 有记录的 {logged} 天中 '
+                          f'{row["metDays"]} 天达到设定频次')
+            else:
+                detail = f'每周 {rule["target"]:g} 次 · 已记录 {row["recordedCount"]:g} 次'
+            h.append(f'<p class="body"><strong>{row["name"]}</strong><br>{detail}</p>')
+        h.append('<p class="sub">次数是规划约定，不是营养剂量；未记录不等于没吃。</p></div>')
+    else:
+        # 矩阵
+        rows = []
+        for k in DAILY_KEYS:
+            cells = w["dailyMatrix"][k]; met = w["dailyMetDays"][k]
+            col = MUT if logged == 0 else (G if met == logged else INK)
+            sq = "".join(
+                f'<span style="flex:1;height:24px;border-radius:7px;'
+                + ('background:%s"></span>' % G if c == "met" else
+                   'background:#E4E1D2"></span>' if c == "recorded" else
+                   'border:1px dashed rgba(42,42,36,.3)"></span>')
+                for c in cells)
+            rows.append(f'<div style="display:flex;align-items:center;gap:9px">'
+                        f'<span style="width:82px;flex:none;font:400 12.5px \'Noto Sans SC\'">{NAME[k]}</span>'
+                        f'<span style="flex:1;display:flex;gap:6px">{sq}</span>'
+                        f'<span class="num" style="width:32px;text-align:right;font-size:12.5px;font-weight:500;color:{col}">{met}/{logged}</span></div>')
+        h.append(f'<div><div style="font:700 15px \'Noto Sans SC\';margin-bottom:10px">每日必有 8 类 · 达标天数</div>'
+                 f'<div style="display:flex;flex-direction:column;gap:7px">{"".join(rows)}</div>'
+                 f'<div style="display:flex;gap:14px;margin-top:10px;font:400 11px \'Noto Sans SC\';color:{MUT}">'
+                 f'<span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:{G};'
+                 f'margin-right:5px;vertical-align:0"></span>达标</span>'
+                 f'<span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#E4E1D2;'
+                 f'margin-right:5px"></span>有记录未达标</span>'
+                 f'<span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;'
+                 f'border:1px dashed rgba(42,42,36,.35);margin-right:5px"></span>没记录</span></div></div>')
+        wk = [{"name": n, "n": w["weeklyCounts"].get(k, 0), "t": w.get("weeklyTargets", {}).get(k, t),
+               "behind": w["weeklyCounts"].get(k, 0) < t * 2 / 3} for k, n, t, _ in WEEKLY]
+        h.append(f'<div><div style="font:700 15px \'Noto Sans SC\';margin-bottom:9px">每周达标 6 项</div>'
+                 + _weekly_grid(wk) + '</div>')
     op = [f'{NAME[k]} {v}' for k, v in (w.get("otherProtein") or {}).items() if v]
     if w.get("neutralList"): op = op + [" · ".join(w["neutralList"])]
     h.append(_pill_block("其他优质蛋白 · 中性食物", "", op, OLB, OLT, "这周未记录到"))
@@ -488,7 +554,7 @@ def render_week(w):
 SCHEMA = """
 Commands:
   fridge --items "菠菜, 西兰花" | fridge --log kitchen-fridge.md
-  score --log kitchen-log.md [--end YYYY-MM-DD]
+  score --log kitchen-log.md [--end YYYY-MM-DD] [--profile kitchen-profile.json]
   day --json day.json [-o today.html]
   week --json week.json [-o review.html]
 
@@ -499,6 +565,15 @@ day.json:
             otherProtein [text], neutral [text], limits [text].
   The coverage ring is derived from daily, never a separate health score.
   Planned meals must be labeled as plans and must not be written to the meal log.
+
+score automatically reads kitchen-profile.json next to the log when present.
+  --profile selects an explicit file; invalid settings fail instead of reverting silently.
+  A profile has optional restrictions/preferences/goals text lists and frequencies:
+  {"legumes": {"period": "week", "target": 6}, "tea": null}.
+  Omitted categories use defaults; null removes a target; neutral has no target.
+  otherProtein counts meals containing any of the four other protein categories once.
+  With a profile, personalPlan is authoritative; legacy fields retain default comparisons.
+  Daily plans with custom frequencies should use a personal-goal table, not day's fixed ring.
 
 week.json: output from score, optionally supplemented with title, rangeLabel,
   review: {"wins": [text], "topGaps": [text], "actions": [text]}.
@@ -518,6 +593,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("cmd", choices=["score", "day", "week", "fridge", "schema"])
     ap.add_argument("--log"); ap.add_argument("--json"); ap.add_argument("--end"); ap.add_argument("-o")
+    ap.add_argument("--profile", help="个人设置 JSON；默认读取日志同目录的 kitchen-profile.json")
     ap.add_argument("--items", help="逗号或换行分隔的原始食材条目")
     a = ap.parse_args(argv)
     if a.cmd == "schema":
@@ -529,12 +605,19 @@ def main(argv=None):
         ap.error("score requires --log")
     if a.cmd in ("day", "week") and not a.json:
         ap.error(f"{a.cmd} requires --json")
+    if a.profile and a.cmd != "score":
+        ap.error("--profile is supported by score; use its output with week")
     try:
         if a.cmd == "fridge":
             raw = a.items if a.items is not None else Path(a.log).read_text(encoding="utf-8")
             out = render_fridge(parse_fridge(raw))
         elif a.cmd == "score":
-            out = json.dumps(score(Path(a.log).read_text(encoding="utf-8"), a.end), ensure_ascii=False, indent=2)
+            profile_path = Path(a.profile) if a.profile else Path(a.log).with_name("kitchen-profile.json")
+            profile = None
+            if a.profile or profile_path.exists():
+                profile = json.loads(profile_path.read_text(encoding="utf-8"))
+                profile_frequencies(profile)
+            out = json.dumps(score(Path(a.log).read_text(encoding="utf-8"), a.end, profile), ensure_ascii=False, indent=2)
         else:
             data = json.loads(Path(a.json).read_text(encoding="utf-8"))
             if a.cmd == "day":

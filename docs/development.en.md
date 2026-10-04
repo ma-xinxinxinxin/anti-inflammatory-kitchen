@@ -21,6 +21,8 @@ Examples use fictional data. Generated HTML works offline without remote fonts. 
 
 Incomplete logs show the actual number of recorded days. Unknown ingredients appear in `unrecognizedItems`; unrecognized does not mean uneaten.
 
+Store personal settings in `kitchen-profile.json` beside the log; `score` reads it automatically, or use `--profile` to select a file. See the [state format](../kitchen/references/state-files.md). With settings present, use `personalPlan` for targets and weekly rendering; legacy fields retain default comparisons for compatibility. Use a personal-goal table instead of the fixed eight-category day ring for custom frequencies.
+
 ## Repository structure
 
 | Path | Purpose |

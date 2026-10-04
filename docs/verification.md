@@ -1,3 +1,13 @@
+# v5.4 验证记录 / Verification record
+
+2026-10-04。本轮 47 项本地测试通过，新增个人频次、合计蛋白去重、默认兼容与 CLI 读取/渲染检查；技能结构验证通过；下载包已重建并通过一致性检查。所有测试数据均为虚构。未新增手机端或各平台模型行为实测。
+
+47 local tests passed, including custom frequencies, combined protein meal counts, default compatibility, profile loading, and weekly rendering. Skill structure validation passed; download artifacts were rebuilt and checked. Fixtures are fictional; no new mobile or host-model acceptance claims.
+
+新增手动验收：创建专用项目、可选设置忌口与目标、录入真实库存；检查查库存/补库存/用完移除、三个早餐选项、保存常用菜谱、个人频次在新聊天中恢复，以及其他蛋白不挤占鱼和豆制品的计划。以下旧版安装结果仅作历史记录。
+
+---
+
 # v5.3 验证记录 / Verification record
 
 2026-10-04。所有库存测试使用虚构数据。All inventory fixtures are fictional.
