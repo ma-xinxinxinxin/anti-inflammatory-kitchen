@@ -127,6 +127,10 @@ It starts with your latest kitchen inventory, preferences, and dietary restricti
 
 ## Where your information goes
 
+**Create a dedicated “Anti-Inflammatory Kitchen” Project and use it for your everyday kitchen conversations.** Use the skill there, or add the conversation-import guide; keep inventory updates, meal records, recipes, and shopping discussions in that same project. If your tool supports project memory, enable it according to the platform's settings so later conversations can refer to earlier records and food preferences, reducing repeated setup.
+
+Project memory helps carry context forward; the latest confirmed records remain the source of truth for inventory and meal logs. Periodically ask the AI to prepare a snapshot of your current inventory, meal log, and saved recipes, and save it in the project's files or sources. If the assistant cannot save it directly, download and upload it yourself. When starting a new chat, ask it to read the latest records before planning. [ChatGPT project guidance](https://learn.chatgpt.com/docs/projects)
+
 - **Local agents:** the selected project's `.kitchen-state/`. Reopen the same project in a new chat.
 - **Cloud tools with persistent storage:** the assistant confirms the actual available location and reports saving only after a successful write.
 - **Conversation-only tools:** keep records in that conversation, then export inventory, recipes, and meal-log snapshots to bring into the next chat.
