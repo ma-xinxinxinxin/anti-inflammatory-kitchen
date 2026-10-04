@@ -116,6 +116,64 @@ class InventoryTests(unittest.TestCase):
         self.assertIn('| 菌菇 | 松茸 |', out)
 
 
+class PersonalPlanTests(unittest.TestCase):
+    def rows(self, text, frequencies):
+        result = k.score(text, '2026-09-07', {'frequencies': frequencies})
+        return {row['key']: row for row in result['personalPlan']}
+
+    def test_frequency_changes_do_not_change_food_counts_or_defaults(self):
+        text = log('豆腐 菠菜 绿茶')
+        original = k.score(text, '2026-09-07')
+        result = k.score(text, '2026-09-07', {'frequencies': {
+            'legumes': {'period': 'week', 'target': 6}, 'tea': None}})
+        self.assertEqual({key: result[key] for key in original}, original)
+        rows = {row['key']: row for row in result['personalPlan']}
+        self.assertEqual(rows['legumes']['frequency']['target'], 6)
+        self.assertEqual(rows['legumes']['recordedCount'], 1)
+        self.assertIsNone(rows['tea']['frequency'])
+        self.assertEqual(rows['tea']['recordedCount'], 1)
+        self.assertEqual(rows['fattyFish']['frequency']['target'], 3)
+        self.assertIsNone(rows['otherProtein']['frequency'])
+        self.assertEqual(k.score(text, '2026-09-07'), original)
+
+    def test_daily_category_can_become_weekly_and_weekly_can_be_daily(self):
+        text = log('菠菜 豆腐', '2026-09-06') + log('菠菜 豆腐') + '- [stated] 晚 | 豆腐\n'
+        rows = self.rows(text, {'leafy': {'period': 'week', 'target': 5},
+                               'legumes': {'period': 'day', 'target': 2}})
+        self.assertEqual(rows['leafy']['recordedCount'], 2)
+        self.assertNotIn('metDays', rows['leafy'])
+        self.assertEqual(rows['legumes']['metDays'], 1)
+        self.assertEqual(rows['legumes']['dailyCounts'], [None] * 5 + [1, 2])
+
+    def test_other_proteins_combined_count_meals_without_crowding_fish_or_soy(self):
+        text = log('鸡蛋 鸡胸 三文鱼 豆腐') + '- [stated] 晚 | 牛肉 虾\n'
+        rows = self.rows(text, {'otherProtein': {'period': 'week', 'target': 4}})
+        self.assertEqual(rows['otherProtein']['recordedCount'], 2)
+        self.assertEqual(rows['fattyFish']['recordedCount'], 1)
+        self.assertEqual(rows['legumes']['recordedCount'], 1)
+        self.assertEqual(rows['legumes']['frequency']['target'], 5)
+        self.assertEqual(self.rows(log('三文鱼 豆腐'), {})['otherProtein']['recordedCount'], 0)
+
+    def test_personal_plan_keeps_half_weights_and_unrecorded_days(self):
+        rows = self.rows(log('花生酱') + '- [stated] 晚 | 花生酱\n',
+                         {'nutsSeeds': {'period': 'week', 'target': 3}})
+        self.assertEqual(rows['nutsSeeds']['recordedCount'], 1)
+        rows = self.rows('', {'nutsSeeds': {'period': 'day', 'target': 1}})
+        self.assertEqual(rows['nutsSeeds']['dailyCounts'], [None] * 7)
+        self.assertEqual(rows['nutsSeeds']['metDays'], 0)
+
+    def test_invalid_personal_targets_fail_instead_of_silently_using_defaults(self):
+        bad = [None, [], {'goals': 'more vegetables'}, {'frequencies': []},
+               {'frequencies': {'neutral': {'period': 'week', 'target': 3}}},
+               {'frequencies': {'typo': None}}]
+        for target in (0, -1, True, '3', float('nan'), float('inf')):
+            bad.append({'frequencies': {'tea': {'period': 'day', 'target': target}}})
+        bad.append({'frequencies': {'tea': {'period': 'month', 'target': 3}}})
+        for profile in bad:
+            with self.subTest(profile=profile), self.assertRaises(ValueError):
+                k.profile_frequencies(profile)
+
+
 class CommandTests(unittest.TestCase):
     def run_cli(self, *args):
         return subprocess.run([sys.executable, str(SCRIPT), *args], capture_output=True, text=True)
@@ -171,6 +229,35 @@ class CommandTests(unittest.TestCase):
             self.assertEqual(out.returncode, 0, out.stderr)
             self.assertIn('2026-09-01', out.stdout)
             self.assertIn('7 天里有 2 天记录', out.stdout)
+
+    def test_personal_profile_auto_load_explicit_override_and_week_render(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            meal_log = root / 'kitchen-log.md'
+            meal_log.write_text(log('豆腐 绿茶 鸡蛋'), encoding='utf-8')
+            profile = root / 'kitchen-profile.json'
+            profile.write_text(json.dumps({'frequencies': {
+                'legumes': {'period': 'week', 'target': 6}, 'tea': None}}), encoding='utf-8')
+            before = (meal_log.read_bytes(), profile.read_bytes())
+            output = root / 'week.json'
+            result = self.run_cli('score', '--log', str(meal_log), '-o', str(output))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            result = self.run_cli('week', '--json', str(output))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn('每周 6 次 · 已记录 1 次', result.stdout)
+            self.assertIn('茶饮</strong><br>不设频次', result.stdout)
+            self.assertNotIn('每日必有 8 类 · 达标天数', result.stdout)
+            self.assertEqual((meal_log.read_bytes(), profile.read_bytes()), before)
+            alternate = root / 'alternate.json'
+            alternate.write_text('{}', encoding='utf-8')
+            result = self.run_cli('score', '--log', str(meal_log), '--profile', str(alternate))
+            rows = {r['key']: r for r in json.loads(result.stdout)['personalPlan']}
+            self.assertEqual(rows['legumes']['frequency']['target'], 5)
+            profile.write_text('null', encoding='utf-8')
+            result = self.run_cli('score', '--log', str(meal_log))
+            self.assertEqual(result.returncode, 2)
+            self.assertIn('profile must be a JSON object', result.stderr)
+            self.assertNotIn('Traceback', result.stderr)
 
     def test_archive_contains_only_installable_skill(self):
         spec = importlib.util.spec_from_file_location('package_skill', ROOT / 'scripts/package_skill.py')

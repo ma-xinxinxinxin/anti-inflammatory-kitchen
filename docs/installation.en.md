@@ -68,7 +68,7 @@ Package compatibility, account installation, public listing, and private state s
 1. [Download kitchen.zip](../downloads/kitchen.zip) using GitHub's download button. No local Python setup is needed.
 2. Enable Code execution and file creation in Settings → Capabilities as permitted by your account.
 3. Open **Customize → Skills → + → Create skill → Upload a skill**, upload the ZIP, and enable it.
-4. Start a new chat and ask for the Kitchen version and category count: v5.3 and 19.
+4. Start a new chat and ask for the Kitchen version and category count: v5.4 and 19.
 
 Use the controls actually available to your account. The ZIP contains `kitchen/SKILL.md`, references, and the helper. Attaching it to an ordinary conversation is not a Skills installation. Mobile discovery and invocation still require testing on that account; this project does not claim identical behavior across all clients.
 
@@ -135,19 +135,17 @@ Use `--tool agents` only when the tool documents support for `.agents/skills/`. 
 This is a generic route to try in ChatGPT, Gemini, Kimi, DeepSeek, or another chat interface that can read text attachments or sufficiently long pasted text. **It has not been tested on every product or plan.**
 
 1. Open [kitchen-chat-guide.md](../downloads/kitchen-chat-guide.md), then download the raw file or open Raw and copy all its text.
-2. Attach it to a new mobile/web conversation or paste the contents. A GitHub URL alone may not be readable by your assistant.
+2. Create a dedicated Kitchen Project and attach the guide to a chat there, or paste its contents. Without Projects, use one ongoing chat. A GitHub URL alone may not be readable by your assistant.
 3. Send:
 
    ```text
    Follow the attached Kitchen guide and respond in English.
-   First confirm whether you can read the complete guide, save inventory across chats,
-   and run scripts. Without scripts, calculate manually. Without persistent storage,
-   keep state in this chat and provide a copyable snapshot for next time.
-   Wait for my ingredients; do not suggest recipes yet.
+   I will share my dietary restrictions, nutrition goals, and frequency preferences (or skip them).
+   Then I will list my real kitchen ingredients; wait until I finish before organizing inventory.
    ```
 
-4. Confirm the assistant identifies **v5.3, 8 daily categories, 6 weekly categories, and 19 total categories** before you begin.
-5. Before switching chats, export inventory, saved recipes, and meal records. Bring those snapshots and the guide into the next chat. Visible chat history is not proof that structured state is synchronized.
+4. Finish with “That is everything; organize my inventory,” then ask what to eat. You do not need to enter sample ingredients first.
+5. Before switching chats, export personal settings, inventory, saved recipes, and meal records. Bring those snapshots and the guide into the next chat. Visible chat history is not proof that structured state is synchronized.
 
 The single file embeds the workflow, nutrition plan, food table, state rules, recipe rules, and visual guidance. **It does not include the Python helper.** Manual calculation and Markdown tables are the default fallback. If the host cannot read the complete file, the import is not complete; do not treat it as an installed skill.
 
@@ -156,16 +154,17 @@ The single file embeds the workflow, nutrition plan, food table, state rules, re
 <a id="verify"></a>
 ## Verify your installation
 
-Start with fictional data:
+These optional acceptance checks are not required for onboarding. Use fictional data in a separate test project to avoid mixing it with real inventory:
 
 | Prompt | Expected observation |
 |---|---|
-| “Which version and how many categories?” | v5.3; 8 daily, 6 weekly, 4 other proteins, 1 neutral |
+| “Which version and how many categories?” | v5.4; 8 daily, 6 weekly, 4 other proteins, 1 neutral |
 | “I have spinach.” | Acknowledge this batch without unsolicited recipes |
 | “Also tofu and salmon. That's everything; show inventory.” | All 19 rows, including empty categories |
 | “Plan dinner with these, but I haven't eaten it.” | One meal recommendation; no actual-consumption log or assumption that pantry items are finished |
 | “I ate bok choy and tofu. What could I add today and this week?” | Both daily and weekly coverage; bok choy can cover leafy greens and cruciferous vegetables |
-| Read inventory in a new chat | Restore only if persistent storage was confirmed; otherwise ask for the snapshot |
+| “No target for tea; legumes 6 times a week; no target for other proteins.” | Save settings and use them in planning and reviews; include protein daily without crowding out fish or soy foods |
+| Read inventory and personal settings in a new chat | Restore only if persistent storage was confirmed; otherwise ask for the snapshot |
 
 **Verification scope:** automated checks cover paths, complete file copying, overwrite refusal, upgrade backups, reproducible packaging, and Python counting behavior. They do not establish model behavior, native mobile UI support, or cross-account synchronization in every AI product.
 

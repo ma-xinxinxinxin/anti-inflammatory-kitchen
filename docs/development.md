@@ -21,6 +21,8 @@ python3 kitchen/scripts/kitchen.py schema
 
 记录不全时显示实际记录天数；未知食材列在 `unrecognizedItems`，不把未识别当作没吃。
 
+个人设置保存在日志同目录的 `kitchen-profile.json`，`score` 会自动读取，也可用 `--profile` 指定其他文件；格式见[状态规则](../kitchen/references/state-files.md)。有设置时用 `personalPlan` 中的频次与记录做规划和周卡；旧输出字段保留默认口径供兼容。默认日卡的八类圆环不适用于个人频次，改用个人目标表。
+
 ## 项目结构
 
 | 路径 | 用途 |

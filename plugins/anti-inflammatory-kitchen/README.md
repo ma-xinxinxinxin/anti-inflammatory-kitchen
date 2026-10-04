@@ -6,11 +6,11 @@ An anti-inflammatory meal-planning assistant built around your latest kitchen in
 
 ## Start / 开始
 
-> 用抗炎厨房。告诉我本次库存保存在哪里。我有菠菜、豆腐和糙米，就这些，先整理库存。
+安装后，单独创建一个「抗炎厨房」Project；支持时启用项目记忆。可先设置忌口、营养目标和食物频次，也可跳过，然后用文字、语音或照片录入真实库存。以后买回或用完食材时更新，所有记录继续放在同一项目。
 
-> Use Kitchen. Tell me where inventory will be saved. I have spinach, tofu and brown rice. That is everything; organize inventory first.
+After installation, create a dedicated Kitchen Project and enable project memory where supported. Optionally set dietary restrictions, nutrition goals, and food frequencies, then add your real inventory by text, voice, or photo. Update purchases and used-up ingredients in that same project.
 
-Then ask / 然后问：`今天晚饭吃什么？` / `What should I eat for dinner?`
+Then ask / 然后问：`今天晚饭吃什么？` / `What should I eat for dinner?`，或 `给我 3 个早餐选项` / `Give me 3 breakfast options`。
 
 ## Install / 安装
 
