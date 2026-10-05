@@ -2,6 +2,8 @@
 
 <table><tr><td><a href="README.md">简体中文</a></td><td><strong>English</strong></td></tr></table>
 
+[![Checks](https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen/actions/workflows/checks.yml/badge.svg)](https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen/actions/workflows/checks.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-3D5A3F.svg)](LICENSE)
+
 **For people who want to follow an anti-inflammatory diet and eat healthy, clean meals.**
 
 Anti-Inflammatory Kitchen is your AI meal-planning assistant, built around **a healthy anti-inflammatory eating plan and what is in your kitchen right now**. Based on a Mediterranean-style eating pattern, it draws on nutrition research to organize its ingredient list and meal-combination rules. It brings these together with your kitchen inventory, preferences, and recorded meals to tell you **what to eat, how to cook, and what to buy**.
@@ -10,9 +12,9 @@ To get started, tell it what is in your kitchen. After that, whenever you shop, 
 
 Ask “What should I eat today?”, “Give me three breakfast options”, or “What should I stock up on this weekend?” It prioritizes ingredients already in your kitchen and fridge to suggest recipes you can start cooking right away, balancing meal composition with fresh ideas and options. Anything you need to buy is listed separately, so you know what you can make now and what to plan for your next shop.
 
-I now use it every day and wouldn't want to do without it.
+**[Get started](#install-it-then-set-up-your-kitchen)** · [Choose your AI tool](#choose-your-ai-tool) · [Food and frequencies](#how-meal-guidance-works) · [Save your records](#where-your-information-goes)
 
-[Choose your AI tool](#choose-your-ai-tool) · [Download plugin](downloads/anti-inflammatory-kitchen-plugin.zip) · [Claude Skill ZIP](downloads/kitchen.zip) · [Full installation guide](docs/installation.en.md)
+[Download plugin](downloads/anti-inflammatory-kitchen-plugin.zip) · [Claude Skill ZIP](downloads/kitchen.zip) · [Conversation guide](downloads/kitchen-chat-guide.md)
 
 ## What you can do
 
@@ -41,20 +43,18 @@ Voice, photo, and receipt recognition depend on the host AI. Unclear items are c
 
 ## Choose your AI tool
 
-One set of kitchen rules, with different installation paths. **Native installation and importing a guide into a conversation are different experiences.**
+Choose one route for your AI tool. Each uses the same kitchen rules.
 
-| Your tool | Installation or import | Start here |
+| AI tool | Method | Instructions |
 |---|---|---|
-| Claude accounts with custom Skills | Download the ZIP, upload in Customize → Skills, and enable | [Claude upload](docs/installation.en.md#claude-upload) |
-| Claude Code | Add this repository as a marketplace and install the plugin | [Plugin installation](docs/installation.en.md#plugins) |
-| Codex / local desktop environment | Install through the repository marketplace; standalone skill also supported | [Plugin installation](docs/installation.en.md#plugins) |
-| Native ChatGPT web/mobile plugin | Package provided; publisher upload, testing, and platform publication still required. Not listed yet | [ChatGPT publishing and mobile checks](docs/installation.en.md#chatgpt-plugin) |
-| Cursor | Agent Plugins-compatible package; standalone skill available before marketplace publication | [Plugin compatibility](docs/installation.en.md#plugins) |
-| Gemini CLI | Install the packaged extension, or use standalone skill installation | [Plugin/extension installation](docs/installation.en.md#plugins) |
-| Other Agent Skills-compatible tools | Import the complete `kitchen/` folder into the tool's skill directory | [Agent Skills](docs/installation.en.md#agent-skills) |
-| ChatGPT web/mobile, Gemini, Kimi, DeepSeek, and other chat interfaces | Upload the single-file guide if text attachments are supported, or paste its contents | [Chat import and mobile](docs/installation.en.md#chat-import) |
+| Claude accounts with custom Skills | Upload and enable the Skill ZIP | [Upload steps](docs/installation.en.md#claude-upload) |
+| Claude Code / Codex | Install through the repository marketplace | [Plugin installation](docs/installation.en.md#plugins) |
+| Cursor | Install the complete skill locally | [Local installation](docs/installation.en.md#local-install) |
+| Gemini CLI | Install the skill or extension | [Skill installation](docs/installation.en.md#gemini-cli) |
+| ChatGPT, Gemini, Kimi, DeepSeek, and other chat tools | Upload the single-file guide to a project or chat, or paste its contents | [Conversation import](docs/installation.en.md#chat-import) |
+| Other Agent Skills-compatible tools | Import the complete `kitchen/` folder | [General installation](docs/installation.en.md#agent-skills) |
 
-**For phone users:** a native plugin package is now provided, but this project has not published an installable Kitchen plugin in the ChatGPT directory. Chat import can be tried without a computer staying online, but it provides guidance to the current conversation; it does not install a native skill or guarantee cross-chat memory or script execution. A Plugins menu does not mean this project is listed there.
+> **On your phone:** try conversation import in ChatGPT mobile; the native plugin is not yet listed in the public directory. Saving across chats depends on the host's projects, memory, and file capabilities. See [compatibility and verification](docs/verification.md) for the tested scope.
 
 ### Prefer not to use a terminal?
 
@@ -82,25 +82,25 @@ Then ask “What should I eat today?” or “Give me 3 breakfast options.” Se
 
 ### Anti-inflammatory food checklist and default frequencies
 
-The 8 daily and 6 weekly categories share one checklist. These are starting points: adjust daily or weekly frequencies to your restrictions, nutrition goals, and habits, or leave a category without a target. Future suggestions follow your confirmed settings.
+**“Include daily” means making room for the category during the day, without limiting it to one meal or one occurrence; weekly frequencies are minimum planning targets.** These are starting points: adjust daily or weekly frequencies to your restrictions, nutrition goals, and habits, or leave a category without a target. Future suggestions follow your confirmed settings.
 
 <table width="100%">
 <thead><tr><th width="25%">Category</th><th width="18%">Default frequency</th><th width="57%">Ingredients</th></tr></thead>
 <tbody>
-<tr><td>Healthy fats</td><td>Once daily</td><td>Extra-virgin olive oil, olive oil, avocado, olives</td></tr>
-<tr><td>Nuts and seeds</td><td>Once daily</td><td>Walnuts, almonds, pistachios, pumpkin seeds, ground flaxseed, chia seeds, Brazil nuts, sesame seeds, sesame paste, almond butter; peanut butter counts as 0.5</td></tr>
-<tr><td>Fermented foods</td><td>Once daily</td><td>Greek yogurt, unsweetened yogurt, kefir, natto, miso, kimchi, kombucha</td></tr>
-<tr><td>Dark leafy greens</td><td>Once daily</td><td>Spinach, kale, watercress, garland chrysanthemum, pea shoots, amaranth greens, Chinese lettuce, young bok choy greens, water spinach, lettuce, bok choy, Chinese broccoli, rapeseed greens</td></tr>
-<tr><td>Whole-grain staples</td><td>Once daily</td><td>Oats, brown rice, quinoa, millet, predominantly whole-grain buckwheat noodles, whole-wheat bread, whole-wheat pita</td></tr>
-<tr><td>Berries and citrus</td><td>Once daily</td><td>Blueberries, raspberries, strawberries, blackberries, cranberries, oranges, pomelo, kiwifruit, pomegranate, cherries; açaí powder counts as 0.5</td></tr>
-<tr><td>Tea</td><td>Once daily</td><td>Green tea, oolong, white tea, black tea, matcha, hibiscus tea</td></tr>
-<tr><td>Herbs and spices</td><td>Once daily</td><td>Scallions, garlic, ginger, onions, turmeric powder, black pepper, rosemary, oregano, thyme, cloves, cinnamon, cumin</td></tr>
-<tr><td>Oily fish</td><td>3 times/week</td><td>Salmon, mackerel, sardines, anchovies, Pacific saury</td></tr>
-<tr><td>Legumes and soy foods</td><td>5 times/week</td><td>Chickpeas, lentils, edamame, black beans, red kidney beans, tofu, pressed tofu, dried tofu skin, unsweetened soy milk, tempeh</td></tr>
-<tr><td>Cruciferous vegetables</td><td>4 times/week</td><td>Broccoli, cauliflower, cabbage, red cabbage, arugula, bok choy, young bok choy greens, daikon, Brussels sprouts, Chinese broccoli, rapeseed greens</td></tr>
-<tr><td>Red and orange produce</td><td>5 times/week</td><td>Tomatoes/cherry tomatoes, carrots, pumpkin, red peppers, yellow peppers, sweet potatoes, purple sweet potatoes; goji berries count as 0.5</td></tr>
-<tr><td>Mushrooms</td><td>3 times/week</td><td>Shiitake, maitake/hen-of-the-woods, oyster mushrooms, wood ear mushrooms, king oyster mushrooms, matsutake, button mushrooms, enoki</td></tr>
-<tr><td>Dark chocolate and cocoa</td><td>2 times/week</td><td>Dark chocolate, natural cocoa powder; prefer low added sugar and choose according to tolerance</td></tr>
+<tr><td>Healthy fats</td><td>Include daily</td><td>Extra-virgin olive oil, olive oil, avocado, olives</td></tr>
+<tr><td>Nuts and seeds</td><td>Include daily</td><td>Walnuts, almonds, pistachios, pumpkin seeds, ground flaxseed, chia seeds, Brazil nuts, sesame seeds, sesame paste, almond butter, peanut butter</td></tr>
+<tr><td>Fermented foods</td><td>Include daily</td><td>Greek yogurt, unsweetened yogurt, kefir, natto, miso, kimchi, kombucha</td></tr>
+<tr><td>Dark leafy greens</td><td>Include daily</td><td>Spinach, kale, watercress, garland chrysanthemum, pea shoots, amaranth greens, Chinese lettuce, young bok choy greens, water spinach, lettuce, bok choy, Chinese broccoli, rapeseed greens</td></tr>
+<tr><td>Whole-grain staples</td><td>Include daily</td><td>Oats, brown rice, quinoa, millet, predominantly whole-grain buckwheat noodles, whole-wheat bread, whole-wheat pita</td></tr>
+<tr><td>Berries and citrus</td><td>Include daily</td><td>Blueberries, raspberries, strawberries, blackberries, cranberries, oranges, pomelo, kiwifruit, pomegranate, cherries, açaí powder</td></tr>
+<tr><td>Tea</td><td>Include daily</td><td>Green tea, oolong, white tea, black tea, matcha, hibiscus tea</td></tr>
+<tr><td>Herbs and spices</td><td>Include daily</td><td>Scallions, garlic, ginger, onions, turmeric powder, black pepper, rosemary, oregano, thyme, cloves, cinnamon, cumin</td></tr>
+<tr><td>Oily fish</td><td>At least 3 times/week</td><td>Salmon, mackerel, sardines, anchovies, Pacific saury</td></tr>
+<tr><td>Legumes and soy foods</td><td>At least 5 times/week</td><td>Chickpeas, lentils, edamame, black beans, red kidney beans, tofu, pressed tofu, dried tofu skin, unsweetened soy milk, tempeh</td></tr>
+<tr><td>Cruciferous vegetables</td><td>At least 4 times/week</td><td>Broccoli, cauliflower, cabbage, red cabbage, arugula, bok choy, young bok choy greens, daikon, Brussels sprouts, Chinese broccoli, rapeseed greens</td></tr>
+<tr><td>Red and orange produce</td><td>At least 5 times/week</td><td>Tomatoes/cherry tomatoes, carrots, pumpkin, red peppers, yellow peppers, sweet potatoes, purple sweet potatoes, goji berries</td></tr>
+<tr><td>Mushrooms</td><td>At least 3 times/week</td><td>Shiitake, maitake/hen-of-the-woods, oyster mushrooms, wood ear mushrooms, king oyster mushrooms, matsutake, button mushrooms, enoki</td></tr>
+<tr><td>Dark chocolate and cocoa</td><td>At least 2 times/week</td><td>Dark chocolate, natural cocoa powder; prefer low added sugar and choose according to tolerance</td></tr>
 </tbody>
 </table>
 
@@ -123,7 +123,7 @@ The 8 daily and 6 weekly categories share one checklist. These are starting poin
 
 It starts with your latest kitchen inventory, preferences, and dietary restrictions, prioritizing ingredients you already have or need to use soon to build a complete meal with produce, protein, a staple, and suitable cooking fat. It then checks daily and weekly meal records and adds less represented categories through sides, the next meal, or the next shop, encouraging variety without fitting every category into one meal. Confirmed purchases, depletion, and eaten meals update inventory and meal records separately, informing the next suggestion for what to eat, how to cook, and what is still missing.
 
-**These frequencies are project planning conventions, not medical thresholds or inflammation scores.** A category counts at most once per meal, and one ingredient can cover multiple categories; 0.5 is a logging weight, not a recommended serving size. Neutral foods still have nutritional value; pork retains its original storage category but is nutritionally red meat. See the [nutrition-planning rules](kitchen/references/nutrition-plan.md) and [food table](kitchen/references/food-table.md); the overall eating pattern draws on [AHA dietary guidance](https://professional.heart.org/en/science-news/2021-dietary-guidance-to-improve-cardiovascular-health/top-things-to-know), which does not validate the project's frequencies or individual anti-inflammatory effects.
+**These frequencies are project planning conventions, not medical thresholds or inflammation scores.** A category counts once per meal, and one ingredient can cover multiple categories; detailed counting conventions are in the food table. Neutral foods still have nutritional value; pork retains its original storage category but is nutritionally red meat. See the [nutrition-planning rules](kitchen/references/nutrition-plan.md) and [food table](kitchen/references/food-table.md); the overall eating pattern draws on [AHA dietary guidance](https://professional.heart.org/en/science-news/2021-dietary-guidance-to-improve-cardiovascular-health/top-things-to-know), which does not validate the project's frequencies or individual anti-inflammatory effects.
 
 ## Where your information goes
 
@@ -137,10 +137,21 @@ Project memory helps carry context forward; the latest confirmed records remain 
 
 Different AI tools do not automatically synchronize private records. Downloads contain no personal inventory or dietary history. Keep private state out of public GitHub repositories. [Storage rules](kitchen/references/state-files.md)
 
-## Development, examples, and contributions
+## Contribute
 
 The skill itself needs no API key. Local helpers require Python 3.10+ and only the standard library. Host subscriptions, permissions, and capabilities depend on the platform.
 
 [Examples and project structure](docs/development.en.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md) · [MIT License](LICENSE)
+
+Feedback, ingredient aliases, and compatibility reports are welcome. [Open an issue](https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen/issues/new) using fictional examples; leave out personal inventory, chat histories, and health information.
+
+<details>
+<summary>A note from the author</summary>
+
+I now use it every day and wouldn't want to do without it.
+
+</details>
+
+---
 
 Kitchen supports everyday food planning. It does not diagnose conditions, interpret lab results, or advise medication or supplement doses.

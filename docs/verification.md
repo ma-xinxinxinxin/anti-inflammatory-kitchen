@@ -1,41 +1,42 @@
-# v5.4 验证记录 / Verification record
+# 兼容性与验证 · Compatibility & verification
 
-2026-10-04。本轮 47 项本地测试通过，新增个人频次、合计蛋白去重、默认兼容与 CLI 读取/渲染检查；技能结构验证通过；下载包已重建并通过一致性检查。所有测试数据均为虚构。未新增手机端或各平台模型行为实测。
+本页区分可自动验证的安装包行为与需要在实际 AI 产品中检查的体验。提供兼容格式不代表已经上架该平台的公共目录。
 
-47 local tests passed, including custom frequencies, combined protein meal counts, default compatibility, profile loading, and weekly rendering. Skill structure validation passed; download artifacts were rebuilt and checked. Fixtures are fictional; no new mobile or host-model acceptance claims.
+This page distinguishes reproducible package checks from behavior that needs testing in an AI product. A compatible package does not imply a public marketplace listing.
 
-新增手动验收：创建专用项目、可选设置忌口与目标、录入真实库存；检查查库存/补库存/用完移除、三个早餐选项、保存常用菜谱、个人频次在新聊天中恢复，以及其他蛋白不挤占鱼和豆制品的计划。以下旧版安装结果仅作历史记录。
+## 支持范围 / Compatibility
 
----
+| 使用方式 / Route | 已验证范围 / Verified scope | 仍需确认 / Still to verify |
+|---|---|---|
+| 本地 skill 安装器 / Local skill installer | Codex、Claude Code、Cursor、Gemini CLI 目录选择、完整复制、升级备份及状态保留 / paths, complete copying, backups and state preservation | 各客户端模型行为 / host-model behavior |
+| 插件包 / Plugin package | 各 manifest 与技能内容一致，解压后可独立运行脚本 / consistent manifests and skill content; standalone helper execution | 每个平台的账号安装与目录发布 / account installation and marketplace publication |
+| Claude Code / Codex 插件 | v5.3 曾完成本地安装；后续包由自动检查验证 / local installation verified for v5.3; later packages checked automatically | 新版客户端实际安装 / current client installation |
+| 单文件对话指南 / Conversation guide | 参考材料完整内嵌，无需外部脚本 / self-contained references, no script required | 附件读取、上下文长度与记忆能力 / attachment, context and memory capabilities |
+| Claude / ChatGPT 手机 / Mobile | 提供安装或导入说明 / instructions provided | 未完成手机实机验收；ChatGPT 公共目录尚未上架 / device acceptance not completed; ChatGPT listing not published |
 
-# v5.3 验证记录 / Verification record
+## 可复现检查 / Reproducible checks
 
-2026-10-04。所有库存测试使用虚构数据。All inventory fixtures are fictional.
+```bash
+python3 -m unittest discover -s tests -v
+python3 scripts/package_skill.py --check
+```
 
-| 检查 / Check | 结果 / Result |
-|---|---|
-| Python 回归检查 / Python regression suite | 41 项本地通过；覆盖计数、路径、完整复制、备份、下载一致性、marketplace 路径、插件独立运行 / 41 local tests passed |
-| Skill 和 Codex 插件结构 / Skill and Codex manifest | 系统验证器通过 / validators passed |
-| Claude Code 插件与市场 / Plugin and marketplace | 官方 CLI 严格验证通过；隔离配置安装成功，5.3.0 已启用；发现 kitchen skill / strict validation and isolated install passed, one skill discovered |
-| Codex 插件实际安装 / Actual plugin install | 本机注册仓库市场并安装 5.3.0 成功 / local repository marketplace registration and installation passed |
-| Cursor | Agent Plugins 和 Cursor manifest 已提供；未做客户端安装或公开上架 / package provided, client installation and listing untested |
-| Gemini CLI | 扩展 manifest 已提供；未做客户端实际安装 / manifest provided, client installation untested |
-| Claude 手机 / Claude mobile | 本次未做 v5.3 手机验收 / v5.3 mobile acceptance not run |
-| ChatGPT 手机及公开目录 / ChatGPT mobile and public listing | 尚未提交、上架或手机实测 / not submitted, listed, or device-tested |
-| 语音、照片、小票的模型行为 / Voice, photo, and receipt behavior | 规则已更新；无全平台实测结论 / instructions updated, no all-platform behavior claim |
+47 项自动测试覆盖食材计数、缺失记录、个人频次、其他蛋白合计去重、安装与备份、私有状态隔离、离线渲染和分发一致性。持续集成在 Linux（Python 3.10 / 3.13）和 Windows（Python 3.13）运行；最新结果以 [GitHub Actions](https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen/actions/workflows/checks.yml) 为准。
 
-## 安装后应逐项验证 / Manual acceptance
+The 47-test suite covers food counts, missing records, personal frequencies, combined protein counts, installation and backups, private-state isolation, offline rendering, and distribution consistency. CI runs on Linux (Python 3.10 / 3.13) and Windows (Python 3.13); see GitHub Actions for current results.
 
-1. 文字库存：菠菜、豆腐、糙米；先接收，明确汇总后显示 19 类。
-2. 食材照片或小票：识别食材，模糊项先核对；未购买的购物车不入库。
-3. 清楚语音：正确增删；听不清时询问，不编造。
-4. 「今晚吃什么？」：直接一套现有食材搭配，不先强迫选多个候选；过敏、忌口优先。
-5. 「怎么做？」：步骤、时间、火候；不凭空假设库存或调料。
-6. 「只是计划，还没吃」：不写实际饮食日志、不扣库存。
-7. 「吃完了，菠菜用完了」：记录这餐并移除菠菜；不假设豆腐、糙米或油都用完。
-8. 「买什么？」：按未来餐食与现有库存列真正缺少的食材。
-9. 新聊天与手机重开：根据实际存储恢复；无持久能力时要求带入状态，不能装作已永久保存。
+## 体验检查 / Try it in your AI tool
 
-English: verify typed inventory, photo/receipt clarification, voice recognition, one direct meal recommendation, usable cooking steps, no intake logged for plans, explicit stock depletion, plan-based shopping, and honest persistence across new chats/devices.
+在独立测试项目中使用虚构食材，避免混入日常库存。
+Use fictional ingredients in a separate test project.
 
-这些是待在各产品逐项执行的行为场景，不是“模型已经全部通过”的声明。These scenarios are a manual checklist, not a claim that every model or device passed them.
+- 设置忌口和频次，重开项目后核对 / Set restrictions and frequencies, then reopen the project.
+- 查看库存、添加购买的食材、移除明确用完的食材 / Check stock, add purchases, remove finished items.
+- 上传照片或小票，核对模糊项 / Upload a photo or receipt and check uncertain items.
+- 要一套晚餐、三个早餐选项及具体做法 / Request dinner, three breakfast options, and cooking steps.
+- 保存常用菜谱，按名字找回 / Save a favorite recipe and retrieve it by name.
+- 确认计划不计作已吃，采购清单不计作已有库存 / Keep planned meals and shopping separate from actual intake and stock.
+- 核对个人目标、已有存货与购物建议是否一致 / Check that suggestions follow personal goals and current stock.
+
+这些是使用者可执行的检查场景，并非所有模型或手机都已通过的保证。
+These are checks you can perform, not a guarantee that every model or mobile client has passed.

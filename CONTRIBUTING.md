@@ -16,7 +16,6 @@ python3 scripts/package_skill.py --check
 
 - 首页与安装文档保持中英文内容对应；能力声明附平台官方说明，明确区分文件级测试与产品实测。
 - 修改 skill 后重建 `downloads/`，不手工编辑生成的聊天指南。
-
 - 19 类名称和每日 8 / 每周 6 的结构保持一致；修改时同步 `kitchen/SKILL.md`、食材表、脚本、示例和测试。
 - 加食材别名时同时检查容易误归类的词，例如燕麦与燕麦奶、杏仁与杏仁奶。未知词不能默认为已正确识别。
 - 计数变化请附前后示例和回归测试；不要只测试实现细节。插件副本由 `--publish` 生成，不直接改其中的 skill。
@@ -32,3 +31,13 @@ python3 scripts/package_skill.py --check
 4. 只规划晚餐：不增加已吃记录，不把所有调味料标为用完。
 5. 新聊天打开同项目：读取原状态；无持久能力时如实说明。
 6. 示例日卡与周卡：各为一张连续长页，手机宽度可读，没有假按钮或外部资源依赖。
+
+## English
+
+Contributions are welcome: ingredient aliases, reproducible bugs, compatibility reports, and documentation improvements.
+
+- Use fictional examples. Keep personal inventory, health information, chat exports, and credentials out of issues and pull requests.
+- Keep the Chinese and English READMEs and installation guides aligned.
+- Edit `kitchen/` as the source of truth. Rebuild downloads and plugin copies with `python3 scripts/package_skill.py --publish`.
+- Explain behavior changes with before/after examples and focused regression checks. Run the commands above before submitting.
+- Keep nutrition evidence separate from project planning conventions, and distinguish package validation from testing in an actual AI product.

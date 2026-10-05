@@ -477,10 +477,11 @@ def render_week(w):
             if rule is None:
                 detail = f'不设频次 · 已记录 {row["recordedCount"]:g} 次'
             elif rule["period"] == "day":
-                detail = (f'每天 {rule["target"]:g} 次 · 有记录的 {logged} 天中 '
+                label = '每日必有' if rule["target"] == 1 else f'每天至少 {rule["target"]:g} 次'
+                detail = (f'{label} · 有记录的 {logged} 天中 '
                           f'{row["metDays"]} 天达到设定频次')
             else:
-                detail = f'每周 {rule["target"]:g} 次 · 已记录 {row["recordedCount"]:g} 次'
+                detail = f'每周至少 {rule["target"]:g} 次 · 已记录 {row["recordedCount"]:g} 次'
             h.append(f'<p class="body"><strong>{row["name"]}</strong><br>{detail}</p>')
         h.append('<p class="sub">次数是规划约定，不是营养剂量；未记录不等于没吃。</p></div>')
     else:
