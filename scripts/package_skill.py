@@ -12,7 +12,7 @@ PLUGIN = ROOT / 'plugins/anti-inflammatory-kitchen'
 # Explicit allowlist: caches, personal state and accidental files never ship.
 SKILL_FILES = (
     'SKILL.md', 'agents/openai.yaml', 'scripts/kitchen.py',
-    'references/food-table.md', 'references/recipe-rules.md',
+    'references/food-table.md', 'references/lexicon.json', 'references/recipe-rules.md',
     'references/state-files.md', 'references/visuals.md', 'references/nutrition-plan.md',
 )
 
@@ -117,6 +117,23 @@ def plugin_files():
     return files
 
 
+def zip_entries(content):
+    with ZipFile(io.BytesIO(content)) as archive:
+        return {info.filename: (archive.read(info), info.date_time, info.external_attr) for info in archive.infolist()}
+
+
+def same_artifact(name, existing, expected):
+    """ZIP bytes depend on the zlib build; compare entries so CI and laptops agree."""
+    if existing == expected:
+        return True
+    if not name.endswith('.zip'):
+        return False
+    try:
+        return zip_entries(existing) == zip_entries(expected)
+    except Exception:
+        return False
+
+
 def distributions():
     return {'kitchen.zip': archive_bytes(), 'kitchen-chat-guide.md': chat_guide(),
             'anti-inflammatory-kitchen-plugin.zip': zip_bytes(plugin_files())}
@@ -132,7 +149,7 @@ def main():
     if args.check:
         stale = [name for name, content in distributions().items()
                  if not (ROOT / 'downloads' / name).is_file()
-                 or (ROOT / 'downloads' / name).read_bytes() != content]
+                 or not same_artifact(name, (ROOT / 'downloads' / name).read_bytes(), content)]
         if stale:
             parser.error('Stale downloads: ' + ', '.join(stale) + '; run python3 scripts/package_skill.py --publish')
         files = plugin_files()

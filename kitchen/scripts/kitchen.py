@@ -15,38 +15,19 @@ import math
 from html import escape
 from pathlib import Path
 
-# ---------- 食材表 ----------
-DAILY = [
-    ("goodFat", "优质脂肪", "特级初榨橄榄油 橄榄油 牛油果 橄榄"),
-    ("nutsSeeds", "坚果种子", "核桃 杏仁 开心果 南瓜籽 亚麻籽粉 奇亚籽 巴西坚果 芝麻酱 杏仁酱 芝麻 坚果"),
-    ("fermented", "发酵食品", "希腊酸奶 无糖酸奶 开菲尔 纳豆 味噌 泡菜 康普茶"),
-    ("leafy", "深色绿叶菜", "菠菜 羽衣甘蓝 西洋菜 茼蒿 豌豆尖 苋菜 油麦菜 鸡毛菜 空心菜 生菜 小白菜 芥蓝 油菜"),
-    ("wholeGrain", "全谷主食", "燕麦 糙米 藜麦 荞麦面 全麦面包 全麦皮塔 小米"),
-    ("berryCitrus", "浆果柑橘", "蓝莓 树莓 草莓 黑莓 蔓越莓 橙 柚子 猕猴桃 石榴 樱桃"),
-    ("tea", "茶饮", "绿茶 乌龙茶 白茶 红茶 抹茶 洛神花茶"),
-    ("spices", "香辛料", "大蒜 洋葱 生姜 姜黄粉 黑胡椒 迷迭香 牛至 百里香 丁香 肉桂 孜然"),
-]
-HALF = {"巴西莓粉": "berryCitrus", "花生酱": "nutsSeeds"}
-WEEK_HALF = {"枸杞": "redOrange"}
-WEEKLY = [
-    ("fattyFish", "高脂深海鱼", 3, "三文鱼 鲭鱼 青花鱼 沙丁鱼罐头 凤尾鱼 秋刀鱼"),
-    ("legumes", "豆类与豆制品", 5, "鹰嘴豆 扁豆 毛豆 黑豆 红腰豆 豆腐 豆干 腐竹 无糖豆浆 天贝"),
-    ("cruciferous", "十字花科", 4, "西蓝花 花椰菜 卷心菜 紫甘蓝 芝麻菜 小白菜 白萝卜 抱子甘蓝 芥蓝 油菜 鸡毛菜"),
-    ("redOrange", "红橙色蔬果", 5, "熟番茄 番茄 胡萝卜 南瓜 红椒 黄椒 红薯 紫薯"),
-    ("mushrooms", "菌菇", 3, "香菇 舞茸 灰树花 平菇 木耳 杏鲍菇 松茸 蘑菇 金针菇"),
-    ("darkChocolate", "黑巧可可", 2, "85%黑巧克力 黑巧克力 天然可可粉 可可粉"),
-]
-OTHERP = [
-    ("eggs", "蛋", "鸡蛋 水煮蛋 煎蛋"),
-    ("whiteFishSeafood", "白肉鱼海鲜", "鳕鱼 鲈鱼 鳜鱼 虾 虾仁 扇贝 蛤蜊 乌贼 鱿鱼 金枪鱼"),
-    ("poultry", "禽肉", "鸡腿 鸡胸 鸡肉 鸭胸 鸭肉"),
-    ("redMeat", "红肉", "牛腱 牛里脊 牛腩 牛肉 牛排 羊腿 羊肉"),
-]
-NEUTRAL = ("香蕉 苹果 梨 葡萄 桃 西瓜 黄瓜 茄子 莴笋 豆角 冬瓜 玉米 丝瓜 牛奶 燕麦奶 杏仁奶 "
-           "海带 紫菜 裙带菜 奶酪 帕玛森 红枣 葡萄干 土豆 山药 芋头 莲藕 猪里脊 猪肉 蜂蜜 榴莲 椰子水 火龙果 芒果 柠檬").split()
-LIMITS = [("processedMeat", "加工肉"), ("sugaryDrink", "含糖饮料"), ("ultraProcessed", "超加工"),
-          ("transFat", "复炸油"), ("refinedGrainMeal", "白米白面"), ("deepFried", "油炸"),
-          ("tooSalty", "偏咸"), ("alcohol", "酒精")]
+# ---------- 食材表（来源：references/lexicon.json） ----------
+LEXICON_PATH = Path(__file__).resolve().parent.parent / "references" / "lexicon.json"
+LEX = json.loads(LEXICON_PATH.read_text(encoding="utf-8"))
+DAILY = [(c["key"], c["name"], " ".join(c["words"])) for c in LEX["daily"]]
+HALF = {w: c["key"] for c in LEX["daily"] for w in c.get("half", [])}
+WEEK_HALF = {w: c["key"] for c in LEX["weekly"] for w in c.get("half", [])}
+WEEKLY = [(c["key"], c["name"], c["target"], " ".join(c["words"])) for c in LEX["weekly"]]
+OTHERP = [(c["key"], c["name"], " ".join(c["words"])) for c in LEX["otherProtein"]]
+NEUTRAL = list(LEX["neutral"])
+LIMITS = [(x["key"], x["name"]) for x in LEX["limits"]]
+EN_NAME = {c["key"]: c["en"] for group in ("daily", "weekly", "otherProtein") for c in LEX[group]}
+EN_NAME["neutral"] = "Neutral foods"
+T2S = str.maketrans(LEX.get("traditional", {}))
 
 # 一个食材可命中多个类别（小白菜 = 绿叶 + 十字花科）；同餐同类只计一次
 VOCAB = {}
@@ -62,10 +43,7 @@ for k, n, s in OTHERP:
     for w in dict.fromkeys(s.split()): _add(w, k)
 for w in NEUTRAL: _add(w, "neutral")
 # Aliases are exact: plant milk must not become nuts or whole grains.
-ALIASES = {"西兰花": "西蓝花", "小番茄": "番茄", "圣女果": "番茄",
-           "蒜": "大蒜", "蒜头": "大蒜", "姜": "生姜", "葱": "洋葱",
-           "小葱": "洋葱", "红洋葱": "洋葱", "低盐泡菜": "泡菜",
-           "沙丁鱼": "沙丁鱼罐头", "黑巧": "黑巧克力"}
+ALIASES = dict(LEX["aliases"])
 for alias, canonical in ALIASES.items():
     VOCAB[alias] = list(VOCAB[canonical])
 DAILY_KEYS = [k for k, _, _ in DAILY]
@@ -75,14 +53,28 @@ NAME.update({k: n for k, n, _ in OTHERP})
 LIMNAME = dict(LIMITS)
 
 
-UPF = "手抓饼 苏打饼干 蟹肉棒 火腿 培根 香肠 午餐肉 speck 薯片 泡面 速冻饺子 沙拉酱 番茄酱".split()
+def normalize(name):
+    """繁体转简体、英文转小写并合并空白；不做模糊翻译。"""
+    t = (name or "").translate(T2S).strip()
+    if re.search(r"[A-Za-z]", t):
+        t = re.sub(r"\s+", " ", t.lower())
+    return t
+
+
+def canonical(name):
+    """别名 -> 规范名；未收录时原样返回。"""
+    n = normalize(name)
+    return ALIASES.get(n, n)
+
+
+UPF = list(LEX["processed"])
 NOISE = re.compile(r"(有机|日日鲜|冰鲜|冷冻|新鲜|进口|云南|挪威|智利|特级初榨(?=橄榄油))")
 QTY = re.compile(r"[\d.]+\s*(g|kg|克|千克|ml|毫升|升|盒|袋|把|根|颗|个|块|段|片|罐|瓶|只|条|包|份|x|X|\*)")
 DATE = re.compile(r"[·・]?\s*(到|至|到期|保质期?)?\s*[（(]?(?:\d{4}[-/.])?\d{1,2}[-/.]\d{1,2}[）)]?|\d+\s*天")
 
 def clean(raw):
     """一条原始条目 -> 干净食材名"""
-    t = re.sub(r"^\s*[-*•]?\s*\[\w+\]\s*", "", raw)
+    t = re.sub(r"^\s*[-*•]?\s*\[\w+\]\s*", "", raw.translate(T2S))
     t = re.sub(r"[·・]\s*(常备|冷冻常备).*$", "", t)
     t = t.strip().strip("·-—•*").strip()
     t = DATE.sub("", t); t = QTY.sub("", t)
@@ -94,6 +86,7 @@ def clean(raw):
 def classify(name):
     """干净名 -> (类别key, 是否加工品)。先精确后包含。"""
     if not name: return None, False
+    name = normalize(name)
     if name in VOCAB: return VOCAB[name][0][0], False
     for u in UPF:
         if u in name: return None, True
@@ -120,7 +113,7 @@ def render_fridge(items):
         elif k is None:
             unknown.append(n)
         else:
-            keys = [key for key, _ in VOCAB[n]] if n in VOCAB else [k]
+            keys = [key for key, _ in VOCAB[normalize(n)]] if normalize(n) in VOCAB else [k]
             for key in keys:
                 buckets.setdefault(key, []).append(n)
     out, empty = [], []
@@ -264,7 +257,7 @@ def score(text, end=None, profile=None):
         for items in meals:
             # Take the largest weight per category, independent of ingredient order.
             meal_weights = {}
-            for it in dict.fromkeys(items):
+            for it in dict.fromkeys(normalize(x) for x in items):
                 if it not in VOCAB:
                     unknown.add(it)
                 for k, wt in VOCAB.get(it, []):
@@ -552,12 +545,137 @@ def render_week(w):
     h.append('</div></html>')
     return "\n".join(h)
 
+# ---------- 补货闭环 ----------
+def fridge_by_category(items):
+    """原始库存条目 -> {类别key: [食材名]}；一个食材可进多类。"""
+    out = {}
+    for raw in items:
+        n = clean(raw)
+        key = normalize(n)
+        for k, _ in VOCAB.get(key, []):
+            out.setdefault(k, []).append(n)
+    return {k: list(dict.fromkeys(v)) for k, v in out.items()}
+
+
+NO_PADDING = {"tea", "darkChocolate", "goodFat"}
+
+
+def _restricted(word, restrictions):
+    return any(word and word in r for r in restrictions)
+
+
+def restock(log_text, fridge_text, end=None, profile=None, limit=3):
+    """周记录缺口 × 当前库存 -> 先用现有的 / 值得补买的。只给候选，不替用户下单。"""
+    week = score(log_text, end, profile)
+    logged = week["daysWithRecord"]
+    stock = fridge_by_category(parse_fridge(fridge_text))
+    restrictions = (profile or {}).get("restrictions", [])
+    gaps = []
+    if "personalPlan" in week:
+        for row in week["personalPlan"]:
+            rule, key = row["frequency"], row["key"]
+            if rule is None or key == "otherProtein":
+                continue
+            if rule["period"] == "day":
+                short = logged - row["metDays"]
+                if logged and short > 0:
+                    gaps.append((key, short / logged, f'{row["metDays"]}/{logged} 天'))
+            elif row["recordedCount"] < rule["target"]:
+                gaps.append((key, 1 - row["recordedCount"] / rule["target"],
+                             f'{row["recordedCount"]:g}/{rule["target"]:g} 次'))
+    else:
+        for key in DAILY_KEYS:
+            met = week["dailyMetDays"][key]
+            if logged and met < logged:
+                gaps.append((key, (logged - met) / logged, f"{met}/{logged} 天"))
+        for key, _, target, _ in WEEKLY:
+            n = week["weeklyCounts"][key]
+            if n < target:
+                gaps.append((key, 1 - n / target, f"{n:g}/{target} 次"))
+    # 规则：不为凑格子额外喝茶、吃巧克力或加油，这三类排在最后。
+    gaps.sort(key=lambda g: (g[0] in NO_PADDING, -g[1]))
+    examples = {k: s.split() for k, _, s in DAILY}
+    examples.update({k: s.split() for k, _, _, s in WEEKLY})
+    use, buy = [], []
+    for key, _, record in gaps:
+        entry = {"key": key, "category": NAME[key], "record": record}
+        if stock.get(key):
+            use.append({**entry, "inStock": stock[key]})
+        elif len(buy) < limit:
+            options = [w for w in examples[key] if not _restricted(w, restrictions)][:3]
+            buy.append({**entry, "options": options})
+    return {
+        "weekStart": week["weekStart"], "weekEnd": week["weekEnd"], "daysWithRecord": logged,
+        "evidence": "insufficient" if logged < 3 else "ok",
+        "useWhatYouHave": use, "worthBuying": buy,
+        "unrecognizedItems": week["unrecognizedItems"],
+        "note": "候选来自记录缺口与库存；按用户计划的餐次挑选，不必全部买齐。记录少于 3 天时只作参考。",
+    }
+
+
+# ---------- 分享卡 ----------
+def render_card(w):
+    """1080×1440 周复盘分享卡：只含覆盖统计与下周三件事，不含库存、忌口或健康信息。"""
+    logged = w.get("daysWithRecord", 0)
+    rng = w.get("rangeLabel") or f'{w.get("weekStart", "")} – {w.get("weekEnd", "")}'
+    rows = []
+    for k in DAILY_KEYS:
+        cells = w["dailyMatrix"][k]
+        sq = "".join(
+            '<i style="background:%s"></i>' % G if c == "met" else
+            '<i style="background:#E4E1D2"></i>' if c == "recorded" else
+            '<i style="border:2px dashed rgba(42,42,36,.28)"></i>' for c in cells)
+        rows.append(f'<div class="r"><span class="n">{NAME[k]}</span><span class="sq">{sq}</span>'
+                    f'<span class="num m">{w["dailyMetDays"][k]}/{logged}</span></div>')
+    weekly = "".join(
+        f'<div class="w{" on" if w["weeklyCounts"].get(k, 0) >= w.get("weeklyTargets", {}).get(k, t) else ""}">'
+        f'<span>{n}</span><span class="num">{w["weeklyCounts"].get(k, 0):g}/{w.get("weeklyTargets", {}).get(k, t)}</span></div>'
+        for k, n, t, _ in WEEKLY)
+    actions = (w.get("review") or {}).get("actions") or []
+    act = "".join(f'<div class="a"><b></b><span>{x}</span></div>' for x in actions[:3])
+    return f"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
+<style>
+*{{box-sizing:border-box;margin:0}}
+body{{background:#DCD6C2}}
+.card{{width:1080px;height:1440px;background:#F6F2E8;color:#2A2A24;padding:76px 84px 64px;
+  font-family:"Noto Sans SC",system-ui,sans-serif;display:flex;flex-direction:column;gap:34px;overflow:hidden}}
+.num{{font-family:"Space Grotesk",monospace}}
+.k{{font:500 30px "Noto Sans SC";color:#6B6857}}
+.t{{font:700 70px/1.2 "Noto Sans SC"}}
+.rg{{display:inline-block;background:#3D5A3F;color:#F6F2E8;border-radius:40px;padding:14px 32px;font-size:30px}}
+.r{{display:flex;align-items:center;gap:22px;margin-bottom:13px}}
+.n{{width:200px;font-size:30px}}
+.sq{{flex:1;display:flex;gap:14px}}
+.sq i{{flex:1;height:44px;border-radius:14px;display:block}}
+.m{{width:80px;text-align:right;font-size:30px;font-weight:500}}
+.g{{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}}
+.w{{background:#EFEADB;border-radius:22px;padding:20px 24px;display:flex;justify-content:space-between;font-size:27px}}
+.w.on{{background:#3D5A3F;color:#F6F2E8}}
+.a{{display:flex;gap:22px;align-items:flex-start;font-size:30px;line-height:1.45;margin-bottom:10px}}
+.a b{{width:34px;height:34px;flex:none;border-radius:9px;border:3px solid rgba(42,42,36,.3);margin-top:7px}}
+.f{{margin-top:auto;display:flex;justify-content:space-between;font-size:24px;color:#6B6857;
+  border-top:2px solid rgba(42,42,36,.09);padding-top:28px}}
+</style>
+<div class="card">
+ <div><div class="k">抗炎厨房 · 周复盘</div><div class="t">{w.get("title") or "这周吃得怎么样"}</div></div>
+ <div><span class="rg num">{rng}</span>
+  <div class="k" style="margin-top:16px">7 天里有 {logged} 天记录，按记了的算</div></div>
+ <div>{"".join(rows)}</div>
+ <div class="g">{weekly}</div>
+ {f'<div><div class="k" style="margin-bottom:20px">下周三件事</div>{act}</div>' if act else ''}
+ <div class="f"><span>覆盖度是记录指标，不是健康评分</span><span>不数卡路里 · 不打卡</span></div>
+</div></html>"""
+
+
 SCHEMA = """
 Commands:
   fridge --items "菠菜, 西兰花" | fridge --log kitchen-fridge.md
   score --log kitchen-log.md [--end YYYY-MM-DD] [--profile kitchen-profile.json]
   day --json day.json [-o today.html]
   week --json week.json [-o review.html]
+  card --json week.json [-o card.html]        1080x1440 shareable weekly card (no inventory or health data)
+  restock --log kitchen-log.md --fridge kitchen-fridge.md [--end YYYY-MM-DD] [--profile ...]
+      -> JSON: useWhatYouHave (gaps already in stock) and worthBuying (up to 3 gaps, 3 options each)
 
 day.json:
   daily: exactly eight {"name": category name, "by": ingredient or null} entries.
@@ -592,7 +710,8 @@ def escaped_text(value):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("cmd", choices=["score", "day", "week", "fridge", "schema"])
+    ap.add_argument("cmd", choices=["score", "day", "week", "card", "restock", "fridge", "schema"])
+    ap.add_argument("--fridge", help="restock 使用的库存文件")
     ap.add_argument("--log"); ap.add_argument("--json"); ap.add_argument("--end"); ap.add_argument("-o")
     ap.add_argument("--profile", help="个人设置 JSON；默认读取日志同目录的 kitchen-profile.json")
     ap.add_argument("--items", help="逗号或换行分隔的原始食材条目")
@@ -604,21 +723,28 @@ def main(argv=None):
         ap.error("fridge requires exactly one of --items or --log")
     if a.cmd == "score" and not a.log:
         ap.error("score requires --log")
-    if a.cmd in ("day", "week") and not a.json:
+    if a.cmd == "restock" and not (a.log and a.fridge):
+        ap.error("restock requires --log and --fridge")
+    if a.cmd in ("day", "week", "card") and not a.json:
         ap.error(f"{a.cmd} requires --json")
-    if a.profile and a.cmd != "score":
-        ap.error("--profile is supported by score; use its output with week")
+    if a.profile and a.cmd not in ("score", "restock"):
+        ap.error("--profile is supported by score and restock; use score output with week")
     try:
         if a.cmd == "fridge":
             raw = a.items if a.items is not None else Path(a.log).read_text(encoding="utf-8")
             out = render_fridge(parse_fridge(raw))
-        elif a.cmd == "score":
+        elif a.cmd in ("score", "restock"):
             profile_path = Path(a.profile) if a.profile else Path(a.log).with_name("kitchen-profile.json")
             profile = None
             if a.profile or profile_path.exists():
                 profile = json.loads(profile_path.read_text(encoding="utf-8"))
                 profile_frequencies(profile)
-            out = json.dumps(score(Path(a.log).read_text(encoding="utf-8"), a.end, profile), ensure_ascii=False, indent=2)
+            log_text = Path(a.log).read_text(encoding="utf-8")
+            if a.cmd == "score":
+                result = score(log_text, a.end, profile)
+            else:
+                result = restock(log_text, Path(a.fridge).read_text(encoding="utf-8"), a.end, profile)
+            out = json.dumps(result, ensure_ascii=False, indent=2)
         else:
             data = json.loads(Path(a.json).read_text(encoding="utf-8"))
             if a.cmd == "day":
@@ -626,7 +752,7 @@ def main(argv=None):
                 if len(names) != 8 or set(names) != {NAME[k] for k in DAILY_KEYS}:
                     raise ValueError("daily must contain each of the eight daily categories exactly once")
             data = escaped_text(data)
-            out = render_day(data) if a.cmd == "day" else render_week(data)
+            out = render_day(data) if a.cmd == "day" else render_card(data) if a.cmd == "card" else render_week(data)
         if a.o:
             Path(a.o).write_text(out, encoding="utf-8")
             print(a.o)
