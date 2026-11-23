@@ -25,7 +25,6 @@
 
 中英文都能完整使用。计划的饭不会算成吃过，购物车也不会算成库存。
 
-<p align="center"><img src="docs/images/breakfasts-zh.png" alt="用冰箱现有食材做的三个抗炎早餐，附食材和分钟数"></p>
 
 ## 开始使用
 
@@ -39,12 +38,6 @@
 1. 安装后新建一个「抗炎厨房」Project，工具支持的话打开记忆功能。
 2. 可选：告诉它你的过敏、忌口和目标。
 3. 告诉它厨房里有什么（打字、说话或拍照都行），然后问「今天早餐吃什么？」
-
-## 抗炎食物清单
-
-<p align="center"><img src="docs/images/foods-zh.png" alt="抗炎食物清单：14 类从最重要的开始，每周份数和代表食材"></p>
-
-这些频次是起点，每一项都可以改。详细规则见[抗炎营养规划](kitchen/references/nutrition-plan.md) · [食材表](kitchen/references/food-table.md)。整体饮食模式参考 [AHA 膳食指导](https://professional.heart.org/en/science-news/2021-dietary-guidance-to-improve-cardiovascular-health/top-things-to-know)；这里的频次是本项目的规划默认值，未经临床验证。
 
 ## 数据存在哪
 
@@ -60,6 +53,12 @@
 <summary>作者的话</summary>
 我的生活现在每一天都离不开它。
 </details>
+
+## 附录：抗炎食物完整清单
+
+<p align="center"><img src="docs/images/foods-zh.png" alt="抗炎食物完整清单：14 类从最重要的开始，每周份数和每类全部食材"></p>
+
+这是 skill 能识别的全部食材，按类别列出。频次是起点，每一项都可以改。详细规则见[抗炎营养规划](kitchen/references/nutrition-plan.md) · [食材表](kitchen/references/food-table.md)。整体饮食模式参考 [AHA 膳食指导](https://professional.heart.org/en/science-news/2021-dietary-guidance-to-improve-cardiovascular-health/top-things-to-know)；这里的频次是本项目的规划默认值，未经临床验证。
 
 ---
 

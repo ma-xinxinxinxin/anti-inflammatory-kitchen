@@ -4,7 +4,7 @@
     python3 scripts/readme_images.py            # HTML + PNG (PNG needs Chrome or Chromium)
     python3 scripts/readme_images.py --html     # HTML only
 
-Outputs docs/images/{weekly,breakfasts,foods}-{en,zh}.png. To use real breakfast photos,
+Outputs docs/images/{weekly,foods}-{en,zh}.png. To use real breakfast photos,
 put breakfast-1.jpg, breakfast-2.jpg and breakfast-3.jpg in docs/images/photos/ and run again.
 """
 import argparse
@@ -54,14 +54,14 @@ ACTIONS = {
 TEXT = {
     "zh": {"fridge": "冰箱里有", "title": "今天早餐吃什么？", "sub": "只用冰箱里现有的，三个抗炎早餐",
            "min": "分钟", "need": "用到", "hits": "覆盖",
-           "foods": "抗炎食物清单", "foods_sub": "从最重要的开始 · 每周目标份数 · 代表食材",
+           "foods": "抗炎食物完整清单", "foods_sub": "从最重要的开始 · 每周目标份数 · 词典收录的全部食材",
            "daily": "每天", "per_week": "每周 {n} 份", "other": "其他优质蛋白",
            "other_freq": "轮换，不设目标", "neutral": "中性食物", "neutral_freq": "不计入目标",
            "other_foods": "鸡蛋、鳕鱼、虾、鸡肉、鸭肉、牛肉", "neutral_foods": "香蕉、苹果、黄瓜、土豆、牛奶、海带",
            "note": "频次是规划目标，可以按自己的情况调整；不是医学阈值。"},
     "en": {"fridge": "In the fridge", "title": "What's for breakfast?", "sub": "Three anti-inflammatory breakfasts from what's already there",
            "min": "min", "need": "Uses", "hits": "Covers",
-           "foods": "The anti-inflammatory food list", "foods_sub": "Most important first · servings per week · example foods",
+           "foods": "The full anti-inflammatory food list", "foods_sub": "Most important first · servings per week · every food in the lexicon",
            "daily": "Daily", "per_week": "{n} a week", "other": "Other quality protein",
            "other_freq": "Rotate, no target", "neutral": "Neutral foods", "neutral_freq": "Not counted",
            "other_foods": "eggs, cod, shrimp, chicken, duck, beef", "neutral_foods": "banana, apple, cucumber, potato, milk, kelp",
@@ -148,19 +148,17 @@ def breakfasts_html(lang):
 <div class="row">{"".join(cards)}</div></div></html>"""
 
 
-def _foods(cat, lang, n=5):
-    """Representative foods: first names in lexicon order, skipping near-duplicates (olive oil / EVOO)."""
+def _foods(words, lang):
+    """Every food in the lexicon for this category (an appendix, so nothing is cut).
+    English shows each English name once; Chinese shows every canonical name."""
     out = []
-    for w in dict.fromkeys(cat["words"]):
-        name = k.EN_FOOD.get(w) if lang == "en" else w
-        if name and lang == "en":
-            name = name.replace("greek", "Greek")
-        if not name or name.startswith("85%") or name in ("熟番茄", "沙丁鱼罐头", "灰树花"):
-            continue
-        if any(name in x or x in name for x in out):
-            continue
-        out.append(name)
-    return out[:n]
+    for w in dict.fromkeys(words):
+        name = k.EN_FOOD.get(w, w) if lang == "en" else w
+        if lang == "en":
+            name = name.replace("greek", "Greek").replace("brazil", "Brazil").replace("chinese", "Chinese")
+        if name not in out:
+            out.append(name)
+    return out
 
 
 def foods_html(lang):
@@ -174,23 +172,29 @@ def foods_html(lang):
         cat, n = cats[key]
         dots = "".join(f'<i class="{"on" if j < n else ""}"></i>' for j in range(7))
         freq = T["daily"] if n == 7 else T["per_week"].format(n=n)
+        words = cat["words"] + cat.get("half", [])
         rows.append(f'<div class="r"><span class="n">{k.nm(key)}</span><span class="d">{dots}</span>'
-                    f'<span class="f">{freq}</span><span class="w">{sep.join(_foods(cat, lang))}</span></div>')
-    for name, freq, foods in ((T["other"], T["other_freq"], T["other_foods"]),
-                              (T["neutral"], T["neutral_freq"], T["neutral_foods"])):
-        rows.append(f'<div class="r m"><span class="n">{name}</span><span class="d"></span>'
-                    f'<span class="f">{freq}</span><span class="w">{foods}</span></div>')
+                    f'<span class="f">{freq}</span><span class="w">{sep.join(_foods(words, lang))}</span></div>')
+    rows.append(f'<div class="g">{T["other"]} · {T["other_freq"]}</div>')
+    for cat in k.LEX["otherProtein"]:
+        rows.append(f'<div class="r m"><span class="n">{k.nm(cat["key"])}</span><span class="d"></span>'
+                    f'<span class="f"></span><span class="w">{sep.join(_foods(cat["words"], lang))}</span></div>')
+    rows.append(f'<div class="g">{T["neutral"]} · {T["neutral_freq"]}</div>')
+    rows.append(f'<div class="r m"><span class="n">{T["neutral"]}</span><span class="d"></span>'
+                f'<span class="f"></span><span class="w">{sep.join(_foods(k.LEX["neutral"], lang))}</span></div>')
     name_w = 300 if lang == "en" else 190
     return f"""<!doctype html><html lang="{k.html_lang()}"><meta charset="utf-8"><style>{BASE_CSS}
 .wrap{{width:1600px;padding:56px 72px 52px;display:flex;flex-direction:column;gap:12px}}
 .t{{font-size:44px;font-weight:700}} .s{{font-size:22px;color:#6B6857;margin:6px 0 18px}}
-.r{{display:flex;align-items:center;gap:24px;padding:13px 22px;border-radius:16px;background:#EFEADB}}
+.r{{display:flex;align-items:flex-start;gap:24px;padding:14px 22px;border-radius:16px;background:#EFEADB}}
+.r>span{{padding-top:2px}}
+.g{{font-size:22px;font-weight:600;color:#6B6857;margin:18px 0 2px}}
 .r.m{{background:transparent;border:2px dashed rgba(42,42,36,.14)}}
 .n{{width:{name_w}px;flex:none;font-size:24px;font-weight:600}}
-.d{{width:196px;flex:none;display:flex;gap:6px}}
+.d{{width:196px;flex:none;display:flex;gap:6px;padding-top:6px}}
 .d i{{width:22px;height:22px;border-radius:6px;background:#DCD6C2}} .d i.on{{background:#3D5A3F}}
 .f{{width:{200 if lang == 'en' else 170}px;flex:none;font-size:21px;color:#3D5A3F;font-weight:600}}
-.w{{flex:1;font-size:21px;color:#4A473C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.w{{flex:1;font-size:21px;line-height:1.5;color:#4A473C}}
 .note{{font-size:19px;color:#6B6857;margin-top:12px}}
 </style><div class="wrap"><div class="t">{T["foods"]}</div><div class="s">{T["foods_sub"]}</div>
 {"".join(rows)}<div class="note">{T["note"]}</div></div></html>"""
@@ -211,10 +215,30 @@ def chrome():
     return str(mac) if mac.exists() else None
 
 
-def shoot(browser, html_path, png_path, width, height):
+def shoot(browser, html_path, png_path, width, height, trim=False):
     subprocess.run([browser, "--headless=new", "--no-sandbox", "--disable-gpu", "--hide-scrollbars",
                     f"--window-size={width},{height}", f"--screenshot={png_path}", html_path.as_uri()],
                    check=True, capture_output=True)
+    if trim:
+        _trim_bottom(png_path)
+
+
+def _trim_bottom(png_path, pad=56):
+    """Crop trailing background rows so tall content never gets cut and never leaves a gap."""
+    try:
+        from PIL import Image
+    except ImportError:
+        return
+    img = Image.open(png_path).convert("RGB")
+    bg = img.getpixel((2, img.height - 2))
+    w, h = img.size
+    px = img.load()
+    bottom = h
+    for y in range(h - 1, -1, -1):
+        if any(px[x, y] != bg for x in range(0, w, 4)):
+            bottom = y + 1
+            break
+    img.crop((0, 0, w, min(h, bottom + pad))).save(png_path)
 
 
 def main(argv=None):
@@ -225,17 +249,16 @@ def main(argv=None):
     if not a.html and not browser:
         print("Chrome/Chromium not found; writing HTML only.", file=sys.stderr)
     OUT.mkdir(parents=True, exist_ok=True)
-    jobs = [("weekly", weekly_html, 1080, 1440), ("breakfasts", breakfasts_html, 1600, 1000),
-            ("foods", foods_html, 1600, {"en": 1330, "zh": 1440})]
+    # breakfasts_html is kept for later (needs real photos); it is not built until then.
+    jobs = [("weekly", weekly_html, 1080, 1440, False), ("foods", foods_html, 1600, 4000, True)]
     with tempfile.TemporaryDirectory() as tmp:
-        for name, build, width, height in jobs:
+        for name, build, width, height, trim in jobs:
             for lang in ("en", "zh"):
                 html = build(lang)
                 target = (Path(tmp) if browser else OUT) / f"{name}-{lang}.html"
                 target.write_text(html, encoding="utf-8")
                 if browser:
-                    h = height[lang] if isinstance(height, dict) else height
-                    shoot(browser, target, OUT / f"{name}-{lang}.png", width, h)
+                    shoot(browser, target, OUT / f"{name}-{lang}.png", width, height, trim)
                     print(f"docs/images/{name}-{lang}.png")
                 else:
                     print(f"docs/images/{name}-{lang}.html")

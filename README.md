@@ -25,7 +25,6 @@ Tell it once what's in your kitchen. From then on it suggests meals from what yo
 
 Works fully in English or Chinese. Planned meals never count as eaten, and a shopping cart never counts as stock.
 
-<p align="center"><img src="docs/images/breakfasts-en.png" alt="Three anti-inflammatory breakfasts made from what's in the fridge, with ingredients and minutes"></p>
 
 ## Get started
 
@@ -40,12 +39,6 @@ Works fully in English or Chinese. Planned meals never count as eaten, and a sho
 2. Optional: tell it your allergies, restrictions and goals.
 3. Tell it what's in your kitchen (type, talk or send photos), then ask "What's for breakfast?"
 
-## The food list
-
-<p align="center"><img src="docs/images/foods-en.png" alt="The anti-inflammatory food list: 14 groups from most important, weekly servings and example foods"></p>
-
-These targets are a starting point; change any of them. Details: [nutrition plan](kitchen/references/nutrition-plan.md) · [food table](kitchen/references/food-table.md). The overall pattern follows the [AHA dietary guidance](https://professional.heart.org/en/science-news/2021-dietary-guidance-to-improve-cardiovascular-health/top-things-to-know); the frequencies here are this project's planning defaults, not clinically validated.
-
 ## Your data
 
 Your stock, meal log, recipes and settings stay in your own project or workspace. The download contains no one's personal data; never commit yours to a public repo. Different AI tools don't sync with each other. [How state is saved](kitchen/references/state-files.md)
@@ -55,6 +48,12 @@ Your stock, meal log, recipes and settings stay in your own project or workspace
 No API key needed. Local helpers need Python 3.10+ (standard library only). The skill's instructions are in Chinese; read the [English translation](kitchen/SKILL.en.md).
 
 [Examples and structure](docs/development.en.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md) · [MIT License](LICENSE) · [Open an issue](https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen/issues/new) (use fictional examples, no personal health data)
+
+## Appendix: the full food list
+
+<p align="center"><img src="docs/images/foods-en.png" alt="The full anti-inflammatory food list: 14 groups from most important, weekly servings and every food in each group"></p>
+
+Every food the skill recognizes, by group. Targets are a starting point; change any of them. Details: [nutrition plan](kitchen/references/nutrition-plan.md) · [food table](kitchen/references/food-table.md). The overall pattern follows the [AHA dietary guidance](https://professional.heart.org/en/science-news/2021-dietary-guidance-to-improve-cardiovascular-health/top-things-to-know); the frequencies here are this project's planning defaults, not clinically validated.
 
 ---
 
