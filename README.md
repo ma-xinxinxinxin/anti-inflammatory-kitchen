@@ -16,14 +16,14 @@ Tell it once what's in your kitchen. From then on it suggests meals from what yo
 
 | | Ask | You get |
 |---|---|---|
-| **Your fridge** | "What's in my fridge?" or send a photo of your groceries or receipt | Your stock sorted into 19 food groups, kept up to date as you buy and use things |
-| **What to eat** | "What's for dinner?" · "3 breakfast ideas" · "I'm at a hawker centre, what should I order?" | Meals from what you have, with steps and cooking time; from your own cookbooks too |
+| **Your fridge** | "Bought salmon, spinach and blueberries" · "The olive oil's finished" · or send a photo of groceries or a receipt | Your stock sorted into 19 food groups, updated as you buy and use things |
+| **What to eat** | "What's for dinner?" · "Give me 3 breakfast options" · "I'm at a hawker centre, what should I order?" | Meals built from what's at home, at a restaurant, or from your own cookbooks |
+| **How to cook it** | "How do I make that?" · "My spinach is about to go off, what can I cook?" · "Save this as my Wednesday fish soup" | Step-by-step recipes with timing and heat cues, clear-out meals for things about to spoil, and your favorites saved by name |
 | **What to buy** | "What should I buy this week?" | What's already at home to use first, then up to three things worth buying |
-| **Weekly review** | "How did I eat this week?" | An index score, your gaps and three actions for next week, as a shareable image |
+| **Weekly review** | "How did I eat this week?" | An anti-inflammatory index, your gaps and three actions for next week, as a shareable image |
 | **Meal prep** | "I want to prep once for the week" | Three bases in 90 minutes, 10-minute meals on weekdays |
-| **Your settings** | "No cilantro, more plant protein, fish 4 times a week" | Allergies, restrictions, goals and targets, saved and applied |
 
-Works fully in English or Chinese. Planned meals never count as eaten, and a shopping cart never counts as stock.
+Everything follows your settings: tell it your allergies, foods you avoid, goals like more plant protein, or how often you want each food group, and it plans around them. Works fully in English or Chinese. Planned meals never count as eaten, and a shopping cart never counts as stock.
 
 
 ## Get started

@@ -770,6 +770,25 @@ IMPORTANCE = ["fattyFish", "goodFat", "leafy", "cruciferous", "legumes", "berryC
               "wholeGrain", "fermented", "redOrange", "mushrooms", "spices", "tea", "darkChocolate"]
 
 
+# 每类主要提供的成分：说明「为什么在清单里」，不是单一食物的疗效承诺。
+NUTRIENT = {
+    "fattyFish": ("Omega-3（EPA、DHA）", "Omega-3 (EPA, DHA)"),
+    "goodFat": ("单不饱和脂肪、橄榄多酚", "Monounsaturated fat, polyphenols"),
+    "leafy": ("叶酸、维生素 K、类胡萝卜素", "Folate, vitamin K, carotenoids"),
+    "cruciferous": ("萝卜硫素等硫代葡萄糖苷", "Sulforaphane, glucosinolates"),
+    "legumes": ("膳食纤维、植物蛋白、大豆异黄酮", "Fibre, plant protein, isoflavones"),
+    "berryCitrus": ("花青素、维生素 C", "Anthocyanins, vitamin C"),
+    "nutsSeeds": ("植物 Omega-3（ALA）、维生素 E", "Plant omega-3 (ALA), vitamin E"),
+    "wholeGrain": ("膳食纤维，喂养肠道菌", "Fibre that feeds gut bacteria"),
+    "fermented": ("活菌，丰富肠道菌群", "Live cultures for the gut"),
+    "redOrange": ("番茄红素、β-胡萝卜素", "Lycopene, beta-carotene"),
+    "mushrooms": ("β-葡聚糖", "Beta-glucans"),
+    "spices": ("姜黄素、姜辣素、大蒜素", "Curcumin, gingerols, allicin"),
+    "tea": ("儿茶素（EGCG）", "Catechins (EGCG)"),
+    "darkChocolate": ("可可黄烷醇", "Cocoa flavanols"),
+}
+
+
 def _half(x):
     return round(x * 2) / 2
 
@@ -828,7 +847,8 @@ def render_card(w):
         mark = (f'<i class="mk" style="left:calc({tgt / scale * 100:.2f}% - 2px)"></i>' if tgt else "")
         num = (f'<b class="{"ok" if r["met"] else ""}">{_fmt(act)}</b><span>/{_fmt(tgt)}</span>'
                if tgt else f'<b>{_fmt(act)}</b><span>/—</span>')
-        rows.append(f'<div class="r"><span class="n">{r["name"]}</span>'
+        why = NUTRIENT[r["key"]][1 if LANG == "en" else 0]
+        rows.append(f'<div class="r"><span class="n">{r["name"]}<em>{why}</em></span>'
                     f'<span class="tr">{box}<i class="ac" style="width:{fill:.2f}%"></i>{mark}</span>'
                     f'<span class="v num">{num}</span></div>')
     sub = t("7 天里有 {n} 天记录，按记了的算", n=logged)
@@ -841,23 +861,24 @@ def render_card(w):
 <style>
 *{{box-sizing:border-box;margin:0}}
 body{{background:#DCD6C2}}
-.card{{width:1080px;height:1440px;background:#F6F2E8;color:#2A2A24;padding:68px 80px 56px;
-  font-family:"Noto Sans SC",system-ui,sans-serif;display:flex;flex-direction:column;gap:26px;overflow:hidden}}
+.card{{width:1080px;height:1440px;background:#F6F2E8;color:#2A2A24;padding:56px 72px 44px;
+  font-family:"Noto Sans SC",system-ui,sans-serif;display:flex;flex-direction:column;gap:20px;overflow:hidden}}
 .num{{font-family:"Space Grotesk",ui-monospace,monospace}}
 .top{{display:flex;justify-content:space-between;align-items:flex-start;gap:30px}}
 .k{{font-size:27px;color:#6B6857}}
-.t{{font-weight:700;font-size:64px;line-height:1.15;margin:6px 0 18px}}
+.t{{font-weight:700;font-size:58px;line-height:1.15;margin:4px 0 14px}}
 .rg{{display:inline-block;background:#3D5A3F;color:#F6F2E8;border-radius:40px;padding:10px 26px;font-size:26px}}
 .sub{{font-size:24px;color:#6B6857;margin-top:14px}}
-.sc{{flex:none;width:236px;height:236px;border-radius:50%;background:#3D5A3F;color:#F6F2E8;
+.sc{{flex:none;width:210px;height:210px;border-radius:50%;background:#3D5A3F;color:#F6F2E8;
   display:flex;flex-direction:column;align-items:center;justify-content:center}}
-.sc .big{{font-size:96px;font-weight:700;line-height:1}}
+.sc .big{{font-size:86px;font-weight:700;line-height:1}}
 .sc .lb{{font-size:{19 if LANG == "en" else 24}px;opacity:.85;margin-top:8px;text-align:center;line-height:1.25;width:170px}}
-.lg{{display:flex;gap:30px;font-size:22px;color:#6B6857;align-items:center}}
+.lg{{display:flex;gap:30px;font-size:21px;color:#6B6857;align-items:center}}
 .lg i{{display:inline-block;width:34px;height:16px;border-radius:5px;margin-right:10px;vertical-align:-1px}}
-.rows{{display:flex;flex-direction:column;gap:13px}}
-.r{{display:flex;align-items:center;gap:22px;height:36px}}
-.n{{width:{290 if LANG == "en" else 210}px;flex:none;font-size:{25 if LANG == "en" else 27}px}}
+.rows{{display:flex;flex-direction:column;gap:6px}}
+.r{{display:flex;align-items:center;gap:22px;height:52px}}
+.n{{width:{330 if LANG == "en" else 300}px;flex:none;font-size:{24 if LANG == "en" else 26}px;line-height:1.15;display:flex;flex-direction:column}}
+.n em{{font-style:normal;font-size:{16 if LANG == "en" else 17}px;color:#8A8676;margin-top:2px;white-space:nowrap}}
 .tr{{flex:1;height:26px;border-radius:8px;background:#ECE6D6;position:relative}}
 .tr i{{position:absolute;left:0;top:0;bottom:0;border-radius:8px}}
 .tg{{border:2.5px dashed rgba(61,90,63,.55);background:rgba(61,90,63,.06)}}
@@ -865,7 +886,7 @@ body{{background:#DCD6C2}}
 .tr i.mk{{width:4px;top:-6px;bottom:-6px;border-radius:2px;background:#2A2A24}}
 .v{{width:96px;flex:none;text-align:right;font-size:26px;color:#6B6857}}
 .v b{{color:#B5643C;font-weight:600}} .v b.ok{{color:#3D5A3F}}
-.a{{display:flex;gap:18px;align-items:flex-start;font-size:26px;line-height:1.45;margin-bottom:6px}}
+.a{{display:flex;gap:18px;align-items:flex-start;font-size:24px;line-height:1.4;margin-bottom:4px}}
 .a b{{width:28px;height:28px;flex:none;border-radius:7px;border:2.5px solid rgba(42,42,36,.3);margin-top:5px}}
 .f span:last-child{{white-space:nowrap}}
 .f{{margin-top:auto;display:flex;justify-content:space-between;gap:20px;font-size:21px;color:#6B6857;
