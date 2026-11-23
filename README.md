@@ -10,7 +10,7 @@ Tell it once what's in your kitchen. From then on it suggests meals from what yo
 
 **[Get started](#get-started)** · [Plugin](downloads/anti-inflammatory-kitchen-plugin.zip) · [Claude Skill ZIP](downloads/kitchen.zip) · [Chat guide](downloads/kitchen-chat-guide.md)
 
-<p align="center"><img src="docs/images/weekly-en.png" width="440" alt="Weekly review: 14 food groups from most important, weekly target vs this week, and an anti-inflammatory index"></p>
+<p align="center"><img src="docs/images/weekly-en.png" width="620" alt="Weekly review: 14 food groups from most important, weekly target vs this week, and an anti-inflammatory index"></p>
 
 ## What it does
 

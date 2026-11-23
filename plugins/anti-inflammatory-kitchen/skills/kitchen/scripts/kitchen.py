@@ -833,7 +833,7 @@ def _fmt(x):
 
 
 def render_card(w):
-    """1080×1440 周复盘分享卡：14 类按重要性排列，每行目标与实际同轴，右上角抗炎指数。
+    """1440×1440 周复盘分享卡：14 类按重要性排列，每行目标与实际同轴，右上角抗炎指数。
     只含记录统计与下周三件事，不含库存、忌口、个人设置或健康信息。"""
     idx = weekly_index(w)
     logged = idx["daysWithRecord"]
@@ -848,7 +848,7 @@ def render_card(w):
         num = (f'<b class="{"ok" if r["met"] else ""}">{_fmt(act)}</b><span>/{_fmt(tgt)}</span>'
                if tgt else f'<b>{_fmt(act)}</b><span>/—</span>')
         why = NUTRIENT[r["key"]][1 if LANG == "en" else 0]
-        rows.append(f'<div class="r"><span class="n">{r["name"]}<em>{why}</em></span>'
+        rows.append(f'<div class="r"><span class="n">{r["name"]}</span><span class="why">{why}</span>'
                     f'<span class="tr">{box}<i class="ac" style="width:{fill:.2f}%"></i>{mark}</span>'
                     f'<span class="v num">{num}</span></div>')
     sub = t("7 天里有 {n} 天记录，按记了的算", n=logged)
@@ -861,7 +861,7 @@ def render_card(w):
 <style>
 *{{box-sizing:border-box;margin:0}}
 body{{background:#DCD6C2}}
-.card{{width:1080px;height:1440px;background:#F6F2E8;color:#2A2A24;padding:56px 72px 44px;
+.card{{width:1440px;height:1440px;background:#F6F2E8;color:#2A2A24;padding:64px 80px 52px;
   font-family:"Noto Sans SC",system-ui,sans-serif;display:flex;flex-direction:column;gap:20px;overflow:hidden}}
 .num{{font-family:"Space Grotesk",ui-monospace,monospace}}
 .top{{display:flex;justify-content:space-between;align-items:flex-start;gap:30px}}
@@ -875,10 +875,10 @@ body{{background:#DCD6C2}}
 .sc .lb{{font-size:{19 if LANG == "en" else 24}px;opacity:.85;margin-top:8px;text-align:center;line-height:1.25;width:170px}}
 .lg{{display:flex;gap:30px;font-size:21px;color:#6B6857;align-items:center}}
 .lg i{{display:inline-block;width:34px;height:16px;border-radius:5px;margin-right:10px;vertical-align:-1px}}
-.rows{{display:flex;flex-direction:column;gap:6px}}
-.r{{display:flex;align-items:center;gap:22px;height:52px}}
-.n{{width:{330 if LANG == "en" else 300}px;flex:none;font-size:{24 if LANG == "en" else 26}px;line-height:1.15;display:flex;flex-direction:column}}
-.n em{{font-style:normal;font-size:{16 if LANG == "en" else 17}px;color:#8A8676;margin-top:2px;white-space:nowrap}}
+.rows{{display:flex;flex-direction:column;gap:14px}}
+.r{{display:flex;align-items:center;gap:24px;height:42px}}
+.n{{width:{290 if LANG == "en" else 180}px;flex:none;font-size:{25 if LANG == "en" else 27}px;white-space:nowrap}}
+.why{{width:{330 if LANG == "en" else 330}px;flex:none;font-size:{20 if LANG == "en" else 21}px;color:#8A8676;white-space:nowrap}}
 .tr{{flex:1;height:26px;border-radius:8px;background:#ECE6D6;position:relative}}
 .tr i{{position:absolute;left:0;top:0;bottom:0;border-radius:8px}}
 .tg{{border:2.5px dashed rgba(61,90,63,.55);background:rgba(61,90,63,.06)}}
@@ -913,7 +913,7 @@ Commands (add --lang en for English output; default zh):
   score --log kitchen-log.md [--end YYYY-MM-DD] [--profile kitchen-profile.json]
   day --json day.json [-o today.html]
   week --json week.json [-o review.html]
-  card --json week.json [-o card.html]        1080x1440 shareable weekly card (no inventory or health data)
+  card --json week.json [-o card.html]        1440x1440 shareable weekly card (no inventory or health data)
   restock --log kitchen-log.md --fridge kitchen-fridge.md [--end YYYY-MM-DD] [--profile ...]
       -> JSON: useWhatYouHave (gaps already in stock) and worthBuying (up to 3 gaps, 3 options each)
 

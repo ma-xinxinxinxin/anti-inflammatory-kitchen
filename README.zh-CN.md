@@ -10,7 +10,7 @@
 
 **[开始使用](#开始使用)** · [插件包](downloads/anti-inflammatory-kitchen-plugin.zip) · [Claude Skill ZIP](downloads/kitchen.zip) · [对话导入指南](downloads/kitchen-chat-guide.md)
 
-<p align="center"><img src="docs/images/weekly-zh.png" width="440" alt="周复盘：14 类从最重要的开始，每周目标对比本周实际，加上抗炎指数"></p>
+<p align="center"><img src="docs/images/weekly-zh.png" width="620" alt="周复盘：14 类从最重要的开始，每周目标对比本周实际，加上抗炎指数"></p>
 
 ## 它能做什么
 

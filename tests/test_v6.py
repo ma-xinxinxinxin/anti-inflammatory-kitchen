@@ -107,7 +107,7 @@ class CardTests(unittest.TestCase):
 
     def test_card_is_fixed_size_and_only_three_actions(self):
         html = k.render_card(self.week())
-        self.assertIn('width:1080px;height:1440px', html)
+        self.assertIn('width:1440px;height:1440px', html)
         self.assertEqual(html.count('<div class="a">'), 3)
         self.assertNotIn('<b>一</b>', html)
 
