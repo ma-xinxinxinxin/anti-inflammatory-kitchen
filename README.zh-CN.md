@@ -10,22 +10,20 @@
 
 **[开始使用](#开始使用)** · [插件包](downloads/anti-inflammatory-kitchen-plugin.zip) · [Claude Skill ZIP](downloads/kitchen.zip) · [对话导入指南](downloads/kitchen-chat-guide.md)
 
-<p align="center"><img src="docs/images/carousel/zh-1-cover.jpg" width="440" alt="从冰箱出发，不从食谱出发。不用会做饭，不用懂营养，开口问就行。"></p>
-
 ## 它能做什么
 
 <table>
 <tr>
+<td width="50%"><img src="docs/images/carousel/zh-1-cover.jpg" alt="从冰箱出发，不从食谱出发。不用会做饭，不用懂营养，开口问就行。"></td>
 <td width="50%"><img src="docs/images/carousel/zh-2-log.jpg" alt="买了什么，说一句或拍张小票，库存就更新了"></td>
+</tr>
+<tr>
 <td width="50%"><img src="docs/images/carousel/zh-3-breakfast.jpg" alt="问一句明天早饭吃什么，给出 3 个只用家里现有食材的选择"></td>
-</tr>
-<tr>
 <td width="50%"><img src="docs/images/carousel/zh-4-cook.jpg" alt="不会做？给出带时间火候的分步菜谱卡"></td>
-<td width="50%"><img src="docs/images/carousel/zh-5-restock.jpg" alt="问这周该买什么：先用掉家里有的，再列几样值得买的"></td>
 </tr>
 <tr>
+<td width="50%"><img src="docs/images/carousel/zh-5-restock.jpg" alt="问这周该买什么：先用掉家里有的，再列几样值得买的"></td>
 <td width="50%"><img src="docs/images/carousel/zh-6-review.jpg" alt="周复盘：抗炎指数，每周目标对比本周实际"></td>
-<td width="50%"><img src="docs/images/carousel/zh-7-open-source.jpg" alt="免费开源，支持 Claude、ChatGPT、Gemini 等"></td>
 </tr>
 </table>
 
