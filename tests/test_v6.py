@@ -1,0 +1,219 @@
+"""v6: lexicon data file, regional aliases, restock loop and share card."""
+import importlib.util
+import json
+from pathlib import Path
+import re
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+spec = importlib.util.spec_from_file_location('kitchen_v6', ROOT / 'kitchen/scripts/kitchen.py')
+k = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(k)
+LEX = json.loads((ROOT / 'kitchen/references/lexicon.json').read_text(encoding='utf-8'))
+
+
+def log(items, date='2026-09-07'):
+    return f'## {date}\n- [stated] 早 | {items}\n'
+
+
+class LexiconTests(unittest.TestCase):
+    def test_nineteen_categories_and_default_targets(self):
+        self.assertEqual(len(LEX['daily']), 8)
+        self.assertEqual([c['target'] for c in LEX['weekly']], [3, 5, 4, 5, 3, 2])
+        self.assertEqual(len(LEX['otherProtein']), 4)
+
+    def test_every_alias_points_to_a_known_food(self):
+        for alias, canonical in LEX['aliases'].items():
+            self.assertIn(alias, k.VOCAB, alias)
+            self.assertEqual(k.VOCAB[alias], k.VOCAB[canonical], alias)
+
+    def test_canonical_words_are_documented_in_food_table(self):
+        table = (ROOT / 'kitchen/references/food-table.md').read_text(encoding='utf-8')
+        for group in ('daily', 'weekly'):
+            for cat in LEX[group]:
+                self.assertIn(cat['name'], table)
+
+    def test_regional_and_traditional_names(self):
+        out = k.score(log('地瓜 高麗菜 鮭魚 酪梨 奇异果 青江菜'))
+        self.assertEqual(out['unrecognizedItems'], [])
+        self.assertEqual(out['weeklyCounts']['redOrange'], 1)
+        self.assertEqual(out['weeklyCounts']['fattyFish'], 1)
+        self.assertEqual(out['weeklyCounts']['cruciferous'], 1)  # same meal, capped once
+        self.assertEqual(out['dailyMetDays']['leafy'], 1)        # 青江菜 inherits both categories
+
+    def test_english_inventory_keeps_user_wording(self):
+        table = k.render_fridge(k.parse_fridge('Greek yogurt, Olive Oil, bok choy'))
+        self.assertIn('| 发酵食品 | Greek yogurt |', table)
+        self.assertIn('bok choy', table.split('十字花科')[1].split('\n')[0])
+
+    def test_aliases_never_turn_plant_milk_into_grains(self):
+        out = k.score(log('燕麦奶 杏仁奶'))
+        self.assertEqual(out['dailyMetDays']['wholeGrain'], 0)
+        self.assertEqual(out['dailyMetDays']['nutsSeeds'], 0)
+
+
+FRIDGE = '- [stated] 豆类与豆制品：鹰嘴豆\n- [stated] 深色绿叶菜：菠菜\n'
+
+
+class RestockTests(unittest.TestCase):
+    def test_in_stock_gaps_are_used_before_buying(self):
+        out = k.restock(log('燕麦 蓝莓'), FRIDGE, '2026-09-07')
+        used = {x['key'] for x in out['useWhatYouHave']}
+        bought = {x['key'] for x in out['worthBuying']}
+        self.assertIn('legumes', used)
+        self.assertIn('leafy', used)
+        self.assertFalse(used & bought)
+        self.assertLessEqual(len(out['worthBuying']), 3)
+
+    def test_no_padding_categories_come_last(self):
+        out = k.restock(log('燕麦'), '', '2026-09-07', limit=19)
+        order = [x['key'] for x in out['worthBuying']]
+        tail = [key for key in order if key in k.NO_PADDING]
+        self.assertEqual(order[-len(tail):], tail)
+
+    def test_restrictions_are_never_suggested(self):
+        profile = {'restrictions': ['三文鱼过敏', '不吃鲭鱼']}
+        out = k.restock(log('燕麦'), '', '2026-09-07', profile, limit=19)
+        fish = next(x for x in out['worthBuying'] if x['key'] == 'fattyFish')
+        self.assertNotIn('三文鱼', fish['options'])
+        self.assertNotIn('鲭鱼', fish['options'])
+
+    def test_personal_null_frequency_is_not_a_gap(self):
+        out = k.restock(log('燕麦'), '', '2026-09-07', {'frequencies': {'darkChocolate': None, 'tea': None}}, limit=19)
+        keys = {x['key'] for x in out['worthBuying'] + out['useWhatYouHave']}
+        self.assertNotIn('darkChocolate', keys)
+        self.assertNotIn('tea', keys)
+
+    def test_little_evidence_is_flagged(self):
+        self.assertEqual(k.restock(log('燕麦'), '', '2026-09-07')['evidence'], 'insufficient')
+
+    def test_cli(self):
+        import subprocess, sys, tempfile
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / 'log.md').write_text(log('燕麦'), encoding='utf-8')
+            (Path(d) / 'fridge.md').write_text(FRIDGE, encoding='utf-8')
+            r = subprocess.run([sys.executable, str(ROOT / 'kitchen/scripts/kitchen.py'), 'restock',
+                                '--log', str(Path(d) / 'log.md'), '--fridge', str(Path(d) / 'fridge.md')],
+                               capture_output=True, text=True, encoding='utf-8')
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn('worthBuying', r.stdout)
+
+
+class CardTests(unittest.TestCase):
+    def week(self):
+        w = k.score(log('菠菜 三文鱼 番茄'), '2026-09-07')
+        w['review'] = {'actions': ['<b>一</b>', '二', '三', '四']}
+        return k.escaped_text(w)
+
+    def test_card_is_fixed_size_and_only_three_actions(self):
+        html = k.render_card(self.week())
+        self.assertIn('width:1080px;height:1440px', html)
+        self.assertEqual(html.count('<div class="a">'), 3)
+        self.assertNotIn('<b>一</b>', html)
+
+    def test_card_carries_no_inventory_or_restrictions(self):
+        w = self.week()
+        w['restrictions'] = ['PRIVATE']
+        self.assertNotIn('PRIVATE', k.render_card(w))
+        self.assertIn('不是健康评分', k.render_card(w))
+        self.assertNotRegex(k.render_card(w), r'[\U0001F300-\U0001FAFF]')
+
+
+if __name__ == '__main__':
+    unittest.main()
+
+
+class EnglishTests(unittest.TestCase):
+    def setUp(self):
+        k.LANG = 'en'
+
+    def tearDown(self):
+        k.LANG = 'zh'
+
+    def test_multi_word_foods_are_not_split(self):
+        text = '## 2026-09-07\n- [stated] Breakfast | plain greek yogurt, frozen blueberries, a handful of walnuts\n' \
+               '- [stated] Lunch | grilled salmon fillet, baby spinach, extra-virgin olive oil, brown rice | Eating out\n'
+        out = k.score(text)
+        self.assertEqual(out['unrecognizedItems'], [])
+        for key in ('fermented', 'berryCitrus', 'nutsSeeds', 'leafy', 'goodFat', 'wholeGrain'):
+            self.assertEqual(out['dailyMetDays'][key], 1, key)
+        self.assertEqual(out['weeklyCounts']['fattyFish'], 1)
+
+    def test_plurals_and_limits(self):
+        out = k.score('## 2026-09-07\n- [stated] Dinner | chickpeas, tomatoes, cherries | Limit: deepFried, tooSalty\n')
+        self.assertEqual(out['unrecognizedItems'], [])
+        self.assertEqual(out['limitsHit'], {'deepFried': 1, 'tooSalty': 1})
+
+    def test_unknown_english_food_is_reported_whole(self):
+        out = k.score('## 2026-09-07\n- [stated] Dinner | okra stew, broccoli\n')
+        self.assertEqual(out['unrecognizedItems'], ['okra stew'])
+
+    def test_no_substring_false_positives(self):
+        self.assertEqual(k.classify('eggplant')[0], 'neutral')
+        self.assertEqual(k.classify('beef steak')[0], 'redMeat')
+        self.assertEqual(k.classify('graham crackers'), (None, True))
+
+    def test_english_fridge_table(self):
+        table = k.render_fridge(k.parse_fridge('Spinach 200g, 2 avocados, eggs x6, okra'))
+        self.assertIn('| Dark leafy greens | Spinach |', table)
+        self.assertIn('| Healthy fats | avocados |', table)
+        self.assertIn('| Eggs | eggs |', table)
+        self.assertIn('To confirm (unclassified): okra', table)
+        self.assertNotRegex(table, r'[一-鿿]')
+
+    def test_english_state_file_round_trip(self):
+        items = k.parse_fridge('- [stated] Legumes & soy: chickpeas, tofu\n- [stated] Dark chocolate & cocoa: none\n')
+        self.assertEqual(items, ['chickpeas', 'tofu'])
+        table = k.render_fridge(k.parse_fridge(k.render_fridge(items)))
+        self.assertIn('| Legumes & soy | chickpeas, tofu |', table)
+
+    def test_english_renders_have_no_chinese_ui(self):
+        week = k.score('## 2026-09-07\n- [stated] Lunch | salmon, spinach, oats\n')
+        week['review'] = {'wins': ['a'], 'topGaps': ['b'], 'actions': ['c']}
+        for html in (k.render_week(dict(week)), k.render_card(dict(week))):
+            self.assertIn('lang="en"', html)
+            self.assertNotRegex(html, r'[一-鿿]')
+
+    def test_english_restock_options(self):
+        out = k.restock('## 2026-09-07\n- [stated] Lunch | oats\n', '', '2026-09-07', limit=19)
+        fish = next(x for x in out['worthBuying'] if x['key'] == 'fattyFish')
+        self.assertEqual(fish['category'], 'Oily fish')
+        self.assertTrue(all(not __import__('re').search(r'[一-鿿]', o) for o in fish['options']))
+        self.assertNotRegex(out['note'], r'[一-鿿]')
+
+    def test_chinese_output_unchanged(self):
+        k.LANG = 'zh'
+        table = k.render_fridge(['菠菜'])
+        self.assertIn('| 深色绿叶菜 | 菠菜 |', table)
+
+
+class EnglishSkillDocTests(unittest.TestCase):
+    """SKILL.en.md is a reference translation; it must not drift from SKILL.md."""
+
+    def structure(self, name):
+        text = (ROOT / 'kitchen' / name).read_text(encoding='utf-8')
+        text = re.sub(r'\A---\n.*?\n---\n', '', text, flags=re.S)
+        text = re.sub(r'```.*?```', '', text, flags=re.S)
+        return [len(m.group(1)) for m in re.finditer(r'^(#{1,3}) ', text, re.M)], text
+
+    def test_same_section_structure(self):
+        zh, _ = self.structure('SKILL.md')
+        en, _ = self.structure('SKILL.en.md')
+        self.assertEqual(zh, en)
+
+    def test_same_version_line(self):
+        _, zh = self.structure('SKILL.md')
+        _, en = self.structure('SKILL.en.md')
+        version = re.search(r'\*\*(v[\d.]+) · 19', zh).group(1)
+        self.assertIn(f'**{version} · 19 categories**', en)
+
+    def test_category_names_match_script(self):
+        _, en = self.structure('SKILL.en.md')
+        for name in k.EN_NAME.values():
+            self.assertIn(name, en)
+
+    def test_not_packaged(self):
+        import zipfile
+        names = zipfile.ZipFile(ROOT / 'downloads/kitchen.zip').namelist()
+        self.assertFalse(any(n.endswith('SKILL.en.md') for n in names))
+        self.assertNotIn('name:', (ROOT / 'kitchen/SKILL.en.md').read_text(encoding='utf-8').split('\n#', 1)[0])

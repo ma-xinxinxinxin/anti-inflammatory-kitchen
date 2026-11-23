@@ -14,6 +14,8 @@ python3 kitchen/scripts/kitchen.py fridge --items "有机菠菜 250g, 西兰花,
 python3 kitchen/scripts/kitchen.py score --log examples/meal-log.md --end 2026-09-07 -o dist/week.json
 python3 kitchen/scripts/kitchen.py week --json dist/week.json -o dist/week.html
 python3 kitchen/scripts/kitchen.py day --json examples/day.json -o dist/today.html
+python3 kitchen/scripts/kitchen.py restock --log examples/meal-log.md --fridge examples/fridge.md --end 2026-09-07
+python3 kitchen/scripts/kitchen.py card --json dist/week.json -o dist/card.html
 python3 kitchen/scripts/kitchen.py schema
 ```
 
@@ -30,6 +32,9 @@ python3 kitchen/scripts/kitchen.py schema
 | `kitchen/SKILL.md` | 各平台共用的工作流与版本 |
 | `kitchen/references/` | 食材、状态、菜谱和视觉规则 |
 | `kitchen/scripts/kitchen.py` | 库存表、计数、日卡与周卡 |
+| `kitchen/SKILL.en.md` | SKILL.md 的英文参考译本，不进安装包。改 SKILL.md 时同一次提交里同步更新；测试会检查版本号和章节结构是否一致 |
+| `kitchen/references/lexicon.json` | 食材词典：19 类、权重、地区别名、繁体与英文名 |
+| `evals/` | 行为评测用例（对话层约定） |
 | `scripts/install_skill.py` | 按工具选择路径；升级前备份 |
 | `scripts/package_skill.py` | 从同一套源文件生成发行文件 |
 | `downloads/` | 用户直接下载的 skill ZIP、插件 ZIP 与单文件聊天指南 |

@@ -41,6 +41,20 @@ Ask “What should I eat today?”, “Give me three breakfast options”, or �
 
 Voice, photo, and receipt recognition depend on the host AI. Unclear items are checked first. While you list stock, it listens; when you ask what to eat, it recommends a meal directly, offering alternatives when you want them. Planned meals are not logged as eaten, and shopping lists are not stock already owned.
 
+## New in v6
+
+| Scenario | Say | You get |
+|---|---|---|
+| **Review → restock** | “Week reviewed. What should I buy?” | First, what's already in your kitchen that fills a gap; then up to three categories worth buying, with your restrictions excluded. It never pads the grid with extra tea, chocolate or oil |
+| **My cookbooks** | “Find something from my cookbooks I can make tonight.” | An index built only from content you provide, matched to your stock, with page numbers |
+| **Eating out** | Send a menu photo: “At a hawker centre, what should I order?” | The most balanced dish, one add-on or swap, and how to round out the rest of the day |
+| **Weekend prep** | “I want to prep once and spend 10 minutes per weekday meal.” | Three bases in 60–90 minutes, plus 4–5 weekday assemblies |
+| **Share card** | “Turn this week's review into an image.” | A 1080×1440 card with coverage and next week's three actions only, no inventory or personal data |
+
+**Fully usable in English.** Ask in English and every reply, fridge table, weekly review and share card comes back in English. Log meals in plain English, comma-separated (`greek yogurt, blueberries, walnuts`): multi-word foods, plurals and words like *fresh*, *frozen* or *grilled* are handled, and anything unknown is flagged for you to confirm instead of guessed. Regional names from mainland China, Taiwan and Singapore and traditional characters are recognized too.
+
+<p align="center"><img src="docs/images/share-card-example.png" width="360" alt="Weekly share card example (fictional data)"></p>
+
 ## Choose your AI tool
 
 Choose one route for your AI tool. Each uses the same kitchen rules.
@@ -139,7 +153,7 @@ Different AI tools do not automatically synchronize private records. Downloads c
 
 ## Contribute
 
-The skill itself needs no API key. Local helpers require Python 3.10+ and only the standard library. Host subscriptions, permissions, and capabilities depend on the platform.
+The skill's instructions are written in Chinese; an English reference translation is in [kitchen/SKILL.en.md](kitchen/SKILL.en.md). The skill itself needs no API key. Local helpers require Python 3.10+ and only the standard library. Host subscriptions, permissions, and capabilities depend on the platform.
 
 [Examples and project structure](docs/development.en.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md) · [MIT License](LICENSE)
 

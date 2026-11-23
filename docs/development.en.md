@@ -14,6 +14,8 @@ python3 kitchen/scripts/kitchen.py fridge --items "有机菠菜 250g, 西兰花,
 python3 kitchen/scripts/kitchen.py score --log examples/meal-log.md --end 2026-09-07 -o dist/week.json
 python3 kitchen/scripts/kitchen.py week --json dist/week.json -o dist/week.html
 python3 kitchen/scripts/kitchen.py day --json examples/day.json -o dist/today.html
+python3 kitchen/scripts/kitchen.py restock --log examples/meal-log.md --fridge examples/fridge.md --end 2026-09-07
+python3 kitchen/scripts/kitchen.py card --json dist/week.json -o dist/card.html
 python3 kitchen/scripts/kitchen.py schema
 ```
 
@@ -30,6 +32,9 @@ Store personal settings in `kitchen-profile.json` beside the log; `score` reads 
 | `kitchen/SKILL.md` | Shared workflow and version |
 | `kitchen/references/` | Food, state, recipe, and visual rules |
 | `kitchen/scripts/kitchen.py` | Inventory tables, counts, daily and weekly cards |
+| `kitchen/SKILL.en.md` | English reference translation of SKILL.md (not packaged). Update it in the same commit as SKILL.md; tests check that version and section structure match |
+| `kitchen/references/lexicon.json` | Ingredient lexicon: 19 categories, weights, regional aliases, traditional and English names |
+| `evals/` | Behavioral eval cases for conversation-level rules |
 | `scripts/install_skill.py` | Tool-specific destinations and upgrade backups |
 | `scripts/package_skill.py` | Generate distributions from the same sources |
 | `downloads/` | Ready-to-download skill ZIP, plugin ZIP, and chat guide |

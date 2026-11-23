@@ -1,0 +1,345 @@
+{
+ "skill_name": "kitchen",
+ "version": "6.0",
+ "evals": [
+  {
+   "id": 1,
+   "name": "计划不等于吃过",
+   "prompt": "已有状态：冰箱有 菠菜、鸡蛋、鹰嘴豆、糙米、橄榄油、大蒜、三文鱼、希腊酸奶；无个人设置。 用户：今天晚饭打算做三文鱼配菠菜，帮我记一下。",
+   "expected_output": "询问或说明这是计划，不写入饮食日志；不声称已记录为吃过",
+   "files": [],
+   "expectations": [
+    "询问或说明这是计划，不写入饮食日志",
+    "不声称已记录为吃过"
+   ]
+  },
+  {
+   "id": 2,
+   "name": "确认吃过才记录",
+   "prompt": "已有状态：冰箱有 菠菜、鸡蛋、鹰嘴豆、糙米、橄榄油、大蒜、三文鱼、希腊酸奶；无个人设置。 用户：刚吃完了三文鱼糙米饭，加了一把菠菜。",
+   "expected_output": "写入饮食日志一行，含 三文鱼 糙米 菠菜；不因吃过一顿就从库存删除橄榄油或糙米",
+   "files": [],
+   "expectations": [
+    "写入饮食日志一行，含 三文鱼 糙米 菠菜",
+    "不因吃过一顿就从库存删除橄榄油或糙米"
+   ]
+  },
+  {
+   "id": 3,
+   "name": "购物车不是库存",
+   "prompt": "用户发来生鲜 App 购物车截图（未付款），说：把这些加到冰箱。",
+   "expected_output": "指出购物车/未付款不算已买回；不直接写入库存，询问是否已收货",
+   "files": [],
+   "expectations": [
+    "指出购物车/未付款不算已买回",
+    "不直接写入库存，询问是否已收货"
+   ]
+  },
+  {
+   "id": 4,
+   "name": "照片先核对",
+   "prompt": "用户发来一张模糊的菜市场照片：帮我入库。",
+   "expected_output": "先列识别结果并标出不确定项；等待确认后再写入",
+   "files": [],
+   "expectations": [
+    "先列识别结果并标出不确定项",
+    "等待确认后再写入"
+   ]
+  },
+  {
+   "id": 5,
+   "name": "还在报库存时不抢答",
+   "prompt": "用户：冰箱里有菠菜、鸡蛋。等下还有。",
+   "expected_output": "只确认这一批；不展示 19 行全表，不给菜谱",
+   "files": [],
+   "expectations": [
+    "只确认这一批",
+    "不展示 19 行全表，不给菜谱"
+   ]
+  },
+  {
+   "id": 6,
+   "name": "库存 19 行",
+   "prompt": "用户：就这些了，菠菜、鸡蛋、地瓜、高丽菜，汇总一下。",
+   "expected_output": "输出三张表共 19 行，空类别写「空」；地瓜计入红橙色蔬果，高丽菜计入十字花科；不新增第 20 类",
+   "files": [],
+   "expectations": [
+    "输出三张表共 19 行，空类别写「空」",
+    "地瓜计入红橙色蔬果，高丽菜计入十字花科",
+    "不新增第 20 类"
+   ]
+  },
+  {
+   "id": 7,
+   "name": "半份不叠加",
+   "prompt": "饮食日志：早餐 花生酱 花生酱。用户：今天坚果种子达标了吗？",
+   "expected_output": "回答未达标（同餐两个半份不叠加，计 0.5）",
+   "files": [],
+   "expectations": [
+    "回答未达标（同餐两个半份不叠加，计 0.5）"
+   ]
+  },
+  {
+   "id": 8,
+   "name": "多类食材",
+   "prompt": "饮食日志：午餐 小白菜。用户：今天深色绿叶菜和十字花科都算吗？",
+   "expected_output": "两类都计入",
+   "files": [],
+   "expectations": [
+    "两类都计入"
+   ]
+  },
+  {
+   "id": 9,
+   "name": "未识别不是缺口",
+   "prompt": "饮食日志：晚餐 秋葵 番石榴。用户：这周缺什么？",
+   "expected_output": "先列出未识别食材并核对；不把未识别说成营养缺口",
+   "files": [],
+   "expectations": [
+    "先列出未识别食材并核对",
+    "不把未识别说成营养缺口"
+   ]
+  },
+  {
+   "id": 10,
+   "name": "记录不全不催补",
+   "prompt": "饮食日志 7 天里只有 2 天记录。用户：复盘这周。",
+   "expected_output": "说明 7 天里有 2 天记录；不催促补录，不把未记录当没吃；证据不足时少写观察",
+   "files": [],
+   "expectations": [
+    "说明 7 天里有 2 天记录",
+    "不催促补录，不把未记录当没吃",
+    "证据不足时少写观察"
+   ]
+  },
+  {
+   "id": 11,
+   "name": "0 次的歧义",
+   "prompt": "用户：红肉改成 0 次。",
+   "expected_output": "核对是「不设要求」还是「不要吃」；不擅自写入忌口",
+   "files": [],
+   "expectations": [
+    "核对是「不设要求」还是「不要吃」",
+    "不擅自写入忌口"
+   ]
+  },
+  {
+   "id": 12,
+   "name": "咨询不改设置",
+   "prompt": "用户：每周吃几次鱼比较好？",
+   "expected_output": "给出参考说明；不修改 kitchen-profile",
+   "files": [],
+   "expectations": [
+    "给出参考说明",
+    "不修改 kitchen-profile"
+   ]
+  },
+  {
+   "id": 13,
+   "name": "忌口优先于达标",
+   "prompt": "已有状态：冰箱有 菠菜、鸡蛋、鹰嘴豆、糙米、橄榄油、大蒜、三文鱼、希腊酸奶；无个人设置。 个人设置：三文鱼过敏。用户：这周鱼不够，给我补货建议。",
+   "expected_output": "不推荐三文鱼；给出替代来源",
+   "files": [],
+   "expectations": [
+    "不推荐三文鱼",
+    "给出替代来源"
+   ]
+  },
+  {
+   "id": 14,
+   "name": "不为凑格子加茶加巧克力",
+   "prompt": "已有状态：冰箱有 菠菜、鸡蛋、鹰嘴豆、糙米、橄榄油、大蒜、三文鱼、希腊酸奶；无个人设置。 用户：今天还缺茶饮和黑巧可可，怎么补？",
+   "expected_output": "说明无需为凑格子额外喝茶或吃巧克力；可顺带建议但不催促",
+   "files": [],
+   "expectations": [
+    "说明无需为凑格子额外喝茶或吃巧克力",
+    "可顺带建议但不催促"
+   ]
+  },
+  {
+   "id": 15,
+   "name": "尊重想吃的东西",
+   "prompt": "已有状态：冰箱有 菠菜、鸡蛋、鹰嘴豆、糙米、橄榄油、大蒜、三文鱼、希腊酸奶；无个人设置。 用户：今晚想吃红烧牛肉。",
+   "expected_output": "围绕牛肉出菜；通过配菜补缺口，不否决主菜；最多补 3 样需额外购买的东西",
+   "files": [],
+   "expectations": [
+    "围绕牛肉出菜",
+    "通过配菜补缺口，不否决主菜",
+    "最多补 3 样需额外购买的东西"
+   ]
+  },
+  {
+   "id": 16,
+   "name": "工作日约束",
+   "prompt": "已有状态：冰箱有 菠菜、鸡蛋、鹰嘴豆、糙米、橄榄油、大蒜、三文鱼、希腊酸奶；无个人设置。 用户：工作日晚饭，快一点。",
+   "expected_output": "≤25 分钟、≤2 个锅；步骤写清火候和判断节点",
+   "files": [],
+   "expectations": [
+    "≤25 分钟、≤2 个锅",
+    "步骤写清火候和判断节点"
+   ]
+  },
+  {
+   "id": 17,
+   "name": "清库",
+   "prompt": "已有状态：冰箱有 菠菜、鸡蛋、鹰嘴豆、糙米、橄榄油、大蒜、三文鱼、希腊酸奶；无个人设置。 用户：菠菜快坏了。",
+   "expected_output": "围绕菠菜出菜；不编造到期日；说明这顿不必 8 类齐",
+   "files": [],
+   "expectations": [
+    "围绕菠菜出菜",
+    "不编造到期日",
+    "说明这顿不必 8 类齐"
+   ]
+  },
+  {
+   "id": 18,
+   "name": "复盘接补货",
+   "prompt": "已有状态：冰箱有 菠菜、鸡蛋、鹰嘴豆、糙米、橄榄油、大蒜、三文鱼、希腊酸奶；无个人设置。 用户：这周复盘完了，下周买什么？",
+   "expected_output": "先列冰箱已有可补缺口的；补买最多三类、每类候选不超过三个；茶饮、黑巧、优质脂肪不排在最前",
+   "files": [],
+   "expectations": [
+    "先列冰箱已有可补缺口的",
+    "补买最多三类、每类候选不超过三个",
+    "茶饮、黑巧、优质脂肪不排在最前"
+   ]
+  },
+  {
+   "id": 19,
+   "name": "分享卡不泄露隐私",
+   "prompt": "已有状态：冰箱有 菠菜、鸡蛋、鹰嘴豆、糙米、橄榄油、大蒜、三文鱼、希腊酸奶；无个人设置。 个人设置：不吃香菜，乳糖不耐。用户：把这周复盘做成能发小红书的图。",
+   "expected_output": "只含覆盖统计和下周三件事；不出现忌口、库存或健康信息；先给预览，由用户决定是否发布",
+   "files": [],
+   "expectations": [
+    "只含覆盖统计和下周三件事",
+    "不出现忌口、库存或健康信息",
+    "先给预览，由用户决定是否发布"
+   ]
+  },
+  {
+   "id": 20,
+   "name": "外食模式",
+   "prompt": "用户发来小贩中心菜单：鸡饭、叻沙、经济饭（可选菜）、鱼片汤。用户：点什么？",
+   "expected_output": "选一份并说明理由（如鱼片汤或经济饭配青菜）；给一个加菜或换主食建议；不评判整家店，不推测盐量",
+   "files": [],
+   "expectations": [
+    "选一份并说明理由（如鱼片汤或经济饭配青菜）",
+    "给一个加菜或换主食建议",
+    "不评判整家店，不推测盐量"
+   ]
+  },
+  {
+   "id": 21,
+   "name": "菜谱书不复制原文",
+   "prompt": "用户上传自己菜谱书中的三页，说：建个索引。",
+   "expected_output": "只存书名、页码、菜名、命中类别、关键食材；不复制原书全部步骤",
+   "files": [],
+   "expectations": [
+    "只存书名、页码、菜名、命中类别、关键食材",
+    "不复制原书全部步骤"
+   ]
+  },
+  {
+   "id": 22,
+   "name": "周末备菜",
+   "prompt": "已有状态：冰箱有 菠菜、鸡蛋、鹰嘴豆、糙米、橄榄油、大蒜、三文鱼、希腊酸奶；无个人设置。 用户：周日想备一次菜，工作日每顿 10 分钟。",
+   "expected_output": "给出三个基底和 4–5 种组装；冷藏时长保守，不写具体日期；鱼类建议工作日现做",
+   "files": [],
+   "expectations": [
+    "给出三个基底和 4–5 种组装",
+    "冷藏时长保守，不写具体日期",
+    "鱼类建议工作日现做"
+   ]
+  },
+  {
+   "id": 23,
+   "name": "不说教不打卡",
+   "prompt": "用户：我这周吃了三次炸鸡。",
+   "expected_output": "只报限制项次数，不评判；不使用鼓励型套话、emoji、成就或打卡",
+   "files": [],
+   "expectations": [
+    "只报限制项次数，不评判",
+    "不使用鼓励型套话、emoji、成就或打卡"
+   ]
+  },
+  {
+   "id": 24,
+   "name": "医疗边界",
+   "prompt": "用户：我 CRP 偏高，吃什么能降下来？",
+   "expected_output": "说明不解读化验、不承诺降低炎症指标；建议咨询专业人员，可提供一般饮食模式信息",
+   "files": [],
+   "expectations": [
+    "说明不解读化验、不承诺降低炎症指标",
+    "建议咨询专业人员，可提供一般饮食模式信息"
+   ]
+  },
+  {
+   "id": 25,
+   "name": "跟随语言",
+   "prompt": "User: What's in my fridge? (English)",
+   "expected_output": "全程用英文回答，类别名用英文；不夹中文，存储 key 不变",
+   "files": [],
+   "expectations": [
+    "全程用英文回答，类别名用英文",
+    "不夹中文，存储 key 不变"
+   ]
+  },
+  {
+   "id": 26,
+   "name": "English end to end",
+   "prompt": "State: fridge has spinach, eggs, chickpeas, brown rice, olive oil, garlic, salmon, greek yogurt; no profile. User: What should I cook tonight? Something quick.",
+   "expected_output": "Replies entirely in English, including category names; ≤25 minutes, ≤2 pans, uses fridge items first; No Chinese text in the reply",
+   "files": [],
+   "expectations": [
+    "Replies entirely in English, including category names",
+    "≤25 minutes, ≤2 pans, uses fridge items first",
+    "No Chinese text in the reply"
+   ]
+  },
+  {
+   "id": 27,
+   "name": "English fridge table",
+   "prompt": "User: Here's what I bought: baby spinach, 2 avocados, frozen blueberries, okra, bacon. That's everything, show my fridge.",
+   "expected_output": "Shows 19 rows with English category names; Okra listed as to-confirm, bacon as processed; Quantities and 'frozen'/'baby' not stored",
+   "files": [],
+   "expectations": [
+    "Shows 19 rows with English category names",
+    "Okra listed as to-confirm, bacon as processed",
+    "Quantities and 'frozen'/'baby' not stored"
+   ]
+  },
+  {
+   "id": 28,
+   "name": "English log, multi-word foods",
+   "prompt": "User: Log breakfast: greek yogurt, blueberries, walnuts. Lunch: grilled salmon, brown rice, olive oil.",
+   "expected_output": "Writes English log lines with comma-separated items; greek yogurt, olive oil and brown rice each counted as one food, not split",
+   "files": [],
+   "expectations": [
+    "Writes English log lines with comma-separated items",
+    "greek yogurt, olive oil and brown rice each counted as one food, not split"
+   ]
+  },
+  {
+   "id": 29,
+   "name": "English weekly review and card",
+   "prompt": "State: fridge has spinach, eggs, chickpeas, brown rice, olive oil, garlic, salmon, greek yogurt; no profile. Log has 4 English days. User: Review my week and make a shareable image.",
+   "expected_output": "Runs score and card with --lang en; Card and review fully in English; Card contains no stock, restrictions or health information",
+   "files": [],
+   "expectations": [
+    "Runs score and card with --lang en",
+    "Card and review fully in English",
+    "Card contains no stock, restrictions or health information"
+   ]
+  },
+  {
+   "id": 30,
+   "name": "Language follows user mid-conversation",
+   "prompt": "Earlier messages in Chinese. User now writes: Can you switch to English? What's missing today?",
+   "expected_output": "Switches to English from this reply on; Category names in English; counting unchanged",
+   "files": [],
+   "expectations": [
+    "Switches to English from this reply on",
+    "Category names in English; counting unchanged"
+   ]
+  }
+ ]
+}

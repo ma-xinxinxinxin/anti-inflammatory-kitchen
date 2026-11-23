@@ -65,7 +65,7 @@ class InstallationTests(unittest.TestCase):
         result = installer.install(target, update=True)
         self.assertEqual((Path(result['backup']) / 'SKILL.md').read_text(), 'old rules')
         self.assertFalse((self.home / '.agents').exists())
-        self.assertIn('v5.4', (legacy / 'SKILL.md').read_text(encoding='utf-8'))
+        self.assertIn('v6.0', (legacy / 'SKILL.md').read_text(encoding='utf-8'))
 
     def test_duplicate_codex_locations_require_resolution(self):
         for folder in ['.codex', '.agents']:
@@ -123,7 +123,7 @@ class DistributionTests(unittest.TestCase):
                      '.cursor-plugin/plugin.json', 'gemini-extension.json']:
             manifest = json.loads(files[name])
             self.assertEqual(manifest['name'], 'anti-inflammatory-kitchen')
-            self.assertEqual(manifest['version'], '5.4.1')
+            self.assertEqual(manifest['version'], '6.0.0')
         portable = json.loads(files['plugin.json'])
         self.assertEqual(portable['$schema'], 'https://agent-plugins.org/schemas/1.0.0/plugin.schema.json')
         for name, source in builder.skill_files():
@@ -159,7 +159,7 @@ class DistributionTests(unittest.TestCase):
 
     def test_zip_extracts_to_complete_installable_skill(self):
         with ZipFile(io.BytesIO(builder.archive_bytes())) as archive:
-            self.assertEqual(len(archive.namelist()), 8)
+            self.assertEqual(len(archive.namelist()), 9)
             self.assertEqual(archive.read('kitchen/SKILL.md'), (ROOT / 'kitchen/SKILL.md').read_bytes())
             with tempfile.TemporaryDirectory() as folder:
                 archive.extractall(folder)
@@ -180,7 +180,7 @@ class DistributionTests(unittest.TestCase):
 
     def test_chat_guide_is_self_contained_for_references(self):
         guide = builder.chat_guide().decode('utf-8')
-        self.assertIn('v5.4', guide)
+        self.assertIn('v6.0', guide)
         self.assertNotRegex(guide, r'\]\(references/')
         for anchor in ['workflow', 'food-table', 'state-files', 'recipe-rules', 'visuals']:
             self.assertIn(f'<a id="{anchor}"></a>', guide)
@@ -189,7 +189,8 @@ class DistributionTests(unittest.TestCase):
 
     def test_committed_downloads_are_current(self):
         for name, content in builder.distributions().items():
-            self.assertEqual((ROOT / 'downloads' / name).read_bytes(), content, name)
+            existing = (ROOT / 'downloads' / name).read_bytes()
+            self.assertTrue(builder.same_artifact(name, existing, content), name)
 
     def test_readme_language_tabs_and_local_document_links(self):
         for filename, other in [('README.md', 'README.en.md'), ('README.en.md', 'README.md')]:
