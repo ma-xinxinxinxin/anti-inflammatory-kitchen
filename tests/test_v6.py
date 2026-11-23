@@ -121,3 +121,67 @@ class CardTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class EnglishTests(unittest.TestCase):
+    def setUp(self):
+        k.LANG = 'en'
+
+    def tearDown(self):
+        k.LANG = 'zh'
+
+    def test_multi_word_foods_are_not_split(self):
+        text = '## 2026-09-07\n- [stated] Breakfast | plain greek yogurt, frozen blueberries, a handful of walnuts\n' \
+               '- [stated] Lunch | grilled salmon fillet, baby spinach, extra-virgin olive oil, brown rice | Eating out\n'
+        out = k.score(text)
+        self.assertEqual(out['unrecognizedItems'], [])
+        for key in ('fermented', 'berryCitrus', 'nutsSeeds', 'leafy', 'goodFat', 'wholeGrain'):
+            self.assertEqual(out['dailyMetDays'][key], 1, key)
+        self.assertEqual(out['weeklyCounts']['fattyFish'], 1)
+
+    def test_plurals_and_limits(self):
+        out = k.score('## 2026-09-07\n- [stated] Dinner | chickpeas, tomatoes, cherries | Limit: deepFried, tooSalty\n')
+        self.assertEqual(out['unrecognizedItems'], [])
+        self.assertEqual(out['limitsHit'], {'deepFried': 1, 'tooSalty': 1})
+
+    def test_unknown_english_food_is_reported_whole(self):
+        out = k.score('## 2026-09-07\n- [stated] Dinner | okra stew, broccoli\n')
+        self.assertEqual(out['unrecognizedItems'], ['okra stew'])
+
+    def test_no_substring_false_positives(self):
+        self.assertEqual(k.classify('eggplant')[0], 'neutral')
+        self.assertEqual(k.classify('beef steak')[0], 'redMeat')
+        self.assertEqual(k.classify('graham crackers'), (None, True))
+
+    def test_english_fridge_table(self):
+        table = k.render_fridge(k.parse_fridge('Spinach 200g, 2 avocados, eggs x6, okra'))
+        self.assertIn('| Dark leafy greens | Spinach |', table)
+        self.assertIn('| Healthy fats | avocados |', table)
+        self.assertIn('| Eggs | eggs |', table)
+        self.assertIn('To confirm (unclassified): okra', table)
+        self.assertNotRegex(table, r'[一-鿿]')
+
+    def test_english_state_file_round_trip(self):
+        items = k.parse_fridge('- [stated] Legumes & soy: chickpeas, tofu\n- [stated] Dark chocolate & cocoa: none\n')
+        self.assertEqual(items, ['chickpeas', 'tofu'])
+        table = k.render_fridge(k.parse_fridge(k.render_fridge(items)))
+        self.assertIn('| Legumes & soy | chickpeas, tofu |', table)
+
+    def test_english_renders_have_no_chinese_ui(self):
+        week = k.score('## 2026-09-07\n- [stated] Lunch | salmon, spinach, oats\n')
+        week['review'] = {'wins': ['a'], 'topGaps': ['b'], 'actions': ['c']}
+        for html in (k.render_week(dict(week)), k.render_card(dict(week))):
+            self.assertIn('lang="en"', html)
+            self.assertNotRegex(html, r'[一-鿿]')
+
+    def test_english_restock_options(self):
+        out = k.restock('## 2026-09-07\n- [stated] Lunch | oats\n', '', '2026-09-07', limit=19)
+        fish = next(x for x in out['worthBuying'] if x['key'] == 'fattyFish')
+        self.assertEqual(fish['category'], 'Oily fish')
+        self.assertTrue(all(not __import__('re').search(r'[一-鿿]', o) for o in fish['options']))
+        self.assertNotRegex(out['note'], r'[一-鿿]')
+
+    def test_chinese_output_unchanged(self):
+        k.LANG = 'zh'
+        table = k.render_fridge(['菠菜'])
+        self.assertIn('| 深色绿叶菜 | 菠菜 |', table)

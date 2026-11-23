@@ -51,7 +51,7 @@ Voice, photo, and receipt recognition depend on the host AI. Unclear items are c
 | **Weekend prep** | “I want to prep once and spend 10 minutes per weekday meal.” | Three bases in 60–90 minutes, plus 4–5 weekday assemblies |
 | **Share card** | “Turn this week's review into an image.” | A 1080×1440 card with coverage and next week's three actions only, no inventory or personal data |
 
-Regional names from mainland China, Taiwan and Singapore, traditional characters and common English ingredient names are recognized directly.
+**Fully usable in English.** Ask in English and every reply, fridge table, weekly review and share card comes back in English. Log meals in plain English, comma-separated (`greek yogurt, blueberries, walnuts`): multi-word foods, plurals and words like *fresh*, *frozen* or *grilled* are handled, and anything unknown is flagged for you to confirm instead of guessed. Regional names from mainland China, Taiwan and Singapore and traditional characters are recognized too.
 
 <p align="center"><img src="docs/images/share-card-example.png" width="360" alt="Weekly share card example (fictional data)"></p>
 

@@ -276,11 +276,69 @@
    "id": 25,
    "name": "跟随语言",
    "prompt": "User: What's in my fridge? (English)",
-   "expected_output": "用英文回答；类别可附中文名，存储 key 不变",
+   "expected_output": "全程用英文回答，类别名用英文；不夹中文，存储 key 不变",
    "files": [],
    "expectations": [
-    "用英文回答",
-    "类别可附中文名，存储 key 不变"
+    "全程用英文回答，类别名用英文",
+    "不夹中文，存储 key 不变"
+   ]
+  },
+  {
+   "id": 26,
+   "name": "English end to end",
+   "prompt": "State: fridge has spinach, eggs, chickpeas, brown rice, olive oil, garlic, salmon, greek yogurt; no profile. User: What should I cook tonight? Something quick.",
+   "expected_output": "Replies entirely in English, including category names; ≤25 minutes, ≤2 pans, uses fridge items first; No Chinese text in the reply",
+   "files": [],
+   "expectations": [
+    "Replies entirely in English, including category names",
+    "≤25 minutes, ≤2 pans, uses fridge items first",
+    "No Chinese text in the reply"
+   ]
+  },
+  {
+   "id": 27,
+   "name": "English fridge table",
+   "prompt": "User: Here's what I bought: baby spinach, 2 avocados, frozen blueberries, okra, bacon. That's everything, show my fridge.",
+   "expected_output": "Shows 19 rows with English category names; Okra listed as to-confirm, bacon as processed; Quantities and 'frozen'/'baby' not stored",
+   "files": [],
+   "expectations": [
+    "Shows 19 rows with English category names",
+    "Okra listed as to-confirm, bacon as processed",
+    "Quantities and 'frozen'/'baby' not stored"
+   ]
+  },
+  {
+   "id": 28,
+   "name": "English log, multi-word foods",
+   "prompt": "User: Log breakfast: greek yogurt, blueberries, walnuts. Lunch: grilled salmon, brown rice, olive oil.",
+   "expected_output": "Writes English log lines with comma-separated items; greek yogurt, olive oil and brown rice each counted as one food, not split",
+   "files": [],
+   "expectations": [
+    "Writes English log lines with comma-separated items",
+    "greek yogurt, olive oil and brown rice each counted as one food, not split"
+   ]
+  },
+  {
+   "id": 29,
+   "name": "English weekly review and card",
+   "prompt": "State: fridge has spinach, eggs, chickpeas, brown rice, olive oil, garlic, salmon, greek yogurt; no profile. Log has 4 English days. User: Review my week and make a shareable image.",
+   "expected_output": "Runs score and card with --lang en; Card and review fully in English; Card contains no stock, restrictions or health information",
+   "files": [],
+   "expectations": [
+    "Runs score and card with --lang en",
+    "Card and review fully in English",
+    "Card contains no stock, restrictions or health information"
+   ]
+  },
+  {
+   "id": 30,
+   "name": "Language follows user mid-conversation",
+   "prompt": "Earlier messages in Chinese. User now writes: Can you switch to English? What's missing today?",
+   "expected_output": "Switches to English from this reply on; Category names in English; counting unchanged",
+   "files": [],
+   "expectations": [
+    "Switches to English from this reply on",
+    "Category names in English; counting unchanged"
    ]
   }
  ]

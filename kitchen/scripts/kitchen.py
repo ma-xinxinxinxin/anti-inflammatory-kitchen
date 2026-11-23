@@ -51,6 +51,135 @@ NAME = {k: n for k, n, _ in DAILY}
 NAME.update({k: n for k, n, _, _ in WEEKLY})
 NAME.update({k: n for k, n, _ in OTHERP})
 LIMNAME = dict(LIMITS)
+LIMNAME_EN = {x["key"]: x.get("en", x["name"]) for x in LEX["limits"]}
+UPF_EN = list(LEX.get("processedEn", []))
+# 规范名 -> 英文名（取词典里第一个英文别名）
+EN_FOOD = {}
+for _alias, _canon in LEX["aliases"].items():
+    if re.search(r"[a-z]", _alias):
+        EN_FOOD.setdefault(_canon, _alias)
+
+# ---------- 语言 ----------
+LANG = "zh"  # CLI --lang 设置；en 时所有输出为英文
+EN_UI = {
+    "每日必有": "Daily essentials", "每周达标": "Weekly goals", "其他 · 中性": "Other · neutral",
+    "类别": "Category", "有什么": "In stock", "空": "none", "空着：": "Empty: ",
+    "加工品（不计入类别）：": "Processed (not counted): ", "待确认（未归类）：": "To confirm (unclassified): ",
+    "今天的餐单": "Today's meals", "我": "Me", "每日类别覆盖": "Daily category coverage",
+    "按所列食材计算；计划餐单不代表已经吃过": "Based on the listed ingredients; planned meals are not meals eaten",
+    "今日抗炎分数": "Daily coverage", "早餐": "Breakfast", "午餐": "Lunch", "晚餐": "Dinner", "加餐": "Snack",
+    "还空着": "Not planned yet", "今日抗炎营养": "Today's anti-inflammatory mix", "缺 ›": "Missing ›",
+    "每周达标 6 项": "Weekly goals · 6", "今天吃到的已算进去": "Includes today",
+    "其他优质蛋白": "Other quality protein", "今天吃到的": "Eaten today", "其他中性食物": "Other neutral foods",
+    "不算格子": "Not counted", "今天未记录到": "Nothing logged today", "限制项": "Limits",
+    "今天踩中的": "Logged today", "今天未记录到限制项": "No limits logged today",
+    "复盘": "Weekly review", "个人频次与记录": "Your targets and records",
+    "次数是规划约定，不是营养剂量；未记录不等于没吃。": "Counts are planning targets, not nutrient doses. Not logged does not mean not eaten.",
+    "每日必有 8 类 · 达标天数": "8 daily essentials · days met", "达标": "Met", "有记录未达标": "Logged, not met",
+    "没记录": "Not logged", "其他优质蛋白 · 中性食物": "Other protein · neutral foods",
+    "这周未记录到": "Nothing logged this week", "这周未记录到限制项": "No limits logged this week",
+    "待核对食材": "Ingredients to confirm", "未计入覆盖": "Not counted", "这周怎么样": "How this week went",
+    "以上为记录统计；具体观察与下周动作由助手结合库存补充。": "These are logging statistics. Observations and next week's actions come from the assistant, using your stock.",
+    "做得好的两点": "Two things that went well", "最该补的三项": "Top three gaps", "下周三件事": "Three things for next week",
+    "只给三条。做完了下周再生成。": "Three at most. Make new ones next week.",
+    "抗炎厨房 · 周复盘": "Anti-Inflammatory Kitchen · Weekly", "这周吃得怎么样": "How I ate this week",
+    "覆盖度是记录指标，不是健康评分": "Coverage is a logging measure, not a health score",
+    "不数卡路里 · 不打卡": "No calories · No streaks",
+    "候选来自记录缺口与库存；按用户计划的餐次挑选，不必全部买齐。记录少于 3 天时只作参考。":
+        "Candidates come from logged gaps and current stock. Pick by the meals planned; no need to buy everything. With fewer than 3 logged days, treat this as a rough guide.",
+    "7 天里有 {n} 天记录，按记了的算": "{n} of 7 days logged; counted from what was logged",
+    "{n} 天有记录": "{n} days logged", "踩中 {n} 次": "{n} logged", "{n} 类": "{n} categories", " / 8 类": " / 8",
+    "{a}/{b} 天": "{a}/{b} days", "{a}/{b} 次": "{a}/{b} times",
+    "不设频次 · 已记录 {n} 次": "No target · logged {n} times", "每天至少 {n} 次": "At least {n} a day",
+    "{label} · 有记录的 {logged} 天中 {met} 天达到设定频次": "{label} · met on {met} of {logged} logged days",
+    "每周至少 {t} 次 · 已记录 {n} 次": "At least {t} a week · logged {n} times",
+}
+
+
+def t(zh, **kw):
+    """界面文字：zh 为键；LANG=en 时取英文。"""
+    text = EN_UI.get(zh, zh) if LANG == "en" else zh
+    return text.format(**kw) if kw else text
+
+
+def nm(key):
+    """类别显示名。"""
+    if LANG == "en":
+        return EN_NAME.get(key) or LIMNAME_EN.get(key, key)
+    return NAME.get(key) or LIMNAME.get(key, key)
+
+
+def limname(key):
+    return LIMNAME_EN.get(key, key) if LANG == "en" else LIMNAME.get(key, key)
+
+
+def sep():
+    return ", " if LANG == "en" else "、"
+
+
+def html_lang():
+    return "en" if LANG == "en" else "zh-CN"
+
+
+# ---------- 英文词组匹配 ----------
+EN_DROP = {"fresh", "frozen", "organic", "canned", "can", "tin", "tinned", "raw", "cooked", "roasted", "roast",
+           "grilled", "steamed", "baked", "boiled", "poached", "sliced", "chopped", "diced", "mashed", "homemade",
+           "a", "an", "some", "of", "the", "and", "with", "on", "in", "cup", "cups", "handful", "bowl", "slice",
+           "slices", "piece", "pieces", "fillet", "fillets", "glass", "mug", "tbsp", "tsp", "pack", "bag", "bottle",
+           "small", "large", "big", "little", "few", "bunch", "pcs", "pc", "lb", "lbs", "oz", "g", "kg", "ml"}
+
+
+EN_SOFT = {"baby", "plain", "natural", "light", "mini", "whole", "wild", "ripe", "lean", "skinless",
+           "boneless", "low", "fat", "full", "extra", "virgin", "greek", "style", "unsweetened", "mixed"}
+
+
+def _en_key(phrase):
+    """英文词组 -> 词典里的键；依次尝试原形与常见复数还原。"""
+    tries = [phrase]
+    head, _, last = phrase.rpartition(" ")
+    pre = head + " " if head else ""
+    if last.endswith("ies"): tries.append(pre + last[:-3] + "y")
+    if last.endswith("oes"): tries.append(pre + last[:-2])
+    if last.endswith("es"): tries.append(pre + last[:-2])
+    if last.endswith("s"): tries.append(pre + last[:-1])
+    for c in tries:
+        if c in VOCAB:
+            return c
+    return None
+
+
+def en_items(piece):
+    """一段英文 -> [已识别键或未识别词组]；最长词组优先，修饰词与数量忽略。"""
+    words = [w for w in re.findall(r"[a-z0-9%]+", piece.lower().replace("-", " "))
+             if w not in EN_DROP and not re.fullmatch(r"x?\d+[a-z]*", w)]
+    out, unknown, i = [], [], 0
+    while i < len(words):
+        for size in range(min(4, len(words) - i), 0, -1):
+            key = _en_key(" ".join(words[i:i + size]))
+            if key:
+                if unknown: out.append(" ".join(unknown)); unknown = []
+                out.append(key); i += size
+                break
+        else:
+            unknown.append(words[i]); i += 1
+    if unknown: out.append(" ".join(unknown))
+    # 同一段里已识别出食材时，只剩修饰词的碎片不再报待确认（baby spinach、plain greek yogurt）。
+    if any(x in VOCAB for x in out):
+        out = [x for x in out if x in VOCAB or not set(x.split()) <= EN_SOFT]
+    return out
+
+
+def split_items(segment):
+    """日志一段 -> 食材列表。中文按空格/顿号切；英文按逗号切再做词组匹配。"""
+    items = []
+    for piece in (x.strip() for x in re.split(r"[,，、;；]+", segment)):
+        if not piece:
+            continue
+        if re.search(r"[A-Za-z]", piece):
+            items += en_items(piece)
+        else:
+            items += [x for x in piece.split() if x]
+    return items
 
 
 def normalize(name):
@@ -70,6 +199,8 @@ def canonical(name):
 UPF = list(LEX["processed"])
 NOISE = re.compile(r"(有机|日日鲜|冰鲜|冷冻|新鲜|进口|云南|挪威|智利|特级初榨(?=橄榄油))")
 QTY = re.compile(r"[\d.]+\s*(g|kg|克|千克|ml|毫升|升|盒|袋|把|根|颗|个|块|段|片|罐|瓶|只|条|包|份|x|X|\*)")
+EN_QTY = re.compile(r"(?i)\b[x×]\s*\d+\b|^\s*\d+\s+(?=[a-z])|\b(?:fresh|frozen|organic)\s+"
+                    r"|\b\d+(?:\.\d+)?\s*(?:pcs?|pieces?|packs?|cans?|bottles?|bags?|lbs?|oz|cups?)\b")
 DATE = re.compile(r"[·・]?\s*(到|至|到期|保质期?)?\s*[（(]?(?:\d{4}[-/.])?\d{1,2}[-/.]\d{1,2}[）)]?|\d+\s*天")
 
 def clean(raw):
@@ -80,6 +211,7 @@ def clean(raw):
     t = DATE.sub("", t); t = QTY.sub("", t)
     t = re.sub(r"[（(].*?[）)]", "", t)
     t = NOISE.sub("", t)
+    t = EN_QTY.sub("", t)
     t = re.sub(r"[·・]?\s*(到|至|到期|保质期?)\s*$", "", t)
     return t.strip(" 、,，:：·-")
 
@@ -88,6 +220,13 @@ def classify(name):
     if not name: return None, False
     name = normalize(name)
     if name in VOCAB: return VOCAB[name][0][0], False
+    if re.search(r"[a-z]", name):
+        if any(re.search(r"\b" + re.escape(u) + r"s?\b", name) for u in UPF_EN):
+            return None, True
+        for item in en_items(name):
+            if item in VOCAB:
+                return VOCAB[item][0][0], False
+        return None, False
     for u in UPF:
         if u in name: return None, True
     hits = [(w, v[0][0]) for w, v in VOCAB.items() if w in name and len(w) >= 2]
@@ -113,20 +252,22 @@ def render_fridge(items):
         elif k is None:
             unknown.append(n)
         else:
-            keys = [key for key, _ in VOCAB[normalize(n)]] if normalize(n) in VOCAB else [k]
+            hit = normalize(n) if normalize(n) in VOCAB else next(
+                (x for x in en_items(normalize(n)) if x in VOCAB), None) if re.search(r"[A-Za-z]", n) else None
+            keys = [key for key, _ in VOCAB[hit]] if hit else [k]
             for key in keys:
                 buckets.setdefault(key, []).append(n)
     out, empty = [], []
     for title, keys in FRIDGE_ROWS:
-        out.append(f"**{title}**\n\n| 类别 | 有什么 |\n|---|---|")
+        out.append(f"**{t(title)}**\n\n| {t('类别')} | {t('有什么')} |\n|---|---|")
         for k in keys:
             v = buckets.get(k) or []
-            if not v: empty.append(NAME[k])
-            out.append(f"| {NAME[k]} | {'、'.join(dict.fromkeys(v)) if v else '空'} |")
+            if not v: empty.append(nm(k))
+            out.append(f"| {nm(k)} | {sep().join(dict.fromkeys(v)) if v else t('空')} |")
         out.append("")
-    if empty: out.append("> 空着：" + " · ".join(empty))
-    if upf: out.append("> 加工品（不计入类别）：" + "、".join(dict.fromkeys(upf)))
-    if unknown: out.append("> 待确认（未归类）：" + "、".join(dict.fromkeys(unknown)))
+    if empty: out.append("> " + t("空着：") + " · ".join(empty))
+    if upf: out.append("> " + t("加工品（不计入类别）：") + sep().join(dict.fromkeys(upf)))
+    if unknown: out.append("> " + t("待确认（未归类）：") + sep().join(dict.fromkeys(unknown)))
     return "\n".join(out)
 
 
@@ -140,20 +281,20 @@ def parse_fridge(text):
             continue
         if line.startswith("|"):
             cells = [x.strip() for x in line.strip("|").split("|")]
-            if len(cells) != 2 or cells[0] not in NAME.values():
+            if len(cells) != 2 or cells[0] not in set(NAME.values()) | set(EN_NAME.values()):
                 continue
             line = cells[1]
         elif line.startswith(">"):
-            if line.startswith("> 空着"):
+            if line.startswith(("> 空着", "> Empty")):
                 continue
-            if not line.startswith(("> 加工品", "> 待确认")):
+            if not line.startswith(("> 加工品", "> 待确认", "> Processed", "> To confirm")):
                 continue
-            line = line.split("：", 1)[-1]
+            line = re.split(r"[：:]", line, maxsplit=1)[-1]
         else:
             line = re.sub(r"^[-*•]\s*(?:\[\w+\]\s*)?", "", line)
-            line = re.sub(r"^[^：:]{1,12}[：:]", "", line)
-        items.extend(x.strip() for x in re.split(r"[,，、\n]", line)
-                     if x.strip() and x.strip() not in ("空", "---"))
+            line = re.sub(r"^[^：:]{1,32}[：:]", "", line)
+        items.extend(x.strip() for x in re.split(r"[,，、;；\n]", line)
+                     if x.strip() and x.strip().lower() not in ("空", "---", "none", "-", "—"))
     return items
 
 # ---------- 打分 ----------
@@ -175,12 +316,13 @@ def parse_log(text):
         parts = [p.strip() for p in body.split("|")]
         meal_items, lim_here = [], []
         for p in parts[1:] if len(parts) > 1 else []:
-            if p.startswith("限制:") or p.startswith("限制："):
-                lim_here = [x.strip() for x in re.split(r"[,，]", p.split(":", 1)[-1].split("：")[-1]) if x.strip()]
-            elif p.startswith("外食"):
+            low = p.lower()
+            if p.startswith(("限制:", "限制：")) or low.startswith(("limit:", "limits:")):
+                lim_here = [x.strip() for x in re.split(r"[,，]", re.split(r"[:：]", p, maxsplit=1)[-1]) if x.strip()]
+            elif p.startswith("外食") or low.startswith(("eating out", "eat out", "takeout", "take-out")):
                 continue
             else:
-                meal_items += [x for x in re.split(r"[\s,，、]+", p) if x]
+                meal_items += split_items(p)
         if meal_items or lim_here:
             days.setdefault(cur, []).append(meal_items)
             lims.setdefault(cur, {})
@@ -288,7 +430,7 @@ def score(text, end=None, profile=None):
     return result
 
 # ---------- 视觉 ----------
-HEAD = """<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+HEAD = """<!doctype html><html lang="LANG_ATTR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
  *{box-sizing:border-box;margin:0}
  body{background:#F6F2E8;color:#2A2A24;font-family:"Noto Sans SC",system-ui,sans-serif;
@@ -296,10 +438,10 @@ HEAD = """<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="vi
  .num{font-family:"Space Grotesk",monospace}
  .col{display:flex;flex-direction:column;gap:13px}
  .card{background:#EFEADB;border-radius:18px;padding:13px 15px}
- .h1{font:700 22px/1.35 "Noto Sans SC"}
- .sub{font:400 11px/1.6 "Noto Sans SC";color:#6B6857}
- .sect{font:500 12.5px "Noto Sans SC";color:#6B6857;margin-bottom:9px}
- .pill{display:inline-flex;align-items:center;border-radius:12px;padding:4px 10px;font:400 11.5px "Noto Sans SC"}
+ .h1{font:700 22px/1.35 "Noto Sans SC",system-ui,sans-serif}
+ .sub{font:400 11px/1.6 "Noto Sans SC",system-ui,sans-serif;color:#6B6857}
+ .sect{font:500 12.5px "Noto Sans SC",system-ui,sans-serif;color:#6B6857;margin-bottom:9px}
+ .pill{display:inline-flex;align-items:center;border-radius:12px;padding:4px 10px;font:400 11.5px "Noto Sans SC",system-ui,sans-serif}
  .p-green{background:#3D5A3F;color:#F6F2E8}
  .p-dash{border:1px dashed rgba(42,42,36,.24);color:#6B6857}
  .p-olive{background:#E6E8CC;color:#55602F}
@@ -312,16 +454,16 @@ HEAD = """<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="vi
  .d-open{border:1px solid rgba(42,42,36,.3)}.d-miss{border:1px solid #B5643C}
  .hair{height:1px;background:rgba(42,42,36,.09);margin:2px 0}
  .tip{background:#FAF1E9;border-radius:16px;padding:11px 13px}
- .tip b{font:500 11px "Noto Sans SC";color:#8A4A28;display:block;margin-bottom:3px}
- .tip p{font:400 12.5px/1.7 "Noto Sans SC";color:#8A6A4E}
+ .tip b{font:500 11px "Noto Sans SC",system-ui,sans-serif;color:#8A4A28;display:block;margin-bottom:3px}
+ .tip p{font:400 12.5px/1.7 "Noto Sans SC",system-ui,sans-serif;color:#8A6A4E}
  .g2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
  .wk{border-radius:12px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;
-     font:400 11.5px "Noto Sans SC";background:#EFEADB}
+     font:400 11.5px "Noto Sans SC",system-ui,sans-serif;background:#EFEADB}
  .wk.on{background:#3D5A3F;color:#F6F2E8}
  .meal{background:#EFEADB;border-radius:18px;padding:11px;display:flex;gap:11px;align-items:center}
  .ph{width:48px;height:48px;border-radius:14px;flex:none;
      background:repeating-linear-gradient(45deg,#DCD3BE 0 6px,#D3C9B1 6px 12px)}
- .body{font:400 13px/1.85 "Noto Sans SC";color:#3A382C}
+ .body{font:400 13px/1.85 "Noto Sans SC",system-ui,sans-serif;color:#3A382C}
  ol{margin:0;padding-left:0;list-style:none}
 </style>"""
 
@@ -331,7 +473,7 @@ def ring(pct, label, big=58):
             f'background:conic-gradient(#E8D9A8 0 {pct}%,rgba(246,242,232,.2) 0);'
             f'display:flex;align-items:center;justify-content:center">'
             f'<div style="width:{inner}px;height:{inner}px;border-radius:50%;background:#3D5A3F;'
-            f'display:flex;align-items:center;justify-content:center;font:700 15px \'Space Grotesk\';'
+            f'display:flex;align-items:center;justify-content:center;font:700 15px \'Space Grotesk\',ui-monospace,monospace;'
             f'color:#F6F2E8">{label}</div></div>')
 
 G, CLAY, INK, MUT = "#3D5A3F", "#B5643C", "#2A2A24", "#6B6857"
@@ -349,13 +491,13 @@ def _daily_grid(daily):
         if by:
             cells.append(f'<div style="background:{G};border-radius:16px;padding:14px 16px;display:flex;'
                          f'justify-content:space-between;align-items:center;gap:8px">'
-                         f'<span style="font:500 14px \'Noto Sans SC\';color:#F6F2E8">{c["name"]}</span>'
-                         f'<span style="font:400 11.5px \'Noto Sans SC\';color:rgba(246,242,232,.8);text-align:right">{by}</span></div>')
+                         f'<span style="font:500 14px \'Noto Sans SC\',system-ui,sans-serif;color:#F6F2E8">{c["name"]}</span>'
+                         f'<span style="font:400 11.5px \'Noto Sans SC\',system-ui,sans-serif;color:rgba(246,242,232,.8);text-align:right">{by}</span></div>')
         else:
             cells.append(f'<div style="border:1px dashed rgba(42,42,36,.3);border-radius:16px;padding:14px 16px;'
                          f'display:flex;justify-content:space-between;align-items:center">'
-                         f'<span style="font:500 14px \'Noto Sans SC\';color:{INK}">{c["name"]}</span>'
-                         f'<span style="font:500 12px \'Noto Sans SC\';color:{CLAY}">缺 ›</span></div>')
+                         f'<span style="font:500 14px \'Noto Sans SC\',system-ui,sans-serif;color:{INK}">{c["name"]}</span>'
+                         f'<span style="font:500 12px \'Noto Sans SC\',system-ui,sans-serif;color:{CLAY}">{t("缺 ›")}</span></div>')
     return f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">{"".join(cells)}</div>'
 
 def _weekly_grid(weekly, big=False):
@@ -367,37 +509,37 @@ def _weekly_grid(weekly, big=False):
         else:                 bg, tc, nc = CARD, INK, MUT
         rows.append(f'<div style="background:{bg};border-radius:16px;padding:13px 16px;display:flex;'
                     f'justify-content:space-between;align-items:center">'
-                    f'<span style="font:500 13.5px \'Noto Sans SC\';color:{tc}">{w["name"]}</span>'
-                    f'<span class="num" style="font-size:13px;font-weight:500;color:{nc}">{n}/{t}</span></div>')
+                    f'<span style="font:500 13.5px \'Noto Sans SC\',system-ui,sans-serif;color:{tc}">{w["name"]}</span>'
+                    f'<span class="num" style="font-size:13px;font-weight:500;color:{nc}">{n:g}/{t:g}</span></div>')
     return f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">{"".join(rows)}</div>'
 
 def _pill_block(title, note, items, bg, fg, empty):
     body = "".join(f'<span style="background:{bg};color:{fg};border-radius:13px;padding:6px 13px;'
-                   f'font:400 12.5px \'Noto Sans SC\'">{x}</span>' for x in items) or (
+                   f'font:400 12.5px \'Noto Sans SC\',system-ui,sans-serif">{x}</span>' for x in items) or (
            f'<span style="background:{CARD};color:{MUT};border-radius:13px;padding:6px 13px;'
-           f'font:400 12.5px \'Noto Sans SC\'">{empty}</span>')
+           f'font:400 12.5px \'Noto Sans SC\',system-ui,sans-serif">{empty}</span>')
     return (f'<div><div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px">'
-            f'<span style="font:700 15px \'Noto Sans SC\'">{title}</span>'
-            f'<span style="font:400 11.5px \'Noto Sans SC\';color:{MUT}">{note}</span></div>'
+            f'<span style="font:700 15px \'Noto Sans SC\',system-ui,sans-serif">{title}</span>'
+            f'<span style="font:400 11.5px \'Noto Sans SC\',system-ui,sans-serif;color:{MUT}">{note}</span></div>'
             f'<div style="display:flex;flex-wrap:wrap;gap:7px">{body}</div></div>')
 
 def render_day(d):
     """一整页：今天的餐单 + 今日抗炎营养"""
-    h = [HEAD, '<div class="col" style="gap:14px">']
+    h = [HEAD.replace("LANG_ATTR", html_lang()), '<div class="col" style="gap:14px">']
     h.append(f'<div style="display:flex;align-items:flex-start;gap:12px">'
-             f'<div style="flex:1"><div style="font:400 11.5px \'Noto Sans SC\';color:{MUT};margin-bottom:1px">{d.get("dateLabel","")}</div>'
-             f'<div class="h1">{d.get("title","今天的餐单")}</div></div>'
+             f'<div style="flex:1"><div style="font:400 11.5px \'Noto Sans SC\',system-ui,sans-serif;color:{MUT};margin-bottom:1px">{d.get("dateLabel","")}</div>'
+             f'<div class="h1">{d.get("title") or t("今天的餐单")}</div></div>'
              f'<div style="width:34px;height:34px;flex:none;border-radius:50%;background:{CARD};display:flex;'
-             f'align-items:center;justify-content:center;font:500 11px \'Space Grotesk\';color:{G}">我</div></div>')
+             f'align-items:center;justify-content:center;font:500 11px \'Space Grotesk\',ui-monospace,monospace;color:{G}">{t("我")}</div></div>')
     if d.get("week"):
         h.append('<div style="display:flex;gap:7px">' + "".join(
             f'<div style="flex:1;border-radius:14px;padding:9px 0;text-align:center;background:{G if x.get("on") else CARD}">'
-            f'<div style="font:400 10.5px \'Noto Sans SC\';color:{"rgba(246,242,232,.75)" if x.get("on") else MUT}">{x["w"]}</div>'
+            f'<div style="font:400 10.5px \'Noto Sans SC\',system-ui,sans-serif;color:{"rgba(246,242,232,.75)" if x.get("on") else MUT}">{x["w"]}</div>'
             f'<div class="num" style="font-size:15px;font-weight:700;color:{"#F6F2E8" if x.get("on") else INK}">{x["d"]}</div></div>'
             for x in d["week"]) + '</div>')
     met = sum(1 for c in d["daily"] if c.get("by"))
-    sc = {"n": f"{met}/8", "pct": met / 8 * 100, "title": "每日类别覆盖",
-          "sub": "按所列食材计算；计划餐单不代表已经吃过"}
+    sc = {"n": f"{met}/8", "pct": met / 8 * 100, "title": t("每日类别覆盖"),
+          "sub": t("按所列食材计算；计划餐单不代表已经吃过")}
     sc.update({k: v for k, v in (d.get("score") or {}).items() if k in ("title", "sub")})
     if sc:
         h.append(f'<div style="background:{G};border-radius:20px;padding:18px 20px;display:flex;align-items:center;gap:16px">'
@@ -405,51 +547,52 @@ def render_day(d):
                  f'background:conic-gradient(#E8D9A8 0 {sc.get("pct",0)}%,rgba(246,242,232,.22) 0);'
                  f'display:flex;align-items:center;justify-content:center">'
                  f'<div style="width:58px;height:58px;border-radius:50%;background:{G};display:flex;align-items:center;'
-                 f'justify-content:center;font:700 24px \'Space Grotesk\';color:#F6F2E8">{sc.get("n","")}</div></div>'
+                 f'justify-content:center;font:700 24px \'Space Grotesk\',ui-monospace,monospace;color:#F6F2E8">{sc.get("n","")}</div></div>'
                  f'<div style="flex:1;display:flex;flex-direction:column;gap:5px">'
-                 f'<span style="font:700 17px \'Noto Sans SC\';color:#F6F2E8">{sc.get("title","今日抗炎分数")}</span>'
-                 f'<span style="font:400 12.5px/1.6 \'Noto Sans SC\';color:rgba(246,242,232,.8)">{sc.get("sub","")}</span></div></div>')
+                 f'<span style="font:700 17px \'Noto Sans SC\',system-ui,sans-serif;color:#F6F2E8">{sc.get("title") or t("今日抗炎分数")}</span>'
+                 f'<span style="font:400 12.5px/1.6 \'Noto Sans SC\',system-ui,sans-serif;color:rgba(246,242,232,.8)">{sc.get("sub","")}</span></div></div>')
     meals = {m["slot"]: m for m in d.get("meals", [])}
     cards = []
     for key, label in SLOTS:
+        label = t(label)
         m = meals.get(key)
         if m:
-            right = (f'<span style="font:400 12px \'Noto Sans SC\';color:{CLAY}">{m["flag"]}</span>' if m.get("flag")
-                     else f'<span class="num" style="font-size:13px;font-weight:500;color:{MUT}">{m.get("n","")} 类</span>')
+            right = (f'<span style="font:400 12px \'Noto Sans SC\',system-ui,sans-serif;color:{CLAY}">{m["flag"]}</span>' if m.get("flag")
+                     else f'<span class="num" style="font-size:13px;font-weight:500;color:{MUT}">{t("{n} 类", n=m.get("n",""))}</span>')
             cards.append(f'<div style="background:{CARD};border-radius:18px;padding:13px;display:flex;gap:13px;align-items:center">'
                          + _ph() + f'<div style="flex:1;display:flex;flex-direction:column;gap:3px">'
-                         f'<span style="font:400 11px \'Noto Sans SC\';color:{MUT}">{label} · {m.get("time","")}</span>'
-                         f'<span style="font:500 15px \'Noto Sans SC\'">{m["title"]}</span></div>{right}</div>')
+                         f'<span style="font:400 11px \'Noto Sans SC\',system-ui,sans-serif;color:{MUT}">{label} · {m.get("time","")}</span>'
+                         f'<span style="font:500 15px \'Noto Sans SC\',system-ui,sans-serif">{m["title"]}</span></div>{right}</div>')
         else:
             cards.append(f'<div style="border:1px dashed rgba(42,42,36,.24);border-radius:18px;padding:13px;'
                          f'display:flex;gap:13px;align-items:center">'
                          f'<div style="width:48px;height:48px;flex:none;border-radius:14px;background:{CARD};display:flex;'
-                         f'align-items:center;justify-content:center;font:300 22px \'Noto Sans SC\';color:{MUT}">+</div>'
+                         f'align-items:center;justify-content:center;font:300 22px \'Noto Sans SC\',system-ui,sans-serif;color:{MUT}">+</div>'
                          f'<div style="flex:1;display:flex;flex-direction:column;gap:3px">'
-                         f'<span style="font:400 11px \'Noto Sans SC\';color:{MUT}">{label}</span>'
-                         f'<span style="font:500 15px \'Noto Sans SC\';color:{MUT}">还空着</span></div>'
+                         f'<span style="font:400 11px \'Noto Sans SC\',system-ui,sans-serif;color:{MUT}">{label}</span>'
+                         f'<span style="font:500 15px \'Noto Sans SC\',system-ui,sans-serif;color:{MUT}">{t("还空着")}</span></div>'
                          f'<span style="color:{MUT};font-size:15px">→</span></div>')
     h.append(f'<div style="display:flex;flex-direction:column;gap:9px">{"".join(cards)}</div>')
     # ---- 下半页 · 今日抗炎营养 ----
     met = sum(1 for c in d["daily"] if c.get("by"))
     h.append(f'<div style="border-top:1px solid rgba(42,42,36,.09);margin-top:8px;padding-top:20px;'
              f'display:flex;align-items:flex-start;gap:12px">'
-             f'<div style="flex:1"><div class="h1">今日抗炎营养</div></div>'
+             f'<div style="flex:1"><div class="h1">{t("今日抗炎营养")}</div></div>'
              f'<div style="text-align:right"><div>'
              f'<span class="num" style="font-size:26px;font-weight:700">{met}</span>'
-             f'<span class="num" style="font-size:15px;font-weight:500;color:{MUT}"> / 8 类</span></div>'
-             f'<div style="font:400 11px \'Noto Sans SC\';color:{MUT}">每日必有</div></div></div>')
+             f'<span class="num" style="font-size:15px;font-weight:500;color:{MUT}">{t(" / 8 类")}</span></div>'
+             f'<div style="font:400 11px \'Noto Sans SC\',system-ui,sans-serif;color:{MUT}">{t("每日必有")}</div></div></div>')
     h.append(_daily_grid(d["daily"]))
     if d.get("caption"):
-        h.append(f'<div style="font:400 12.5px/1.7 \'Noto Sans SC\';color:{MUT}">{d["caption"]}</div>')
+        h.append(f'<div style="font:400 12.5px/1.7 \'Noto Sans SC\',system-ui,sans-serif;color:{MUT}">{d["caption"]}</div>')
     if d.get("weekly"):
         h.append(f'<div><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px">'
-                 f'<span style="font:700 15px \'Noto Sans SC\'">每周达标 6 项</span>'
-                 f'<span style="font:400 11.5px \'Noto Sans SC\';color:{MUT}">{d.get("weekNote","今天吃到的已算进去")}</span></div>'
+                 f'<span style="font:700 15px \'Noto Sans SC\',system-ui,sans-serif">{t("每周达标 6 项")}</span>'
+                 f'<span style="font:400 11.5px \'Noto Sans SC\',system-ui,sans-serif;color:{MUT}">{d.get("weekNote") or t("今天吃到的已算进去")}</span></div>'
                  + _weekly_grid(d["weekly"]) + '</div>')
-    h.append(_pill_block("其他优质蛋白", "今天吃到的", d.get("otherProtein") or [], OLB, OLT, "今天未记录到"))
-    h.append(_pill_block("其他中性食物", "不算格子", d.get("neutral") or [], OLB, OLT, "今天未记录到"))
-    h.append(_pill_block("限制项", "今天踩中的", d.get("limits") or [], "rgba(181,100,60,.16)", "#8A4A28", "今天未记录到限制项"))
+    h.append(_pill_block(t("其他优质蛋白"), t("今天吃到的"), d.get("otherProtein") or [], OLB, OLT, t("今天未记录到")))
+    h.append(_pill_block(t("其他中性食物"), t("不算格子"), d.get("neutral") or [], OLB, OLT, t("今天未记录到")))
+    h.append(_pill_block(t("限制项"), t("今天踩中的"), d.get("limits") or [], "rgba(181,100,60,.16)", "#8A4A28", t("今天未记录到限制项")))
     h.append('</div></html>')
     return "\n".join(h)
 
@@ -457,26 +600,26 @@ def render_week(w):
     """一整页：复盘矩阵 + 这周怎么样"""
     logged = w.get("daysWithRecord", 0)
     w.setdefault("rangeLabel", f'{w.get("weekStart", "")} – {w.get("weekEnd", "")}')
-    h = [HEAD, '<div class="col" style="gap:15px">']
-    h.append(f'<div class="h1">{w.get("title","复盘")}</div>')
+    h = [HEAD.replace("LANG_ATTR", html_lang()), '<div class="col" style="gap:15px">']
+    h.append(f'<div class="h1">{w.get("title") or t("复盘")}</div>')
     h.append(f'<div style="background:{G};border-radius:22px;padding:11px;text-align:center;'
              f'color:#F6F2E8">{w.get("rangeLabel", "")}</div>')
-    h.append(f'<div style="font:400 12px \'Noto Sans SC\';color:{MUT};margin-top:-6px">'
-             f'7 天里有 {logged} 天记录，按记了的算</div>')
+    h.append(f'<div style="font:400 12px \'Noto Sans SC\',system-ui,sans-serif;color:{MUT};margin-top:-6px">'
+             f'{t("7 天里有 {n} 天记录，按记了的算", n=logged)}</div>')
     if "personalPlan" in w:
-        h.append('<div class="card"><div class="sect">个人频次与记录</div>')
+        h.append(f'<div class="card"><div class="sect">{t("个人频次与记录")}</div>')
         for row in w["personalPlan"]:
             rule = row["frequency"]
             if rule is None:
-                detail = f'不设频次 · 已记录 {row["recordedCount"]:g} 次'
+                detail = t("不设频次 · 已记录 {n} 次", n=f'{row["recordedCount"]:g}')
             elif rule["period"] == "day":
-                label = '每日必有' if rule["target"] == 1 else f'每天至少 {rule["target"]:g} 次'
-                detail = (f'{label} · 有记录的 {logged} 天中 '
-                          f'{row["metDays"]} 天达到设定频次')
+                label = t("每日必有") if rule["target"] == 1 else t("每天至少 {n} 次", n=f'{rule["target"]:g}')
+                detail = t("{label} · 有记录的 {logged} 天中 {met} 天达到设定频次",
+                           label=label, logged=logged, met=row["metDays"])
             else:
-                detail = f'每周至少 {rule["target"]:g} 次 · 已记录 {row["recordedCount"]:g} 次'
-            h.append(f'<p class="body"><strong>{row["name"]}</strong><br>{detail}</p>')
-        h.append('<p class="sub">次数是规划约定，不是营养剂量；未记录不等于没吃。</p></div>')
+                detail = t("每周至少 {t} 次 · 已记录 {n} 次", t=f'{rule["target"]:g}', n=f'{row["recordedCount"]:g}')
+            h.append(f'<p class="body"><strong>{nm(row["key"]) if LANG == "en" else row["name"]}</strong><br>{detail}</p>')
+        h.append(f'<p class="sub">{t("次数是规划约定，不是营养剂量；未记录不等于没吃。")}</p></div>')
     else:
         # 矩阵
         rows = []
@@ -490,58 +633,58 @@ def render_week(w):
                    'border:1px dashed rgba(42,42,36,.3)"></span>')
                 for c in cells)
             rows.append(f'<div style="display:flex;align-items:center;gap:9px">'
-                        f'<span style="width:82px;flex:none;font:400 12.5px \'Noto Sans SC\'">{NAME[k]}</span>'
+                        f'<span style="width:{112 if LANG == "en" else 82}px;flex:none;font:400 12.5px \'Noto Sans SC\',system-ui,sans-serif">{nm(k)}</span>'
                         f'<span style="flex:1;display:flex;gap:6px">{sq}</span>'
                         f'<span class="num" style="width:32px;text-align:right;font-size:12.5px;font-weight:500;color:{col}">{met}/{logged}</span></div>')
-        h.append(f'<div><div style="font:700 15px \'Noto Sans SC\';margin-bottom:10px">每日必有 8 类 · 达标天数</div>'
+        h.append(f'<div><div style="font:700 15px \'Noto Sans SC\',system-ui,sans-serif;margin-bottom:10px">{t("每日必有 8 类 · 达标天数")}</div>'
                  f'<div style="display:flex;flex-direction:column;gap:7px">{"".join(rows)}</div>'
-                 f'<div style="display:flex;gap:14px;margin-top:10px;font:400 11px \'Noto Sans SC\';color:{MUT}">'
+                 f'<div style="display:flex;gap:14px;margin-top:10px;font:400 11px \'Noto Sans SC\',system-ui,sans-serif;color:{MUT}">'
                  f'<span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:{G};'
-                 f'margin-right:5px;vertical-align:0"></span>达标</span>'
+                 f'margin-right:5px;vertical-align:0"></span>{t("达标")}</span>'
                  f'<span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#E4E1D2;'
-                 f'margin-right:5px"></span>有记录未达标</span>'
+                 f'margin-right:5px"></span>{t("有记录未达标")}</span>'
                  f'<span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;'
-                 f'border:1px dashed rgba(42,42,36,.35);margin-right:5px"></span>没记录</span></div></div>')
-        wk = [{"name": n, "n": w["weeklyCounts"].get(k, 0), "t": w.get("weeklyTargets", {}).get(k, t),
-               "behind": w["weeklyCounts"].get(k, 0) < t * 2 / 3} for k, n, t, _ in WEEKLY]
-        h.append(f'<div><div style="font:700 15px \'Noto Sans SC\';margin-bottom:9px">每周达标 6 项</div>'
+                 f'border:1px dashed rgba(42,42,36,.35);margin-right:5px"></span>{t("没记录")}</span></div></div>')
+        wk = [{"name": nm(k), "n": w["weeklyCounts"].get(k, 0), "t": w.get("weeklyTargets", {}).get(k, target),
+               "behind": w["weeklyCounts"].get(k, 0) < target * 2 / 3} for k, n, target, _ in WEEKLY]
+        h.append(f'<div><div style="font:700 15px \'Noto Sans SC\',system-ui,sans-serif;margin-bottom:9px">{t("每周达标 6 项")}</div>'
                  + _weekly_grid(wk) + '</div>')
-    op = [f'{NAME[k]} {v}' for k, v in (w.get("otherProtein") or {}).items() if v]
+    op = [f'{nm(k)} {v}' for k, v in (w.get("otherProtein") or {}).items() if v]
     if w.get("neutralList"): op = op + [" · ".join(w["neutralList"])]
-    h.append(_pill_block("其他优质蛋白 · 中性食物", "", op, OLB, OLT, "这周未记录到"))
-    lm = [f'{LIMNAME.get(k,k)} {v}' for k, v in (w.get("limitsHit") or {}).items() if v]
+    h.append(_pill_block(t("其他优质蛋白 · 中性食物"), "", op, OLB, OLT, t("这周未记录到")))
+    lm = [f'{limname(k)} {v}' for k, v in (w.get("limitsHit") or {}).items() if v]
     tot = sum((w.get("limitsHit") or {}).values())
-    h.append(_pill_block("限制项", f"踩中 {tot} 次" if tot else "", lm,
-                         "rgba(181,100,60,.16)", "#8A4A28", "这周未记录到限制项"))
+    h.append(_pill_block(t("限制项"), t("踩中 {n} 次", n=tot) if tot else "", lm,
+                         "rgba(181,100,60,.16)", "#8A4A28", t("这周未记录到限制项")))
     if w.get("unrecognizedItems"):
-        h.append(_pill_block("待核对食材", "未计入覆盖", w["unrecognizedItems"], CLAYP, CLAY, ""))
+        h.append(_pill_block(t("待核对食材"), t("未计入覆盖"), w["unrecognizedItems"], CLAYP, CLAY, ""))
     # ---- 下半页 · 这周怎么样 ----
     r = w.get("review") or {}
     h.append(f'<div style="border-top:1px solid rgba(42,42,36,.09);margin-top:8px;padding-top:20px;'
              f'display:flex;align-items:center;gap:12px">'
-             f'<div style="flex:1"><div class="h1">这周怎么样</div></div>'
+             f'<div style="flex:1"><div class="h1">{t("这周怎么样")}</div></div>'
              '</div>')
-    h.append(f'<div style="font:400 12.5px \'Noto Sans SC\';color:{MUT};margin-top:-8px">'
-             f'{w.get("rangeLabel","").replace(" 本周","")} · {logged} 天有记录</div>')
+    h.append(f'<div style="font:400 12.5px \'Noto Sans SC\',system-ui,sans-serif;color:{MUT};margin-top:-8px">'
+             f'{w.get("rangeLabel","").replace(" 本周","")} · {t("{n} 天有记录", n=logged)}</div>')
     if not r:
-        h.append(f'<p style="color:{MUT};font-size:12px">以上为记录统计；具体观察与下周动作由助手结合库存补充。</p>')
+        h.append(f'<p style="color:{MUT};font-size:12px">{t("以上为记录统计；具体观察与下周动作由助手结合库存补充。")}</p>')
     if r.get("wins"):
-        h.append(f'<div><div style="font:400 12.5px \'Noto Sans SC\';color:{MUT};margin-bottom:7px">做得好的两点</div>'
-                 f'<div style="font:400 15px/1.85 \'Noto Sans SC\';color:{INK}">{"<br>".join(r["wins"])}</div></div>')
+        h.append(f'<div><div style="font:400 12.5px \'Noto Sans SC\',system-ui,sans-serif;color:{MUT};margin-bottom:7px">{t("做得好的两点")}</div>'
+                 f'<div style="font:400 15px/1.85 \'Noto Sans SC\',system-ui,sans-serif;color:{INK}">{"<br>".join(r["wins"])}</div></div>')
     if r.get("topGaps"):
         h.append(f'<div style="border-top:1px solid rgba(42,42,36,.09);padding-top:15px">'
-                 f'<div style="font:400 12.5px \'Noto Sans SC\';color:{MUT};margin-bottom:9px">最该补的三项</div>'
-                 + "".join(f'<div style="display:flex;gap:10px;font:400 15px/1.8 \'Noto Sans SC\';margin-bottom:7px">'
+                 f'<div style="font:400 12.5px \'Noto Sans SC\',system-ui,sans-serif;color:{MUT};margin-bottom:9px">{t("最该补的三项")}</div>'
+                 + "".join(f'<div style="display:flex;gap:10px;font:400 15px/1.8 \'Noto Sans SC\',system-ui,sans-serif;margin-bottom:7px">'
                            f'<span class="num" style="flex:none;color:{INK}">{i+1} ·</span><span>{x}</span></div>'
                            for i, x in enumerate(r["topGaps"])) + '</div>')
     if r.get("actions"):
         h.append(f'<div style="border-top:1px solid rgba(42,42,36,.09);padding-top:15px">'
-                 f'<div style="font:400 12.5px \'Noto Sans SC\';color:{MUT};margin-bottom:11px">下周三件事</div>'
+                 f'<div style="font:400 12.5px \'Noto Sans SC\',system-ui,sans-serif;color:{MUT};margin-bottom:11px">{t("下周三件事")}</div>'
                  + "".join(f'<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:11px">'
                            f'<span style="width:19px;height:19px;flex:none;border-radius:5px;'
                            f'border:1.5px solid rgba(42,42,36,.3);margin-top:3px"></span>'
-                           f'<span style="font:400 15px/1.6 \'Noto Sans SC\'">{x}</span></div>' for x in r["actions"])
-                 + f'<div style="font:400 12.5px \'Noto Sans SC\';color:{MUT};margin-top:4px">只给三条。做完了下周再生成。</div></div>')
+                           f'<span style="font:400 15px/1.6 \'Noto Sans SC\',system-ui,sans-serif">{x}</span></div>' for x in r["actions"])
+                 + f'<div style="font:400 12.5px \'Noto Sans SC\',system-ui,sans-serif;color:{MUT};margin-top:4px">{t("只给三条。做完了下周再生成。")}</div></div>')
     h.append('</div></html>')
     return "\n".join(h)
 
@@ -579,41 +722,46 @@ def restock(log_text, fridge_text, end=None, profile=None, limit=3):
             if rule["period"] == "day":
                 short = logged - row["metDays"]
                 if logged and short > 0:
-                    gaps.append((key, short / logged, f'{row["metDays"]}/{logged} 天'))
+                    gaps.append((key, short / logged, t("{a}/{b} 天", a=row["metDays"], b=logged)))
             elif row["recordedCount"] < rule["target"]:
                 gaps.append((key, 1 - row["recordedCount"] / rule["target"],
-                             f'{row["recordedCount"]:g}/{rule["target"]:g} 次'))
+                             t("{a}/{b} 次", a=f'{row["recordedCount"]:g}', b=f'{rule["target"]:g}')))
     else:
         for key in DAILY_KEYS:
             met = week["dailyMetDays"][key]
             if logged and met < logged:
-                gaps.append((key, (logged - met) / logged, f"{met}/{logged} 天"))
+                gaps.append((key, (logged - met) / logged, t("{a}/{b} 天", a=met, b=logged)))
         for key, _, target, _ in WEEKLY:
             n = week["weeklyCounts"][key]
             if n < target:
-                gaps.append((key, 1 - n / target, f"{n:g}/{target} 次"))
+                gaps.append((key, 1 - n / target, t("{a}/{b} 次", a=f"{n:g}", b=target)))
     # 规则：不为凑格子额外喝茶、吃巧克力或加油，这三类排在最后。
     gaps.sort(key=lambda g: (g[0] in NO_PADDING, -g[1]))
     examples = {k: s.split() for k, _, s in DAILY}
     examples.update({k: s.split() for k, _, _, s in WEEKLY})
     use, buy = [], []
     for key, _, record in gaps:
-        entry = {"key": key, "category": NAME[key], "record": record}
+        entry = {"key": key, "category": nm(key), "record": record}
         if stock.get(key):
             use.append({**entry, "inStock": stock[key]})
         elif len(buy) < limit:
-            options = [w for w in examples[key] if not _restricted(w, restrictions)][:3]
+            options = [w for w in examples[key]
+                       if not _restricted(w, restrictions) and not _restricted(EN_FOOD.get(w, ""), restrictions)]
+            if LANG == "en":
+                options = [EN_FOOD[w] for w in options if w in EN_FOOD]
+            options = options[:3]
             buy.append({**entry, "options": options})
     return {
         "weekStart": week["weekStart"], "weekEnd": week["weekEnd"], "daysWithRecord": logged,
         "evidence": "insufficient" if logged < 3 else "ok",
         "useWhatYouHave": use, "worthBuying": buy,
         "unrecognizedItems": week["unrecognizedItems"],
-        "note": "候选来自记录缺口与库存；按用户计划的餐次挑选，不必全部买齐。记录少于 3 天时只作参考。",
+        "note": t("候选来自记录缺口与库存；按用户计划的餐次挑选，不必全部买齐。记录少于 3 天时只作参考。"),
     }
 
 
 # ---------- 分享卡 ----------
+CARD_SHORT_EN = {"redOrange": "Red & orange", "darkChocolate": "Dark chocolate", "cruciferous": "Cruciferous"}
 def render_card(w):
     """1080×1440 周复盘分享卡：只含覆盖统计与下周三件事，不含库存、忌口或健康信息。"""
     logged = w.get("daysWithRecord", 0)
@@ -625,23 +773,25 @@ def render_card(w):
             '<i style="background:%s"></i>' % G if c == "met" else
             '<i style="background:#E4E1D2"></i>' if c == "recorded" else
             '<i style="border:2px dashed rgba(42,42,36,.28)"></i>' for c in cells)
-        rows.append(f'<div class="r"><span class="n">{NAME[k]}</span><span class="sq">{sq}</span>'
+        rows.append(f'<div class="r"><span class="n">{nm(k)}</span><span class="sq">{sq}</span>'
                     f'<span class="num m">{w["dailyMetDays"][k]}/{logged}</span></div>')
     weekly = "".join(
-        f'<div class="w{" on" if w["weeklyCounts"].get(k, 0) >= w.get("weeklyTargets", {}).get(k, t) else ""}">'
-        f'<span>{n}</span><span class="num">{w["weeklyCounts"].get(k, 0):g}/{w.get("weeklyTargets", {}).get(k, t)}</span></div>'
-        for k, n, t, _ in WEEKLY)
+        f'<div class="w{" on" if w["weeklyCounts"].get(k, 0) >= w.get("weeklyTargets", {}).get(k, target) else ""}">'
+        f'<span>{CARD_SHORT_EN.get(k, nm(k)) if LANG == "en" else nm(k)}</span><span class="num">{w["weeklyCounts"].get(k, 0):g}/{w.get("weeklyTargets", {}).get(k, target)}</span></div>'
+        for k, n, target, _ in WEEKLY)
     actions = (w.get("review") or {}).get("actions") or []
+    en_css = (".n{width:290px;font-size:28px}.r{margin-bottom:11px}.sq i{height:40px}"
+              ".w{font-size:24px}.w span:first-child{flex:1;margin-right:12px}") if LANG == "en" else ""
     act = "".join(f'<div class="a"><b></b><span>{x}</span></div>' for x in actions[:3])
-    return f"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
+    return f"""<!doctype html><html lang="{html_lang()}"><meta charset="utf-8">
 <style>
 *{{box-sizing:border-box;margin:0}}
 body{{background:#DCD6C2}}
 .card{{width:1080px;height:1440px;background:#F6F2E8;color:#2A2A24;padding:76px 84px 64px;
   font-family:"Noto Sans SC",system-ui,sans-serif;display:flex;flex-direction:column;gap:34px;overflow:hidden}}
 .num{{font-family:"Space Grotesk",monospace}}
-.k{{font:500 30px "Noto Sans SC";color:#6B6857}}
-.t{{font:700 70px/1.2 "Noto Sans SC"}}
+.k{{font:500 30px "Noto Sans SC",system-ui,sans-serif;color:#6B6857}}
+.t{{font:700 70px/1.2 "Noto Sans SC",system-ui,sans-serif}}
 .rg{{display:inline-block;background:#3D5A3F;color:#F6F2E8;border-radius:40px;padding:14px 32px;font-size:30px}}
 .r{{display:flex;align-items:center;gap:22px;margin-bottom:13px}}
 .n{{width:200px;font-size:30px}}
@@ -655,20 +805,21 @@ body{{background:#DCD6C2}}
 .a b{{width:34px;height:34px;flex:none;border-radius:9px;border:3px solid rgba(42,42,36,.3);margin-top:7px}}
 .f{{margin-top:auto;display:flex;justify-content:space-between;font-size:24px;color:#6B6857;
   border-top:2px solid rgba(42,42,36,.09);padding-top:28px}}
+{en_css}
 </style>
 <div class="card">
- <div><div class="k">抗炎厨房 · 周复盘</div><div class="t">{w.get("title") or "这周吃得怎么样"}</div></div>
+ <div><div class="k">{t("抗炎厨房 · 周复盘")}</div><div class="t">{w.get("title") or t("这周吃得怎么样")}</div></div>
  <div><span class="rg num">{rng}</span>
-  <div class="k" style="margin-top:16px">7 天里有 {logged} 天记录，按记了的算</div></div>
+  <div class="k" style="margin-top:16px">{t("7 天里有 {n} 天记录，按记了的算", n=logged)}</div></div>
  <div>{"".join(rows)}</div>
  <div class="g">{weekly}</div>
- {f'<div><div class="k" style="margin-bottom:20px">下周三件事</div>{act}</div>' if act else ''}
- <div class="f"><span>覆盖度是记录指标，不是健康评分</span><span>不数卡路里 · 不打卡</span></div>
+ {f'<div><div class="k" style="margin-bottom:20px">{t("下周三件事")}</div>{act}</div>' if act else ''}
+ <div class="f"><span>{t("覆盖度是记录指标，不是健康评分")}</span><span>{t("不数卡路里 · 不打卡")}</span></div>
 </div></html>"""
 
 
 SCHEMA = """
-Commands:
+Commands (add --lang en for English output; default zh):
   fridge --items "菠菜, 西兰花" | fridge --log kitchen-fridge.md
   score --log kitchen-log.md [--end YYYY-MM-DD] [--profile kitchen-profile.json]
   day --json day.json [-o today.html]
@@ -712,10 +863,13 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("cmd", choices=["score", "day", "week", "card", "restock", "fridge", "schema"])
     ap.add_argument("--fridge", help="restock 使用的库存文件")
+    ap.add_argument("--lang", choices=["zh", "en"], default="zh", help="输出语言 / output language")
     ap.add_argument("--log"); ap.add_argument("--json"); ap.add_argument("--end"); ap.add_argument("-o")
     ap.add_argument("--profile", help="个人设置 JSON；默认读取日志同目录的 kitchen-profile.json")
     ap.add_argument("--items", help="逗号或换行分隔的原始食材条目")
     a = ap.parse_args(argv)
+    global LANG
+    LANG = a.lang
     if a.cmd == "schema":
         print(SCHEMA)
         return

@@ -46,7 +46,9 @@ Keep this guide in a dedicated Kitchen Project; optionally set restrictions, nut
 - 单文件对话导入：使用同文件中内嵌的参考材料。没有持久存储时提供可复制/下载的状态快照，让用户在新聊天中带入；不能把“能读附件”说成“安装成功”。
 - 没有视觉工具：用相同信息结构的 Markdown 表，不让渲染能力阻断厨房任务。
 
-默认中文；用户使用或要求另一种语言时跟随该语言，类别可在完整中文名旁附译名，日志规范和 key 保持不变。脚本词表以中文为主；调用前将其他语言食材映射到食材表中的规范名称，无法确定时先核对。首次初始化只询问任务必需的信息，不一次索取完整健康档案。
+**语言**：跟随用户使用的语言。用户用英文提问，就全程用英文回答，包括类别名、表格、图表、菜谱和状态文件里的食材名；不夹中文，不在英文类别名旁附中文。用户用中文就用中文。调用脚本时加 `--lang en` 或 `--lang zh`，与回复语言一致。
+
+英文用户的日志和库存可以直接写英文：脚本认得常见英文食材名、复数和多词食材（greek yogurt、olive oil、brown rice），会忽略 fresh、frozen、grilled 这类修饰词。英文日志里食材之间用逗号分隔；限制项写 `Limit: key1,key2`，外食写 `Eating out`。词典没有的英文食材列入待确认，先核对，不猜。类别 key 与计数规则在两种语言下完全相同。首次初始化只询问任务必需的信息，不一次索取完整健康档案。
 
 ## 首次使用与个人设置
 
@@ -67,7 +69,7 @@ Keep this guide in a dedicated Kitchen Project; optionally set restrictions, nut
 - 算数由脚本完成；未识别食材先核对，不能把漏识别说成营养缺口。
 - 看长期搭配，不给单顿饭贴抗炎/致炎的二元标签。
 - 记录不全是常态。只按有记录的部分算，说明覆盖天数，不催补录。未记录不等于没吃。
-- 默认中文，跟随用户明确的语言偏好；直接、具体，不说教、不用 emoji、不用鼓励型套话。
+- 跟随用户的语言；直接、具体，不说教、不用 emoji、不用鼓励型套话。英文同样遵守，不用 "Great job!"、"Amazing!" 之类。
 - 用户还在报库存时只确认这一批，等他说「就这些」或明确要求汇总再展示全表。不抢着给菜谱。完成库存汇总后可问一次下一步，等用户选择。
 
 ## 19 个类别名
@@ -94,7 +96,10 @@ python3 scripts/kitchen.py fridge --items "有机菠菜 250g, 云南蓝莓 125g,
 python3 scripts/kitchen.py score --log /path/to/kitchen-log.md --end 2026-09-07
 python3 scripts/kitchen.py restock --log /path/to/kitchen-log.md --fridge /path/to/kitchen-fridge.md
 python3 scripts/kitchen.py card --json week.json -o card.html
+python3 scripts/kitchen.py fridge --lang en --items "baby spinach, 2 avocados, greek yogurt"
 ```
+
+所有命令都支持 `--lang en`：库存表、补货结果、复盘页和分享卡的类别名与界面文字输出为英文。
 
 食材词典在 `references/lexicon.json`，含大陆、台湾、新加坡常见叫法、繁体字与常见英文名；别名继承规范名的全部类别。用户的说法保留在库存里，计数按规范名。词典仍未收录的叫法列入待确认，不猜。
 
@@ -460,6 +465,15 @@ sources: [chat]
 - 格式：`- [stated] <早/午/晚/加> | <食材空格分隔> | 限制:key1,key2`
   - 中间可插 `外食·<类型>` 段，表示这顿在外面吃
   - 没踩限制项就省略第三段
+- 英文用户用英文写，食材之间用逗号分隔，结构相同：
+
+```markdown
+## 2026-09-07
+- [stated] Breakfast | greek yogurt, blueberries, walnuts, cinnamon, green tea
+- [stated] Lunch | Eating out · sushi | mackerel, miso, white rice | Limit: refinedGrainMeal
+```
+
+  英文库存文件的类别行写英文类别名，例如 `- [stated] Legumes & soy: chickpeas, tofu`；空类别写 `none`。
 - 用户没记的顿数**不补、不问**。
 - 一天里同一类别在不同餐各计一次；同一餐同一类别取最大权重，不重复计次；半份与整份同时出现按整份计，不受输入顺序影响。空日期标题不是一条记录。
 - 超过 5 周的按月压成一行归档摘要，删掉原始行。文件是有大小上限的，别无限追加。

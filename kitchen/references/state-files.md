@@ -150,6 +150,15 @@ sources: [chat]
 - 格式：`- [stated] <早/午/晚/加> | <食材空格分隔> | 限制:key1,key2`
   - 中间可插 `外食·<类型>` 段，表示这顿在外面吃
   - 没踩限制项就省略第三段
+- 英文用户用英文写，食材之间用逗号分隔，结构相同：
+
+```markdown
+## 2026-09-07
+- [stated] Breakfast | greek yogurt, blueberries, walnuts, cinnamon, green tea
+- [stated] Lunch | Eating out · sushi | mackerel, miso, white rice | Limit: refinedGrainMeal
+```
+
+  英文库存文件的类别行写英文类别名，例如 `- [stated] Legumes & soy: chickpeas, tofu`；空类别写 `none`。
 - 用户没记的顿数**不补、不问**。
 - 一天里同一类别在不同餐各计一次；同一餐同一类别取最大权重，不重复计次；半份与整份同时出现按整份计，不受输入顺序影响。空日期标题不是一条记录。
 - 超过 5 周的按月压成一行归档摘要，删掉原始行。文件是有大小上限的，别无限追加。
