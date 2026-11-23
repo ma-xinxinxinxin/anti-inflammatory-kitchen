@@ -10,14 +10,29 @@ Tell it once what's in your kitchen. From then on it suggests meals from what yo
 
 **[Get started](#get-started)** · [Plugin](downloads/anti-inflammatory-kitchen-plugin.zip) · [Claude Skill ZIP](downloads/kitchen.zip) · [Chat guide](downloads/kitchen-chat-guide.md)
 
-<p align="center"><img src="docs/images/weekly-en.png" width="620" alt="Weekly review: 14 food groups from most important, weekly target vs this week, and an anti-inflammatory index"></p>
+<p align="center"><img src="docs/images/carousel/en-1-cover.jpg" width="440" alt="Start from your fridge, not a recipe. No cooking skills or nutrition knowledge needed. Just ask."></p>
 
 ## What it does
+
+<table>
+<tr>
+<td width="50%"><img src="docs/images/carousel/en-2-log.jpg" alt="Just say what you bought, by voice or a receipt photo, and your stock is updated"></td>
+<td width="50%"><img src="docs/images/carousel/en-3-breakfast.jpg" alt="Ask for 3 breakfast options and get meals made only from what's already in your kitchen"></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/images/carousel/en-4-cook.jpg" alt="Can't cook? Get a step-by-step recipe card with timing and heat"></td>
+<td width="50%"><img src="docs/images/carousel/en-5-restock.jpg" alt="Ask what to buy: use up what you have first, then a short list worth buying"></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/images/carousel/en-6-review.jpg" alt="Weekly review with an anti-inflammatory index, weekly target vs this week"></td>
+<td width="50%"><img src="docs/images/carousel/en-7-open-source.jpg" alt="Free and open source. Works with Claude, ChatGPT, Gemini and more"></td>
+</tr>
+</table>
 
 | | Ask | You get |
 |---|---|---|
 | **Your fridge** | "Bought salmon, spinach and blueberries" · "The olive oil's finished" · or send a photo of groceries or a receipt | Your stock sorted into 19 food groups, updated as you buy and use things |
-| **What to eat** | "What's for dinner?" · "Give me 3 breakfast options" · "I'm at a hawker centre, what should I order?" | Meals built from what's at home, at a restaurant, or from your own cookbooks |
+| **What to eat** | "What's for dinner?" · "Give me 3 breakfast options" · "I'm at a hawker centre, what should I order?" | Meals made only from what you already have, with nothing extra to buy; eating out or cooking from your own cookbooks works too |
 | **How to cook it** | "How do I make that?" · "My spinach is about to go off, what can I cook?" · "Save this as my Wednesday fish soup" | Step-by-step recipes with timing and heat cues, clear-out meals for things about to spoil, and your favorites saved by name |
 | **What to buy** | "What should I buy this week?" | What's already at home to use first, then up to three things worth buying |
 | **Weekly review** | "How did I eat this week?" | An anti-inflammatory index, your gaps and three actions for next week, as a shareable image |

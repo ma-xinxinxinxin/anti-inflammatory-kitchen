@@ -10,14 +10,29 @@
 
 **[开始使用](#开始使用)** · [插件包](downloads/anti-inflammatory-kitchen-plugin.zip) · [Claude Skill ZIP](downloads/kitchen.zip) · [对话导入指南](downloads/kitchen-chat-guide.md)
 
-<p align="center"><img src="docs/images/weekly-zh.png" width="620" alt="周复盘：14 类从最重要的开始，每周目标对比本周实际，加上抗炎指数"></p>
+<p align="center"><img src="docs/images/carousel/zh-1-cover.jpg" width="440" alt="从冰箱出发，不从食谱出发。不用会做饭，不用懂营养，开口问就行。"></p>
 
 ## 它能做什么
+
+<table>
+<tr>
+<td width="50%"><img src="docs/images/carousel/zh-2-log.jpg" alt="买了什么，说一句或拍张小票，库存就更新了"></td>
+<td width="50%"><img src="docs/images/carousel/zh-3-breakfast.jpg" alt="问一句明天早饭吃什么，给出 3 个只用家里现有食材的选择"></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/images/carousel/zh-4-cook.jpg" alt="不会做？给出带时间火候的分步菜谱卡"></td>
+<td width="50%"><img src="docs/images/carousel/zh-5-restock.jpg" alt="问这周该买什么：先用掉家里有的，再列几样值得买的"></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/images/carousel/zh-6-review.jpg" alt="周复盘：抗炎指数，每周目标对比本周实际"></td>
+<td width="50%"><img src="docs/images/carousel/zh-7-open-source.jpg" alt="免费开源，支持 Claude、ChatGPT、Gemini 等"></td>
+</tr>
+</table>
 
 | | 你可以这样问 | 你会得到 |
 |---|---|---|
 | **冰箱库存** | 「买了三文鱼、菠菜和蓝莓」·「橄榄油用完了」· 或拍一张买的菜、购物小票 | 按 19 类整理好的库存，买了、用完随口更新 |
-| **吃什么** | 「今晚吃什么？」·「给我 3 个早餐选项」·「在小贩中心，点什么？」 | 用家里现有的食材配好一餐；在外面吃、从自己的菜谱书里挑也可以 |
+| **吃什么** | 「今晚吃什么？」·「给我 3 个早餐选项」·「在小贩中心，点什么？」 | 只用家里现有的食材配好一餐，不用另外买；在外面吃、从自己的菜谱书里挑也可以 |
 | **怎么做** | 「这道怎么做？」·「菠菜快坏了，做什么菜？」·「把这个存成我的周三鱼汤」 | 带时间和火候的分步做法；围绕快坏的食材出清库菜；常做的菜按名字保存，下次直接叫出来 |
 | **买什么** | 「这周该买什么？」 | 先列家里已有、该先用掉的，再给最多三样值得补买的 |
 | **周复盘** | 「这周吃得怎么样？」 | 抗炎指数、缺口和下周三件事，可以生成分享图 |
