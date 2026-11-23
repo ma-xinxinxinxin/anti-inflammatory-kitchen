@@ -1,6 +1,6 @@
 # Install Anti-Inflammatory Kitchen
 
-[简体中文](installation.md) · **English** · [Home](../README.en.md)
+[简体中文](installation.md) · **English** · [Home](../README.md)
 
 Choose one path for your actual tool. Do not install duplicate copies of `kitchen` in the same agent. Rules and scripts are portable; private records are not migrated with them. Platform documentation was checked on 2026-10-04; account permissions and versions can change the available controls.
 

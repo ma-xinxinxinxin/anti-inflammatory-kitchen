@@ -85,6 +85,9 @@ EN_UI = {
     "抗炎厨房 · 周复盘": "Anti-Inflammatory Kitchen · Weekly", "这周吃得怎么样": "How I ate this week",
     "覆盖度是记录指标，不是健康评分": "Coverage is a logging measure, not a health score",
     "不数卡路里 · 不打卡": "No calories · No streaks",
+    "抗炎指数": "Anti-inflammatory index", "本周实际": "This week", "每周目标": "Weekly target",
+    "从最重要的开始": "Most important first", "；目标按记录天数折算": "; targets scaled to logged days",
+    "抗炎指数按记录计算，反映搭配完整度，不是医学评分": "Based on logged meals · not a medical score",
     "候选来自记录缺口与库存；按用户计划的餐次挑选，不必全部买齐。记录少于 3 天时只作参考。":
         "Candidates come from logged gaps and current stock. Pick by the meals planned; no need to buy everything. With fewer than 3 logged days, treat this as a rough guide.",
     "7 天里有 {n} 天记录，按记了的算": "{n} of 7 days logged; counted from what was logged",
@@ -427,6 +430,7 @@ def score(text, end=None, profile=None):
     }
     if frequencies is not None:
         result["personalPlan"] = personal_plan(frequencies, counts, dates, days)
+    result["weeklyIndex"] = weekly_index(result)["score"]
     return result
 
 # ---------- 视觉 ----------
@@ -760,61 +764,125 @@ def restock(log_text, fridge_text, end=None, profile=None, limit=3):
     }
 
 
-# ---------- 分享卡 ----------
-CARD_SHORT_EN = {"redOrange": "Red & orange", "darkChocolate": "Dark chocolate", "cruciferous": "Cruciferous"}
-def render_card(w):
-    """1080×1440 周复盘分享卡：只含覆盖统计与下周三件事，不含库存、忌口或健康信息。"""
+# ---------- 抗炎指数与分享卡 ----------
+# 从最重要的开始：每周最该保证的放在最上面。
+IMPORTANCE = ["fattyFish", "goodFat", "leafy", "cruciferous", "legumes", "berryCitrus", "nutsSeeds",
+              "wholeGrain", "fermented", "redOrange", "mushrooms", "spices", "tea", "darkChocolate"]
+
+
+def _half(x):
+    return round(x * 2) / 2
+
+
+def weekly_index(w):
+    """14 类：每周目标 vs 本周实际 -> 0–100 抗炎指数。
+
+    每日类别按每周 7 份计（实际 = 达标天数）；每周类别用默认或个人目标。
+    记录不满 7 天时目标按记录天数折算，未记录不等于没吃。不设频次的类别只展示，不计分。
+    这是按记录计算的搭配完整度，不是医学评分。
+    """
     logged = w.get("daysWithRecord", 0)
-    rng = w.get("rangeLabel") or f'{w.get("weekStart", "")} – {w.get("weekEnd", "")}'
+    factor = logged / 7 if logged else 0
+    plan = {r["key"]: r for r in w.get("personalPlan", [])}
     rows = []
-    for k in DAILY_KEYS:
-        cells = w["dailyMatrix"][k]
-        sq = "".join(
-            '<i style="background:%s"></i>' % G if c == "met" else
-            '<i style="background:#E4E1D2"></i>' if c == "recorded" else
-            '<i style="border:2px dashed rgba(42,42,36,.28)"></i>' for c in cells)
-        rows.append(f'<div class="r"><span class="n">{nm(k)}</span><span class="sq">{sq}</span>'
-                    f'<span class="num m">{w["dailyMetDays"][k]}/{logged}</span></div>')
-    weekly = "".join(
-        f'<div class="w{" on" if w["weeklyCounts"].get(k, 0) >= w.get("weeklyTargets", {}).get(k, target) else ""}">'
-        f'<span>{CARD_SHORT_EN.get(k, nm(k)) if LANG == "en" else nm(k)}</span><span class="num">{w["weeklyCounts"].get(k, 0):g}/{w.get("weeklyTargets", {}).get(k, target)}</span></div>'
-        for k, n, target, _ in WEEKLY)
+    for k in IMPORTANCE:
+        daily = k in DAILY_KEYS
+        if k in plan:
+            rule = plan[k]["frequency"]
+            if rule is None:
+                full, actual = None, plan[k]["recordedCount"]
+            elif rule["period"] == "day":
+                full, actual = 7, plan[k].get("metDays", 0)
+            else:
+                full, actual = rule["target"], plan[k]["recordedCount"]
+        elif daily:
+            full, actual = 7, w["dailyMetDays"][k]
+        else:
+            full = w.get("weeklyTargets", {}).get(k) or dict((x, t) for x, _, t, _ in WEEKLY)[k]
+            actual = w["weeklyCounts"].get(k, 0)
+        target = None if full is None else max(0.5, _half(full * factor)) if logged else full
+        rows.append({"key": k, "name": nm(k), "target": target, "weeklyTarget": full,
+                     "actual": actual, "met": target is not None and actual >= target})
+    scored = [r for r in rows if r["target"]]
+    value = round(100 * sum(min(r["actual"] / r["target"], 1) for r in scored) / len(scored)) \
+        if logged and scored else None
+    return {"score": value, "daysWithRecord": logged, "prorated": 0 < logged < 7, "rows": rows}
+
+
+def _fmt(x):
+    return f"{x:g}"
+
+
+def render_card(w):
+    """1080×1440 周复盘分享卡：14 类按重要性排列，每行目标与实际同轴，右上角抗炎指数。
+    只含记录统计与下周三件事，不含库存、忌口、个人设置或健康信息。"""
+    idx = weekly_index(w)
+    logged = idx["daysWithRecord"]
+    rng = w.get("rangeLabel") or f'{w.get("weekStart", "")} – {w.get("weekEnd", "")}'
+    scale = max([7] + [min(r["actual"], 9) for r in idx["rows"]])
+    rows = []
+    for r in idx["rows"]:
+        tgt, act = r["target"], r["actual"]
+        fill = min(act, scale) / scale * 100
+        box = (f'<i class="tg" style="width:{tgt / scale * 100:.2f}%"></i>' if tgt else "")
+        mark = (f'<i class="mk" style="left:calc({tgt / scale * 100:.2f}% - 2px)"></i>' if tgt else "")
+        num = (f'<b class="{"ok" if r["met"] else ""}">{_fmt(act)}</b><span>/{_fmt(tgt)}</span>'
+               if tgt else f'<b>{_fmt(act)}</b><span>/—</span>')
+        rows.append(f'<div class="r"><span class="n">{r["name"]}</span>'
+                    f'<span class="tr">{box}<i class="ac" style="width:{fill:.2f}%"></i>{mark}</span>'
+                    f'<span class="v num">{num}</span></div>')
+    sub = t("7 天里有 {n} 天记录，按记了的算", n=logged)
+    if idx["prorated"]:
+        sub += t("；目标按记录天数折算")
+    score = "—" if idx["score"] is None else idx["score"]
     actions = (w.get("review") or {}).get("actions") or []
-    en_css = (".n{width:290px;font-size:28px}.r{margin-bottom:11px}.sq i{height:40px}"
-              ".w{font-size:24px}.w span:first-child{flex:1;margin-right:12px}") if LANG == "en" else ""
     act = "".join(f'<div class="a"><b></b><span>{x}</span></div>' for x in actions[:3])
     return f"""<!doctype html><html lang="{html_lang()}"><meta charset="utf-8">
 <style>
 *{{box-sizing:border-box;margin:0}}
 body{{background:#DCD6C2}}
-.card{{width:1080px;height:1440px;background:#F6F2E8;color:#2A2A24;padding:76px 84px 64px;
-  font-family:"Noto Sans SC",system-ui,sans-serif;display:flex;flex-direction:column;gap:34px;overflow:hidden}}
-.num{{font-family:"Space Grotesk",monospace}}
-.k{{font:500 30px "Noto Sans SC",system-ui,sans-serif;color:#6B6857}}
-.t{{font:700 70px/1.2 "Noto Sans SC",system-ui,sans-serif}}
-.rg{{display:inline-block;background:#3D5A3F;color:#F6F2E8;border-radius:40px;padding:14px 32px;font-size:30px}}
-.r{{display:flex;align-items:center;gap:22px;margin-bottom:13px}}
-.n{{width:200px;font-size:30px}}
-.sq{{flex:1;display:flex;gap:14px}}
-.sq i{{flex:1;height:44px;border-radius:14px;display:block}}
-.m{{width:80px;text-align:right;font-size:30px;font-weight:500}}
-.g{{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}}
-.w{{background:#EFEADB;border-radius:22px;padding:20px 24px;display:flex;justify-content:space-between;font-size:27px}}
-.w.on{{background:#3D5A3F;color:#F6F2E8}}
-.a{{display:flex;gap:22px;align-items:flex-start;font-size:30px;line-height:1.45;margin-bottom:10px}}
-.a b{{width:34px;height:34px;flex:none;border-radius:9px;border:3px solid rgba(42,42,36,.3);margin-top:7px}}
-.f{{margin-top:auto;display:flex;justify-content:space-between;font-size:24px;color:#6B6857;
-  border-top:2px solid rgba(42,42,36,.09);padding-top:28px}}
-{en_css}
+.card{{width:1080px;height:1440px;background:#F6F2E8;color:#2A2A24;padding:68px 80px 56px;
+  font-family:"Noto Sans SC",system-ui,sans-serif;display:flex;flex-direction:column;gap:26px;overflow:hidden}}
+.num{{font-family:"Space Grotesk",ui-monospace,monospace}}
+.top{{display:flex;justify-content:space-between;align-items:flex-start;gap:30px}}
+.k{{font-size:27px;color:#6B6857}}
+.t{{font-weight:700;font-size:64px;line-height:1.15;margin:6px 0 18px}}
+.rg{{display:inline-block;background:#3D5A3F;color:#F6F2E8;border-radius:40px;padding:10px 26px;font-size:26px}}
+.sub{{font-size:24px;color:#6B6857;margin-top:14px}}
+.sc{{flex:none;width:236px;height:236px;border-radius:50%;background:#3D5A3F;color:#F6F2E8;
+  display:flex;flex-direction:column;align-items:center;justify-content:center}}
+.sc .big{{font-size:96px;font-weight:700;line-height:1}}
+.sc .lb{{font-size:{19 if LANG == "en" else 24}px;opacity:.85;margin-top:8px;text-align:center;line-height:1.25;width:170px}}
+.lg{{display:flex;gap:30px;font-size:22px;color:#6B6857;align-items:center}}
+.lg i{{display:inline-block;width:34px;height:16px;border-radius:5px;margin-right:10px;vertical-align:-1px}}
+.rows{{display:flex;flex-direction:column;gap:13px}}
+.r{{display:flex;align-items:center;gap:22px;height:36px}}
+.n{{width:{290 if LANG == "en" else 210}px;flex:none;font-size:{25 if LANG == "en" else 27}px}}
+.tr{{flex:1;height:26px;border-radius:8px;background:#ECE6D6;position:relative}}
+.tr i{{position:absolute;left:0;top:0;bottom:0;border-radius:8px}}
+.tg{{border:2.5px dashed rgba(61,90,63,.55);background:rgba(61,90,63,.06)}}
+.ac{{background:#3D5A3F}}
+.tr i.mk{{width:4px;top:-6px;bottom:-6px;border-radius:2px;background:#2A2A24}}
+.v{{width:96px;flex:none;text-align:right;font-size:26px;color:#6B6857}}
+.v b{{color:#B5643C;font-weight:600}} .v b.ok{{color:#3D5A3F}}
+.a{{display:flex;gap:18px;align-items:flex-start;font-size:26px;line-height:1.45;margin-bottom:6px}}
+.a b{{width:28px;height:28px;flex:none;border-radius:7px;border:2.5px solid rgba(42,42,36,.3);margin-top:5px}}
+.f span:last-child{{white-space:nowrap}}
+.f{{margin-top:auto;display:flex;justify-content:space-between;gap:20px;font-size:21px;color:#6B6857;
+  border-top:2px solid rgba(42,42,36,.09);padding-top:22px}}
 </style>
 <div class="card">
- <div><div class="k">{t("抗炎厨房 · 周复盘")}</div><div class="t">{w.get("title") or t("这周吃得怎么样")}</div></div>
- <div><span class="rg num">{rng}</span>
-  <div class="k" style="margin-top:16px">{t("7 天里有 {n} 天记录，按记了的算", n=logged)}</div></div>
- <div>{"".join(rows)}</div>
- <div class="g">{weekly}</div>
- {f'<div><div class="k" style="margin-bottom:20px">{t("下周三件事")}</div>{act}</div>' if act else ''}
- <div class="f"><span>{t("覆盖度是记录指标，不是健康评分")}</span><span>{t("不数卡路里 · 不打卡")}</span></div>
+ <div class="top">
+  <div><div class="k">{t("抗炎厨房 · 周复盘")}</div><div class="t">{w.get("title") or t("这周吃得怎么样")}</div>
+   <span class="rg num">{rng}</span><div class="sub">{sub}</div></div>
+  <div class="sc"><span class="big num">{score}</span><span class="lb">{t("抗炎指数")}</span></div>
+ </div>
+ <div class="lg"><span><i style="background:#3D5A3F"></i>{t("本周实际")}</span>
+  <span><i style="border:2.5px dashed rgba(61,90,63,.55);position:relative"><em style="position:absolute;right:-3px;top:-6px;bottom:-6px;width:4px;border-radius:2px;background:#2A2A24"></em></i>{t("每周目标")}</span>
+  <span>{t("从最重要的开始")}</span></div>
+ <div class="rows">{"".join(rows)}</div>
+ {f'<div><div class="k" style="margin-bottom:12px">{t("下周三件事")}</div>{act}</div>' if act else ''}
+ <div class="f"><span>{t("抗炎指数按记录计算，反映搭配完整度，不是医学评分")}</span><span>{t("不数卡路里 · 不打卡")}</span></div>
 </div></html>"""
 
 

@@ -10,7 +10,7 @@ line and the section structure match.
 **v6.0 · 19 categories**: 8 daily essentials + 6 weekly goals + 4 other quality proteins + 1 neutral.
 Gives practical advice built around an anti-inflammatory eating plan and the kitchen's latest stock. Works as a cross-platform plugin. Keeps the v5 categories and counting rules, and supports personal restrictions, nutrition goals and frequency targets. v6 connects logging, review and restocking into one loop, and adds three scenarios: cookbooks, eating out and meal prep. When the user asks for the version, answer with this line; the old 22-category or 10-daily-category versions are no longer used.
 
-For people who want to follow an anti-inflammatory way of eating and eat healthy, clean food. Built on a Mediterranean-style anti-inflammatory plan and kept in step with the kitchen's latest stock, it tells the user what to eat, how to cook it, what to buy and what to use up first. Stock changes only when the user reports and confirms purchases, use and clear-outs; the skill cannot monitor the kitchen by itself. Coverage is this tool's logging measure, not an inflammation test or a health score.
+For people who want to follow an anti-inflammatory way of eating and eat healthy, clean food. Built on a Mediterranean-style anti-inflammatory plan and kept in step with the kitchen's latest stock, it tells the user what to eat, how to cook it, what to buy and what to use up first. Stock changes only when the user reports and confirms purchases, use and clear-outs; the skill cannot monitor the kitchen by itself. Coverage and the weekly anti-inflammatory index are this tool's logging measures: they reflect how complete the logged meals were, not an inflammation test or a medical score.
 
 ## Using it across tools
 
@@ -150,7 +150,9 @@ Render one continuous page following the visual spec, with three text parts: two
 
 After the review you may ask once whether to plan next week's restock; if the user agrees, go to task 4 (`restock`). Review, restock, put away purchases, log what was eaten: one loop.
 
-When the user wants to share, render the same `week.json` as a 1080×1440 portrait image with `card`. The share card holds only coverage statistics and the three actions for next week: no stock, restrictions, personal settings or health information. Show the user a preview first and let them decide whether to post it.
+`score` outputs `weeklyIndex`, a 0–100 anti-inflammatory index: the average share of target reached across the 14 categories. Daily categories count as 7 per week; with fewer than 7 logged days, targets are scaled to the days logged; categories the user set to no target are not scored. When explaining it, say it reflects how complete the logged meals were, not a medical score; no praise or criticism, just point to the categories worth adding next week.
+
+When the user wants to share, render the same `week.json` as a 1080×1440 portrait image with `card`: the 14 categories run top to bottom from most important, each row showing the weekly target and this week's amount on one axis, with the index in the top-right corner. The share card holds only these statistics and the three actions for next week: no stock, restrictions, personal settings or health information. Show the user a preview first and let them decide whether to post it.
 
 ### 9 · Set preferences, nutrition goals and frequencies
 

@@ -1,6 +1,6 @@
 # Development and examples
 
-[简体中文](development.md) · **English** · [Home](../README.en.md)
+[简体中文](development.md) · **English** · [Home](../README.md)
 
 Most users can start with the [installation guide](installation.en.md). This page is for inspecting helpers, changing rules, or maintaining downloads. Python 3.10+ is required, with no third-party dependencies. On Windows, use `py -3` instead of `python3`; Python UTF-8 mode is recommended for Chinese terminal output.
 

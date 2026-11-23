@@ -1,6 +1,6 @@
 # 开发与示例
 
-**简体中文** · [English](development.en.md) · [返回首页](../README.md)
+**简体中文** · [English](development.en.md) · [返回首页](../README.zh-CN.md)
 
 普通用户从[安装说明](installation.md)开始即可。以下命令供想检查脚本、改规则或维护发行文件的人使用，需要 Python 3.10+，没有第三方依赖。Windows 可用 `py -3` 替代 `python3`；在终端显示中文时建议启用 Python UTF-8 模式。
 
