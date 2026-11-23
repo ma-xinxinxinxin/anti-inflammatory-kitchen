@@ -153,7 +153,7 @@ Different AI tools do not automatically synchronize private records. Downloads c
 
 ## Contribute
 
-The skill itself needs no API key. Local helpers require Python 3.10+ and only the standard library. Host subscriptions, permissions, and capabilities depend on the platform.
+The skill's instructions are written in Chinese; an English reference translation is in [kitchen/SKILL.en.md](kitchen/SKILL.en.md). The skill itself needs no API key. Local helpers require Python 3.10+ and only the standard library. Host subscriptions, permissions, and capabilities depend on the platform.
 
 [Examples and project structure](docs/development.en.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md) · [MIT License](LICENSE)
 

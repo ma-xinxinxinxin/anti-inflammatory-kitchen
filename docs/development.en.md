@@ -32,6 +32,7 @@ Store personal settings in `kitchen-profile.json` beside the log; `score` reads 
 | `kitchen/SKILL.md` | Shared workflow and version |
 | `kitchen/references/` | Food, state, recipe, and visual rules |
 | `kitchen/scripts/kitchen.py` | Inventory tables, counts, daily and weekly cards |
+| `kitchen/SKILL.en.md` | English reference translation of SKILL.md (not packaged). Update it in the same commit as SKILL.md; tests check that version and section structure match |
 | `kitchen/references/lexicon.json` | Ingredient lexicon: 19 categories, weights, regional aliases, traditional and English names |
 | `evals/` | Behavioral eval cases for conversation-level rules |
 | `scripts/install_skill.py` | Tool-specific destinations and upgrade backups |

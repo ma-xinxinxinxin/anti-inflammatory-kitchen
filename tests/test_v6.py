@@ -185,3 +185,35 @@ class EnglishTests(unittest.TestCase):
         k.LANG = 'zh'
         table = k.render_fridge(['菠菜'])
         self.assertIn('| 深色绿叶菜 | 菠菜 |', table)
+
+
+class EnglishSkillDocTests(unittest.TestCase):
+    """SKILL.en.md is a reference translation; it must not drift from SKILL.md."""
+
+    def structure(self, name):
+        text = (ROOT / 'kitchen' / name).read_text(encoding='utf-8')
+        text = re.sub(r'\A---\n.*?\n---\n', '', text, flags=re.S)
+        text = re.sub(r'```.*?```', '', text, flags=re.S)
+        return [len(m.group(1)) for m in re.finditer(r'^(#{1,3}) ', text, re.M)], text
+
+    def test_same_section_structure(self):
+        zh, _ = self.structure('SKILL.md')
+        en, _ = self.structure('SKILL.en.md')
+        self.assertEqual(zh, en)
+
+    def test_same_version_line(self):
+        _, zh = self.structure('SKILL.md')
+        _, en = self.structure('SKILL.en.md')
+        version = re.search(r'\*\*(v[\d.]+) · 19', zh).group(1)
+        self.assertIn(f'**{version} · 19 categories**', en)
+
+    def test_category_names_match_script(self):
+        _, en = self.structure('SKILL.en.md')
+        for name in k.EN_NAME.values():
+            self.assertIn(name, en)
+
+    def test_not_packaged(self):
+        import zipfile
+        names = zipfile.ZipFile(ROOT / 'downloads/kitchen.zip').namelist()
+        self.assertFalse(any(n.endswith('SKILL.en.md') for n in names))
+        self.assertNotIn('name:', (ROOT / 'kitchen/SKILL.en.md').read_text(encoding='utf-8').split('\n#', 1)[0])

@@ -14,7 +14,7 @@
 
 **[开始使用](#安装好建立你的厨房)** · [选择 AI 工具](#选择你的-ai-工具) · [食材与频率](#它如何判断搭配) · [库存与记录](#库存和记录保存在哪)
 
-[下载插件包](downloads/anti-inflammatory-kitchen-plugin.zip) · [Claude Skill ZIP](downloads/kitchen.zip) · [对话导入指南](downloads/kitchen-chat-guide.md)
+[英文版说明 SKILL.en.md](kitchen/SKILL.en.md) · [下载插件包](downloads/anti-inflammatory-kitchen-plugin.zip) · [Claude Skill ZIP](downloads/kitchen.zip) · [对话导入指南](downloads/kitchen-chat-guide.md)
 
 ## 它能帮你做什么
 
