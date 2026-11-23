@@ -193,10 +193,10 @@ class DistributionTests(unittest.TestCase):
             self.assertTrue(builder.same_artifact(name, existing, content), name)
 
     def test_readme_language_tabs_and_local_document_links(self):
-        for filename, other in [('README.md', 'README.en.md'), ('README.en.md', 'README.md')]:
+        for filename, other in [('README.md', 'README.zh-CN.md'), ('README.zh-CN.md', 'README.md')]:
             content = (ROOT / filename).read_text(encoding='utf-8')
-            self.assertIn(f'href="{other}"', content)
-        for doc in [ROOT / 'README.md', ROOT / 'README.en.md', *sorted((ROOT / 'docs').glob('*.md'))]:
+            self.assertTrue(f'href="{other}"' in content or f']({other})' in content, filename)
+        for doc in [ROOT / 'README.md', ROOT / 'README.zh-CN.md', *sorted((ROOT / 'docs').glob('*.md'))]:
             content = doc.read_text(encoding='utf-8')
             for link in re.findall(r'\]\(([^)]+)\)|href="([^"]+)"', content):
                 target = next(part for part in link if part).split('#')[0]

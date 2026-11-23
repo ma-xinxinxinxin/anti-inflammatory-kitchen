@@ -1,5 +1,5 @@
 # English documentation
 
-The full English README has moved to [README.en.md](../README.en.md).
+The English README is now the main [README.md](../README.md).
 
-[简体中文](../README.md) · [English](../README.en.md)
+[English](../README.md) · [简体中文](../README.zh-CN.md)

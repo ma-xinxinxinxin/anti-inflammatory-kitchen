@@ -115,7 +115,7 @@ class CardTests(unittest.TestCase):
         w = self.week()
         w['restrictions'] = ['PRIVATE']
         self.assertNotIn('PRIVATE', k.render_card(w))
-        self.assertIn('不是健康评分', k.render_card(w))
+        self.assertIn('不是医学评分', k.render_card(w))
         self.assertNotRegex(k.render_card(w), r'[\U0001F300-\U0001FAFF]')
 
 
@@ -217,3 +217,50 @@ class EnglishSkillDocTests(unittest.TestCase):
         names = zipfile.ZipFile(ROOT / 'downloads/kitchen.zip').namelist()
         self.assertFalse(any(n.endswith('SKILL.en.md') for n in names))
         self.assertNotIn('name:', (ROOT / 'kitchen/SKILL.en.md').read_text(encoding='utf-8').split('\n#', 1)[0])
+
+
+class WeeklyIndexTests(unittest.TestCase):
+    FULL = ''.join(f'## 2026-09-0{d}\n- [stated] 早 | 橄榄油 核桃 希腊酸奶 菠菜 燕麦 蓝莓 绿茶 大蒜\n'
+                   f'- [stated] 晚 | 三文鱼 豆腐 西蓝花 番茄 香菇 黑巧克力\n' for d in range(1, 8))
+
+    def test_perfect_week_scores_100(self):
+        w = k.score(self.FULL, '2026-09-07')
+        self.assertEqual(w['weeklyIndex'], 100)
+        idx = k.weekly_index(w)
+        self.assertEqual([r['key'] for r in idx['rows']], k.IMPORTANCE)
+        self.assertEqual(idx['rows'][0]['key'], 'fattyFish')
+        self.assertEqual(len(idx['rows']), 14)
+
+    def test_daily_categories_target_seven_per_week(self):
+        w = k.score(self.FULL, '2026-09-07')
+        rows = {r['key']: r for r in k.weekly_index(w)['rows']}
+        self.assertEqual(rows['leafy']['target'], 7)
+        self.assertEqual(rows['fattyFish']['target'], 3)
+
+    def test_partial_week_targets_are_prorated(self):
+        w = k.score('## 2026-09-07\n- [stated] 早 | 三文鱼 菠菜\n', '2026-09-07')
+        idx = k.weekly_index(w)
+        self.assertTrue(idx['prorated'])
+        rows = {r['key']: r for r in idx['rows']}
+        self.assertEqual(rows['leafy']['target'], 1)
+        self.assertEqual(rows['fattyFish']['target'], 0.5)
+        self.assertTrue(rows['fattyFish']['met'])
+        self.assertIn('目标按记录天数折算', k.render_card(w))
+
+    def test_no_log_has_no_score(self):
+        w = k.score('', '2026-09-07')
+        self.assertIsNone(w['weeklyIndex'])
+        self.assertIn('>—<', k.render_card(w))
+
+    def test_untargeted_personal_category_is_not_scored(self):
+        w = k.score(self.FULL, '2026-09-07', {'frequencies': {'darkChocolate': None, 'tea': None}})
+        rows = {r['key']: r for r in k.weekly_index(w)['rows']}
+        self.assertIsNone(rows['tea']['target'])
+        self.assertEqual(w['weeklyIndex'], 100)
+
+    def test_card_has_index_and_disclaimer(self):
+        w = k.score(self.FULL, '2026-09-07')
+        html = k.render_card(w)
+        self.assertIn('抗炎指数', html)
+        self.assertIn('>100<', html)
+        self.assertIn('不是医学评分', html)

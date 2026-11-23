@@ -126,7 +126,9 @@ class PersonalPlanTests(unittest.TestCase):
         original = k.score(text, '2026-09-07')
         result = k.score(text, '2026-09-07', {'frequencies': {
             'legumes': {'period': 'week', 'target': 6}, 'tea': None}})
-        self.assertEqual({key: result[key] for key in original}, original)
+        # weeklyIndex is scored against the user's own targets, so it is expected to change.
+        same = [key for key in original if key != 'weeklyIndex']
+        self.assertEqual({key: result[key] for key in same}, {key: original[key] for key in same})
         rows = {row['key']: row for row in result['personalPlan']}
         self.assertEqual(rows['legumes']['frequency']['target'], 6)
         self.assertEqual(rows['legumes']['recordedCount'], 1)

@@ -1,170 +1,60 @@
-# 抗炎厨房 · Anti-Inflammatory Kitchen
+# Anti-Inflammatory Kitchen
 
-<table><tr><td><strong>简体中文</strong></td><td><a href="README.en.md">English</a></td></tr></table>
+**English** · [简体中文](README.zh-CN.md)
 
 [![Checks](https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen/actions/workflows/checks.yml/badge.svg)](https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen/actions/workflows/checks.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-3D5A3F.svg)](LICENSE)
 
-**给想要遵循抗炎饮食、追求吃得健康和干净的人。**
+**An AI kitchen assistant for anti-inflammatory eating, built around what's already in your fridge.**
 
-抗炎厨房是你的 AI 饮食规划助手：**一切围绕健康的抗炎饮食计划，以及厨房里当前有什么食材。** 它以地中海式抗炎饮食为基础，参考营养研究整理食材清单和搭配规则，结合你的厨房库存、饮食偏好和已记录的餐食，告诉你应该「吃什么、怎么做、买什么」。
+Tell it once what's in your kitchen. From then on it suggests meals from what you have, shows how to cook them, tells you what to buy, and reviews your week. No calorie counting, no streaks, no guilt.
 
-开始使用时，你需要先告诉它一次「厨房里有什么」。以后每次买菜回来，可以打字、说话，或拍一张食材、小票照片；做完饭，告诉它吃了什么、哪些用完了。它据此更新厨房状态，下一次建议就从最新库存出发。
+**[Get started](#get-started)** · [Plugin](downloads/anti-inflammatory-kitchen-plugin.zip) · [Claude Skill ZIP](downloads/kitchen.zip) · [Chat guide](downloads/kitchen-chat-guide.md)
 
-当你问它「今天吃什么」「给我三个早饭选项」「周末应该补充点什么」，它会优先用厨房和冰箱里已有的食材，给你可以马上动手做的食谱：既照顾营养搭配，又带来新的灵感和选项。需要补买的食材会单独列出，让你清楚哪些现在能做、哪些留给下一次采购。
+<p align="center"><img src="docs/images/weekly-en.png" width="440" alt="Weekly review: 14 food groups from most important, weekly target vs this week, and an anti-inflammatory index"></p>
 
-**[开始使用](#安装好建立你的厨房)** · [选择 AI 工具](#选择你的-ai-工具) · [食材与频率](#它如何判断搭配) · [库存与记录](#库存和记录保存在哪)
+## What it does
 
-[英文版说明 SKILL.en.md](kitchen/SKILL.en.md) · [下载插件包](downloads/anti-inflammatory-kitchen-plugin.zip) · [Claude Skill ZIP](downloads/kitchen.zip) · [对话导入指南](downloads/kitchen-chat-guide.md)
-
-## 它能帮你做什么
-
-<table width="100%">
-<thead>
-<tr>
-<th width="30%">操作</th>
-<th width="32%">你可以这样说或做</th>
-<th width="38%">你会得到什么</th>
-</tr>
-</thead>
-<tbody>
-<tr><td><strong>1. 整理冰箱与厨房库存</strong></td><td><strong>查库存：</strong>「冰箱里有什么？」<br><br><strong>买菜后补充：</strong>说一句「买了番茄和鸡蛋」，或拍买的菜、购物小票。<br><br><strong>吃完后移除：</strong>「菠菜吃完了。」或「橄榄油用完了。」</td><td>查看冰箱、冷冻室与常备食材；根据购买或明确用完的信息更新库存；照片识别后先核对，按 19 类展示，空缺也可见</td></tr>
-<tr><td><strong>2. 决定吃什么</strong></td><td>「今天早饭/午饭/晚饭吃什么？」<br><br>「今晚想吃鱼。」<br><br>「给我 3 个早餐选项。」</td><td>直接用现有食材搭配一套餐食；也可围绕你想吃的东西，结合抗炎饮食计划补上配菜与主食；想比较时按要求给多个选项</td></tr>
-<tr><td><strong>3. 告诉你做法</strong></td><td>「就做这套，告诉我怎么做。」</td><td>用量、下锅顺序、时间、火候与判断熟度的节点，默认工作日尽量 25 分钟、两个锅以内</td></tr>
-<tr><td><strong>4. 告诉你买什么</strong></td><td>「按接下来三餐的计划，我还要买什么？」</td><td>参照抗炎饮食要求和你的个人目标，结合厨房存货，只列餐食计划需要而家里缺少的食材，说明用途和预计餐次</td></tr>
-<tr><td><strong>5. 安排今日饮食</strong></td><td>「今天吃过这些，剩下两餐怎么搭配？」</td><td>参照抗炎饮食要求、你的频次设置和已吃记录，结合现有存货安排后续餐食；支持时生成餐单</td></tr>
-<tr><td><strong>6. 记录餐食与保存常用菜谱</strong></td><td><strong>记餐食：</strong>「今天晚饭吃了这道鱼汤。」<br><br><strong>存常用菜谱：</strong>「把这个菜谱保存为常用菜谱，叫『周三鱼汤』。」</td><td>记录确认吃过的餐食；保存你指定的常用菜谱，以后说名字就能找回做法</td></tr>
-<tr><td><strong>7. 优先清库</strong></td><td>「菠菜快坏了，围绕它做一道菜。」</td><td>优先用掉需要尽快处理的食材，减少浪费</td></tr>
-<tr><td><strong>8. 复盘一周</strong></td><td>「回顾这七天，告诉我下周怎么吃、怎么备菜。」</td><td>基于已有记录总结搭配与轮换，给出可执行的餐食和采购建议</td></tr>
-<tr><td><strong>9. 设置个人偏好与目标</strong></td><td>「我不吃香菜，想多吃植物蛋白。」<br><br>「豆类与豆制品改成每周 6 次，茶饮不设频次。」<br><br>「其他蛋白合计每周 4 次。」或「其他蛋白不设频次。」</td><td>保存忌口、过敏、营养目标和个人频次；首次使用可设置，也可跳过或随时修改，后续选餐、采购和复盘按你的设置执行</td></tr>
-</tbody>
-</table>
-
-语音、照片和小票识别使用所在 AI 工具的能力；模糊项会先核对。你还在报库存时，它先接收；问吃什么时直接推荐，想比较时再给多个方案。计划的饭不会算成已经吃过，购物清单也不会算成现有库存。
-
-## v6 新增
-
-| 场景 | 你可以这样说 | 你会得到什么 |
+| | Ask | You get |
 |---|---|---|
-| **复盘接补货** | 「这周复盘完，下周买什么？」 | 先列出冰箱里已有、可以补上缺口的食材，再给最多三类值得补买的候选，已排除忌口；不为凑格子加茶、加巧克力或加油 |
-| **用我的菜谱书** | 「从我的菜谱书里找一道今晚能做的。」 | 只用你提供的内容建索引，按库存挑菜并注明页码 |
-| **外食模式** | 发一张菜单照片：「在小贩中心，点什么？」 | 选一份结构最完整的，给一个加菜或换主食的建议，并说明当天其他餐怎么补 |
-| **周末备菜** | 「周末想备一次，工作日每顿 10 分钟。」 | 60–90 分钟做三个基底，工作日 4–5 种组装 |
-| **分享卡** | 「把这周复盘做成一张图。」 | 1080×1440 竖图，只有覆盖统计和下周三件事，不含库存和个人信息 |
+| **Your fridge** | "What's in my fridge?" or send a photo of your groceries or receipt | Your stock sorted into 19 food groups, kept up to date as you buy and use things |
+| **What to eat** | "What's for dinner?" · "3 breakfast ideas" · "I'm at a hawker centre, what should I order?" | Meals from what you have, with steps and cooking time; from your own cookbooks too |
+| **What to buy** | "What should I buy this week?" | What's already at home to use first, then up to three things worth buying |
+| **Weekly review** | "How did I eat this week?" | An index score, your gaps and three actions for next week, as a shareable image |
+| **Meal prep** | "I want to prep once for the week" | Three bases in 90 minutes, 10-minute meals on weekdays |
+| **Your settings** | "No cilantro, more plant protein, fish 4 times a week" | Allergies, restrictions, goals and targets, saved and applied |
 
-台湾、新加坡、大陆的常见叫法（地瓜、高丽菜、青江菜、鲑鱼、酪梨……）、繁体字和常见英文食材名都能直接识别。英文用户可以全程用英文：提问、记录、库存表、复盘和分享卡都是英文，多词食材（greek yogurt、olive oil）和复数也能正确识别。
+Works fully in English or Chinese. Planned meals never count as eaten, and a shopping cart never counts as stock.
 
-<p align="center"><img src="docs/images/share-card-example.png" width="360" alt="周复盘分享卡示例（虚构数据）"></p>
 
-## 选择你的 AI 工具
+## Get started
 
-按你使用的工具选择一个入口，安装同一份厨房规则。
+| Your AI tool | How |
+|---|---|
+| Claude (with custom Skills) | Upload [kitchen.zip](downloads/kitchen.zip) and turn it on · [steps](docs/installation.en.md#claude-upload) |
+| Claude Code · Codex · Cursor · Gemini CLI | Install the plugin or the skill folder · [steps](docs/installation.en.md) |
+| ChatGPT, Gemini, Kimi, DeepSeek and other chats | Upload the [chat guide](downloads/kitchen-chat-guide.md) to a project or chat · [steps](docs/installation.en.md#chat-import) |
+| Any other Agent Skills tool | Import the `kitchen/` folder · [steps](docs/installation.en.md#agent-skills) |
 
-| AI 工具 | 使用方式 | 安装说明 |
-|---|---|---|
-| Claude（支持自定义 Skills 的账号） | 上传 Skill ZIP 并启用 | [上传步骤](docs/installation.md#claude-upload) |
-| Claude Code / Codex | 从仓库插件市场安装 | [插件安装](docs/installation.md#plugins) |
-| Cursor | 本地安装完整 skill | [本地安装](docs/installation.md#local-install) |
-| Gemini CLI | 安装 skill 或扩展 | [Skill 安装](docs/installation.md#gemini-cli) |
-| ChatGPT、Gemini、Kimi、DeepSeek 等聊天工具 | 在项目或聊天中上传单文件指南，或粘贴全文 | [对话导入](docs/installation.md#chat-import) |
-| 其他支持 Agent Skills 的工具 | 导入完整 `kitchen/` 文件夹 | [通用安装](docs/installation.md#agent-skills) |
+1. Install it, then create a project called "Anti-Inflammatory Kitchen" and turn on memory if your tool has it.
+2. Optional: tell it your allergies, restrictions and goals.
+3. Tell it what's in your kitchen (type, talk or send photos), then ask "What's for breakfast?"
 
-> **手机使用：** ChatGPT 手机可尝试对话导入；原生插件尚未上架公共目录。跨聊天保存取决于工具的项目、记忆和文件能力。各平台支持范围见[兼容与验证](docs/verification.md)。
+## Your data
 
-### 不想碰命令行？
+Your stock, meal log, recipes and settings stay in your own project or workspace. The download contains no one's personal data; never commit yours to a public repo. Different AI tools don't sync with each other. [How state is saved](kitchen/references/state-files.md)
 
-- **Claude Skills 用户：** [下载 kitchen.zip](downloads/kitchen.zip)，按上传步骤安装。
-- **普通聊天用户：** [打开单文件指南](downloads/kitchen-chat-guide.md)，在 GitHub 点击下载原始文件的按钮，上传到对话；也可打开 Raw 后复制全文。
-- **本地 AI 工具用户：** 将下面的话交给有文件访问权限的助手：
+## Contribute
 
-```text
-请从 https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen 安装 kitchen skill。
-先读取 docs/installation.md，按当前工具选择原生安装路径。
-保留已有安装和私人记录；如果当前环境不支持原生 skill，请说明并使用单文件对话指南。
-```
+No API key needed. Local helpers need Python 3.10+ (standard library only). The skill's instructions are in Chinese; read the [English translation](kitchen/SKILL.en.md).
 
-### 安装好，建立你的厨房
+[Examples and structure](docs/development.en.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md) · [MIT License](LICENSE) · [Open an issue](https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen/issues/new) (use fictional examples, no personal health data)
 
-1. **安装 skill。** 按上面的方式安装；使用对话导入时，先上传指南并要求按附件工作。
-2. **单独开一个「抗炎厨房」Project。** 后续的库存、餐食、菜谱和采购都在这个项目里记录；支持项目记忆时启用 Memory。没有 Project 功能的工具，可先用固定的一段聊天。
-3. **设置个人偏好与目标（可跳过）。** 告诉它你的过敏、忌口、营养目标，以及想调整的食物频次；不设置就按默认计划开始，以后随时可以改。
-4. **录入你真实的厨房库存。** 打字、说话，或拍食材和小票，报完后说「就这些，帮我整理库存」。它会整理冰箱、冷冻室和常备食材；以后买了什么、用完什么，再随口更新。
+## Appendix: the full food list
 
-然后直接问「今天吃什么？」或「给我 3 个早餐选项」。记录如何延续见[库存和记录](#库存和记录保存在哪)；需要检查安装是否正常时，再看[安装验收](docs/installation.md#verify)。
+<p align="center"><img src="docs/images/foods-en.png" alt="The full anti-inflammatory food list: 14 groups from most important, weekly servings and every food in each group"></p>
 
-## 它如何判断搭配
-
-### 抗炎食物清单与默认频率
-
-**「每日必有」表示当天有安排，不限制出现在哪一餐或一天吃几次；每周频次表示规划中的最低覆盖次数。** 下表是起点：你可以按忌口、营养目标和实际习惯调整为每天或每周的次数，也可以对某类不设频次；后续建议按你确认的设置执行。
-
-<table width="100%">
-<thead><tr><th width="25%">类别</th><th width="16%">默认频率</th><th width="59%">具体食材</th></tr></thead>
-<tbody>
-<tr><td>优质脂肪</td><td>每日必有</td><td>特级初榨橄榄油、橄榄油、牛油果、橄榄</td></tr>
-<tr><td>坚果种子</td><td>每日必有</td><td>核桃、杏仁、开心果、南瓜籽、亚麻籽粉、奇亚籽、巴西坚果、芝麻、芝麻酱、杏仁酱、花生酱</td></tr>
-<tr><td>发酵食品</td><td>每日必有</td><td>希腊酸奶、无糖酸奶、开菲尔、纳豆、味噌、泡菜、康普茶</td></tr>
-<tr><td>深色绿叶菜</td><td>每日必有</td><td>菠菜、羽衣甘蓝、西洋菜、茼蒿、豌豆尖、苋菜、油麦菜、鸡毛菜、空心菜、生菜、小白菜、芥蓝、油菜</td></tr>
-<tr><td>全谷主食</td><td>每日必有</td><td>燕麦、糙米、藜麦、小米、以全谷物为主的荞麦面、全麦面包、全麦皮塔</td></tr>
-<tr><td>浆果柑橘</td><td>每日必有</td><td>蓝莓、树莓、草莓、黑莓、蔓越莓、橙、柚子、猕猴桃、石榴、樱桃、巴西莓粉</td></tr>
-<tr><td>茶饮</td><td>每日必有</td><td>绿茶、乌龙茶、白茶、红茶、抹茶、洛神花茶</td></tr>
-<tr><td>香辛料</td><td>每日必有</td><td>葱、蒜、生姜、洋葱、姜黄粉、黑胡椒、迷迭香、牛至、百里香、丁香、肉桂、孜然</td></tr>
-<tr><td>高脂深海鱼</td><td>每周至少 3 次</td><td>三文鱼、鲭鱼/青花鱼、沙丁鱼、凤尾鱼、秋刀鱼</td></tr>
-<tr><td>豆类与豆制品</td><td>每周至少 5 次</td><td>鹰嘴豆、扁豆、毛豆、黑豆、红腰豆、豆腐、豆干、腐竹、无糖豆浆、天贝</td></tr>
-<tr><td>十字花科</td><td>每周至少 4 次</td><td>西蓝花/西兰花、花椰菜、卷心菜、紫甘蓝、芝麻菜、小白菜、鸡毛菜、白萝卜、抱子甘蓝、芥蓝、油菜</td></tr>
-<tr><td>红橙色蔬果</td><td>每周至少 5 次</td><td>番茄/小番茄、胡萝卜、南瓜、红椒、黄椒、红薯、紫薯、枸杞</td></tr>
-<tr><td>菌菇</td><td>每周至少 3 次</td><td>香菇、舞茸、灰树花、平菇、木耳、杏鲍菇、松茸、蘑菇、金针菇</td></tr>
-<tr><td>黑巧可可</td><td>每周至少 2 次</td><td>黑巧克力、天然可可粉；优先低添加糖，按耐受选择</td></tr>
-</tbody>
-</table>
-
-### 其他蛋白与中性食物
-
-**默认每天安排蛋白质来源，同时保留高脂深海鱼和豆类与豆制品的计划频次。** 蛋、白肉鱼海鲜、禽肉、红肉这四类的合计频次可以由你设定，也可以不设；它们用于轮换搭配，不额外要求每天吃一份“其他蛋白”，也不能为了凑它们的次数挤掉鱼和豆制品。过敏或忌口优先，相应类别另行调整并安排替代。中性食物不设频次。
-
-<table width="100%">
-<thead><tr><th width="25%">类别</th><th width="23%">频率</th><th width="52%">具体食材</th></tr></thead>
-<tbody>
-<tr><td>蛋</td><td>合计可设，默认不设</td><td>鸡蛋、水煮蛋、煎蛋</td></tr>
-<tr><td>白肉鱼海鲜</td><td>合计可设，默认不设</td><td>鳕鱼、鲈鱼、鳜鱼、虾、扇贝、蛤蜊、乌贼、鱿鱼、品种不明的金枪鱼</td></tr>
-<tr><td>禽肉</td><td>合计可设，默认不设</td><td>鸡腿、鸡胸、鸡肉、鸭胸、鸭肉</td></tr>
-<tr><td>红肉</td><td>合计可设，默认不设</td><td>牛腱、牛里脊、牛腩、牛肉、牛排、羊腿、羊肉</td></tr>
-<tr><td>中性食物</td><td>不设频次</td><td>海藻、普通蔬果、牛奶及植物奶、奶酪、干果、土豆、山药、芋头、莲藕、猪肉、蜂蜜等</td></tr>
-</tbody>
-</table>
-
-### 怎么搭配
-
-它先看最新厨房库存、你的口味与忌口，优先用已有和需要尽快吃掉的食材，按「蔬菜或水果 + 蛋白质 + 主食 + 合适用油」组成完整的一餐。再对照每日、每周饮食记录，在配菜、下一餐或下次采购中补充较少出现的类别，让食物轮换更丰富，不要求一餐凑齐。确认买回、用完或吃过后，它分别更新库存和饮食记录，再据此告诉你下一步吃什么、怎么做、还缺什么。
-
-**这些频率是本项目的规划约定，不是医学阈值，也不是炎症评分。** 同餐同类计一次，同一食材可覆盖多类；具体计数口径见食材表。中性食物仍有营养价值，猪肉虽沿用原来的存放分类，营养上仍属红肉。详细规则见[抗炎营养规划](kitchen/references/nutrition-plan.md)与[食材表](kitchen/references/food-table.md)；整体饮食模式参考 [AHA 膳食指导](https://professional.heart.org/en/science-news/2021-dietary-guidance-to-improve-cardiovascular-health/top-things-to-know)，该指导并未验证本项目的频次或个人抗炎效果。
-
-## 库存和记录保存在哪
-
-**建议单独创建一个「抗炎厨房」Project（项目），把日常使用都放在这个项目里。** 在项目中使用 skill，或放入对话导入指南；之后的库存更新、吃饭记录、菜谱和采购讨论，也都在同一个项目中进行。工具支持项目记忆（Memory）时，按平台设置启用，让后续对话能参考之前的记录和饮食偏好，减少重复介绍。
-
-项目记忆用于延续上下文，准确的库存与饮食日志仍以最近确认的记录为准。建议定期让 AI 整理一份「个人设置 + 最新库存 + 饮食日志 + 常用菜谱」快照，保存到项目文件或资料中；如果它不能直接保存，就下载后手动上传。新开聊天时，先请它读取最新记录，再继续规划。[ChatGPT 项目说明](https://learn.chatgpt.com/docs/projects)
-
-- **本地工具：** 保存在你选定项目的 `.kitchen-state/`，新聊天继续使用同一项目。
-- **有持久存储的云端工具：** 由助手确认实际可用的保存位置，写入成功后才确认保存。
-- **只有对话：** 在当前聊天维护记录；结束时导出个人设置、库存、菜谱和日志快照，下次带入。
-
-不同 AI 工具不会自动同步私人记录。下载包没有任何人的库存或饮食历史；你的私人状态不应提交到公开 GitHub。[存储规则](kitchen/references/state-files.md)
-
-## 参与改进
-
-核心助手不需要 API key；本地辅助脚本需要 Python 3.10+，只使用标准库。AI 工具自身的订阅、权限和能力由各平台决定。
-
-[运行示例与项目结构](docs/development.md) · [贡献指南](CONTRIBUTING.md) · [更新记录](CHANGELOG.md) · [MIT License](LICENSE)
-
-欢迎分享使用反馈、食材别名和跨工具兼容问题。[提交反馈](https://github.com/ma-xinxinxinxin/anti-inflammatory-kitchen/issues/new) 时请使用虚构示例，避免上传私人库存、聊天记录或健康资料。
-
-<details>
-<summary>作者的话</summary>
-
-我的生活现在每一天都离不开它。
-
-</details>
+Every food the skill recognizes, by group. Targets are a starting point; change any of them. Details: [nutrition plan](kitchen/references/nutrition-plan.md) · [food table](kitchen/references/food-table.md). The overall pattern follows the [AHA dietary guidance](https://professional.heart.org/en/science-news/2021-dietary-guidance-to-improve-cardiovascular-health/top-things-to-know); the frequencies here are this project's planning defaults, not clinically validated.
 
 ---
 
-抗炎厨房用于日常饮食搭配，不提供疾病诊断、化验解读或药物、补剂剂量建议。
+For everyday meal planning only. It does not diagnose conditions, interpret lab results, or advise on medication or supplement doses.
