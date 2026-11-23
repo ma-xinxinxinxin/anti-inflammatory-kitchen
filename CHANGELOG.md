@@ -12,7 +12,7 @@
 - 英文全程可用：所有命令支持 `--lang en`，库存表、补货、复盘页和分享卡输出英文；英文日志按逗号分隔，多词食材、复数与修饰词正确识别；英文按整词匹配，不再出现 eggplant 被当成蛋这类误判；支持 `Limit:`、`Eating out` 和英文库存文件。
 - 新增 `kitchen/SKILL.en.md`：SKILL.md 的英文参考译本，供英文读者和贡献者使用，不进安装包；测试保证版本号、章节结构与类别名和中文版一致。
 - 周复盘分享卡重做：14 类按重要性从上到下，每行同一根轴显示每周目标和本周实际，右上角 0–100 抗炎指数（每日类别按每周 7 份计，不满 7 天按记录天数折算；不是医学评分）。`score` 输出 `weeklyIndex`。
-- README 改为英文优先（`README.md`），中文为 `README.zh-CN.md`；功能合并成一张表，配 7 张中英文功能图（`docs/images/carousel/`），完整食物清单改成图放在附录。新增 `scripts/readme_images.py`，从虚构示例数据生成全部 README 图片。
+- README 改为英文优先（`README.md`），中文为 `README.zh-CN.md`；功能合并成一张表，配 6 张中英文功能图（`docs/images/carousel/`），完整食物清单改成图放在附录。新增 `scripts/readme_images.py`，从虚构示例数据生成全部 README 图片。
 - HTML 输出补充字体后备，避免英文标题掉成衬线体。
 - 19 类结构、默认频次与计数口径不变。
 
