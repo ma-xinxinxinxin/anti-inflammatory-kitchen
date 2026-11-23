@@ -152,7 +152,7 @@ After the review you may ask once whether to plan next week's restock; if the us
 
 `score` outputs `weeklyIndex`, a 0–100 anti-inflammatory index: the average share of target reached across the 14 categories. Daily categories count as 7 per week; with fewer than 7 logged days, targets are scaled to the days logged; categories the user set to no target are not scored. When explaining it, say it reflects how complete the logged meals were, not a medical score; no praise or criticism, just point to the categories worth adding next week.
 
-When the user wants to share, render the same `week.json` as a 1080×1440 portrait image with `card`: the 14 categories run top to bottom from most important, each row showing the weekly target and this week's amount on one axis, with the index in the top-right corner. The share card holds only these statistics and the three actions for next week: no stock, restrictions, personal settings or health information. Show the user a preview first and let them decide whether to post it.
+When the user wants to share, render the same `week.json` as a 1440×1440 square image with `card`: the 14 categories run top to bottom from most important, each row showing the weekly target and this week's amount on one axis, with the index in the top-right corner. The share card holds only these statistics and the three actions for next week: no stock, restrictions, personal settings or health information. Show the user a preview first and let them decide whether to post it.
 
 ### 9 · Set preferences, nutrition goals and frequencies
 

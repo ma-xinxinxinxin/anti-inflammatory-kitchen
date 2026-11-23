@@ -107,7 +107,7 @@ class CardTests(unittest.TestCase):
 
     def test_card_is_fixed_size_and_only_three_actions(self):
         html = k.render_card(self.week())
-        self.assertIn('width:1080px;height:1440px', html)
+        self.assertIn('width:1440px;height:1440px', html)
         self.assertEqual(html.count('<div class="a">'), 3)
         self.assertNotIn('<b>一</b>', html)
 
@@ -264,3 +264,17 @@ class WeeklyIndexTests(unittest.TestCase):
         self.assertIn('抗炎指数', html)
         self.assertIn('>100<', html)
         self.assertIn('不是医学评分', html)
+
+
+class CardNutrientTests(unittest.TestCase):
+    def test_every_group_has_nutrient_note_in_both_languages(self):
+        self.assertEqual(set(k.NUTRIENT), set(k.IMPORTANCE))
+        w = k.score('## 2026-09-07\n- [stated] 早 | 三文鱼\n', '2026-09-07')
+        self.assertIn('Omega-3（EPA、DHA）', k.render_card(dict(w)))
+        k.LANG = 'en'
+        try:
+            html = k.render_card(dict(w))
+            self.assertIn('Omega-3 (EPA, DHA)', html)
+            self.assertNotRegex(html, r'[\u4e00-\u9fff]')
+        finally:
+            k.LANG = 'zh'

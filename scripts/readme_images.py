@@ -250,7 +250,7 @@ def main(argv=None):
         print("Chrome/Chromium not found; writing HTML only.", file=sys.stderr)
     OUT.mkdir(parents=True, exist_ok=True)
     # breakfasts_html is kept for later (needs real photos); it is not built until then.
-    jobs = [("weekly", weekly_html, 1080, 1440, False), ("foods", foods_html, 1600, 4000, True)]
+    jobs = [("weekly", weekly_html, 1440, 1440, False), ("foods", foods_html, 1600, 4000, True)]
     with tempfile.TemporaryDirectory() as tmp:
         for name, build, width, height, trim in jobs:
             for lang in ("en", "zh"):
